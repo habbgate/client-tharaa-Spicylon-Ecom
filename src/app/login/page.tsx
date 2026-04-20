@@ -54,6 +54,7 @@ export default function LoginPage() {
               <input
                 type="text"
                 required
+                suppressHydrationWarning
                 className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-orange-500 transition-all outline-none"
                 placeholder="John Doe"
                 value={name}
@@ -66,6 +67,7 @@ export default function LoginPage() {
             <input
               type="email"
               required
+              suppressHydrationWarning
               className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-orange-500 transition-all outline-none"
               placeholder="john@example.com"
               value={email}
@@ -77,6 +79,7 @@ export default function LoginPage() {
             <input
               type="password"
               required
+              suppressHydrationWarning
               className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-orange-500 transition-all outline-none"
               placeholder="••••••••"
               value={password}

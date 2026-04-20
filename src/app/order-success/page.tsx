@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useStore } from '@/store/useStore';
-import { HiCheckCircle } from 'react-icons/hi';
+import { HiCheckCircle, HiDownload } from 'react-icons/hi';
 import { useTranslations } from 'next-intl';
 import axios from 'axios';
+import { generateInvoice } from '@/lib/generateInvoice';
 
 export default function OrderSuccessPage() {
   const searchParams = useSearchParams();
@@ -14,14 +15,25 @@ export default function OrderSuccessPage() {
   const orderId = searchParams.get('orderId');
   const { clearCart } = useStore();
   const t = useTranslations('OrderSuccess');
+  const [order, setOrder] = useState<any>(null);
 
   useEffect(() => {
     if (sessionId) {
       clearCart();
     }
-    if (orderId) {
-      axios.put(`/api/orders/${orderId}/pay`).catch(console.error);
-    }
+    
+    const finalizeOrder = async () => {
+      if (orderId) {
+        try {
+          const { data } = await axios.put(`/api/orders/${orderId}/pay`);
+          setOrder(data);
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    };
+    
+    finalizeOrder();
   }, [sessionId, orderId, clearCart]);
 
   return (
@@ -32,13 +44,22 @@ export default function OrderSuccessPage() {
         {t('message')}
       </p>
       
-      <div className="space-x-4">
-        <Link href="/" className="px-8 py-3 bg-stone-900 text-white font-bold rounded-xl hover:bg-stone-800 transition-all inline-block shadow-lg shadow-stone-900/20">
+      <div className="flex flex-col sm:flex-row gap-4">
+        <Link href="/" className="px-8 py-3 bg-stone-900 text-white font-bold rounded-xl hover:bg-stone-800 transition-all inline-block shadow-lg shadow-stone-900/20 text-center">
           {t('homeBtn')}
         </Link>
-        <Link href="/products" className="px-8 py-3 bg-orange-100 text-orange-700 font-bold rounded-xl hover:bg-orange-200 transition-all inline-block">
+        <Link href="/products" className="px-8 py-3 bg-orange-100 text-orange-700 font-bold rounded-xl hover:bg-orange-200 transition-all inline-block text-center">
           Order More Spices
         </Link>
+        {order && (
+          <button 
+            onClick={() => generateInvoice(order)}
+            className="px-8 py-3 bg-orange-600 text-white font-bold rounded-xl hover:bg-orange-700 transition-all flex items-center justify-center gap-2 shadow-lg shadow-orange-600/20"
+          >
+            <HiDownload className="text-xl" />
+            Download Invoice
+          </button>
+        )}
       </div>
     </div>
   );

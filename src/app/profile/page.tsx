@@ -6,9 +6,10 @@ import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import { HiOutlineUser, HiOutlineShoppingBag, HiOutlineCog, HiOutlineTrash } from 'react-icons/hi';
+import { HiOutlineUser, HiOutlineShoppingBag, HiOutlineCog, HiOutlineTrash, HiDownload } from 'react-icons/hi';
 import Image from 'next/image';
 import Link from 'next/link';
+import { generateInvoice } from '@/lib/generateInvoice';
 
 export default function ProfilePage() {
   const user = useStore((state) => state.user);
@@ -226,6 +227,14 @@ export default function ProfilePage() {
                             <span className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider ${order.isDelivered ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
                               {order.isDelivered ? t('delivered') : t('processing')}
                             </span>
+                            <button
+                              onClick={() => generateInvoice(order)}
+                              className="px-4 py-1.5 flex items-center gap-2 rounded-full text-xs font-bold uppercase tracking-wider bg-orange-100 text-orange-700 hover:bg-orange-200 transition-colors"
+                              title="Download Invoice"
+                            >
+                              <HiDownload className="text-sm" />
+                              Invoice
+                            </button>
                           </div>
                         </div>
                         <div className="p-6">
