@@ -32,7 +32,7 @@ export default function AdminDashboard() {
     setIsUploadingImage(true);
     const dataForm = new FormData();
     dataForm.append('image', file);
-    dataForm.append('key', '93fb3524249e8f39be550a4b8804904e');
+    dataForm.append('key', process.env.NEXT_PUBLIC_IMGBB_API_KEY as string);
 
     try {
       const { data } = await axios.post('https://api.imgbb.com/1/upload', dataForm);
@@ -623,19 +623,35 @@ export default function AdminDashboard() {
               <div>
                   <label className="block text-sm font-bold text-stone-700 mb-1">Images (Upload or Comma-separated URLs)</label>
                   
-                  <div className="flex items-center gap-4 mb-3">
+                  {formData.images && (
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {formData.images.split(',').map((url, i) => url.trim() && (
+                        <div key={i} className="relative w-16 h-16 rounded-lg overflow-hidden border border-stone-200">
+                          <img src={url.trim()} alt="" className="w-full h-full object-cover" />
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  <input 
+                    type="text" 
+                    placeholder="E.g. https://...image.jpg, https://..."
+                    value={formData.images}
+                    onChange={(e) => setFormData({ ...formData, images: e.target.value })}
+                    className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-orange-500 mb-3 bg-stone-50"
+                  />
+                  
+                  <div className="flex items-center gap-4">
                     <input 
                       type="file" 
                       accept="image/*" 
                       onChange={uploadImage}
                       disabled={isUploadingImage}
-                      className="block w-full text-sm text-stone-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100"
+                      className="block w-full text-sm text-stone-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100 cursor-pointer"
                     />
-                    {isUploadingImage && <span className="text-orange-600 text-sm font-bold animate-pulse">Uploading...</span>}
+                    {isUploadingImage && <span className="text-orange-600 text-sm font-bold animate-pulse whitespace-nowrap">Uploading...</span>}
                   </div>
-
-              </div>
-
+                </div>
               <div className="flex justify-end gap-2 pt-6 border-t border-stone-200 mt-6">
                 <button type="button" onClick={() => setShowModal(false)} className="px-6 py-3 bg-stone-200 hover:bg-stone-300 text-stone-800 font-bold rounded-xl transition-all">Cancel</button>
                 <button type="submit" className="px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl transition-all">Save Product</button>
