@@ -18,6 +18,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: 'Invalid credentials' }, { status: 401 });
     }
 
+    if (!user.isVerified) {
+       return NextResponse.json(
+        { message: 'Account not verified', requiresVerification: true, email: user.email },
+        { status: 401 }
+      );
+    }
+
     const token = signToken({ id: user._id, role: user.role });
 
     const response = NextResponse.json(

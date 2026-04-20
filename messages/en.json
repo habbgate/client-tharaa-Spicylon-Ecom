@@ -124,7 +124,7 @@
   },
   "Auth": {
     "welcomeBack": "Welcome back!",
-    "accountCreated": "Account created!",
+    "accountCreated": "Account created successfully! Please verify your email.",
     "error": "Ah, error happened",
     "loginTitle": "Welcome Back",
     "registerTitle": "Create Account",

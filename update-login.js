@@ -1,4 +1,5 @@
-'use client';
+const fs = require('fs');
+const content = `'use client';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -214,7 +215,7 @@ export default function LoginPage() {
                 className="text-stone-500 hover:text-orange-600 font-bold text-sm"
                 onClick={() => setIsLogin(!isLogin)}
               >
-                {isLogin ? `${t('noAccount')} ${t('switchRegister')}` : `${t('hasAccount')} ${t('switchLogin')}`}
+                {isLogin ? \`\${t('noAccount')} \${t('switchRegister')}\` : \`\${t('hasAccount')} \${t('switchLogin')}\`}
               </button>
             </div>
           </form>
@@ -224,3 +225,5 @@ export default function LoginPage() {
     </GoogleOAuthProvider>
   );
 }
+`;
+fs.writeFileSync('src/app/login/page.tsx', content);

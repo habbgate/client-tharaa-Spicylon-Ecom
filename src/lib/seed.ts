@@ -181,7 +181,8 @@ async function seed() {
       name: 'Admin',
       email: 'admin@spicylon.com',
       password: hashedPassword,
-      role: 'admin'
+      role: 'admin',
+      isVerified: true
     });
 
     // Add Products
