@@ -13,6 +13,11 @@ const UserSchema = new Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   role: { type: String, enum: ['customer', 'admin'], default: 'customer' },
+  isVerified: { type: Boolean, default: false },
+  verifyOtp: String,
+  verifyOtpExpires: Date,
+  resetOtp: String,
+  resetOtpExpires: Date,
   address: {
     address: String,
     city: String,

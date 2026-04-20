@@ -7,6 +7,7 @@ import { useStore } from '@/store/useStore';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 
 export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -37,8 +38,23 @@ export default function LoginPage() {
     }
   };
 
+  const handleGoogleSuccess = async (credentialResponse: any) => {
+    try {
+      setLoading(true);
+      const { data } = await axios.post('/api/auth/google', { token: credentialResponse.credential });
+      setUser(data.user);
+      toast.success('Successfully logged in with Google!');
+      router.push('/');
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Google login failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="min-h-[80vh] flex items-center justify-center bg-stone-50 px-4">
+    <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ''}>
+    <div className="min-h-[80vh] flex flex-col items-center justify-center bg-stone-50 px-4 py-12">
       <div className="max-w-md w-full bg-white rounded-3xl shadow-xl overflow-hidden border border-stone-200">
         <div className="bg-stone-900 py-8 px-4 text-center">
              <h2 className="text-3xl font-black text-white italic tracking-tighter">Spicylon</h2>
@@ -90,12 +106,29 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-4 bg-orange-600 hover:bg-orange-700 text-white font-black rounded-xl transition-all shadow-lg shadow-orange-100 disabled:opacity-50"
+            className="w-full py-4 bg-orange-600 hover:bg-orange-700 text-white font-black rounded-xl transition-all shadow-lg shadow-orange-100 disabled:opacity-50 mt-4"
           >
             {loading ? (isLogin ? t('signingIn') : t('signingUp')) : (isLogin ? t('signInBtn') : t('signUpBtn'))}
           </button>
 
-          <div className="text-center pt-4">
+          <div className="relative flex items-center py-5">
+            <div className="flex-grow border-t border-stone-200"></div>
+            <span className="flex-shrink-0 mx-4 text-stone-400 text-sm font-bold uppercase">or continue with</span>
+            <div className="flex-grow border-t border-stone-200"></div>
+          </div>
+          
+          <div className="flex justify-center -mt-2 mb-4">
+             <GoogleLogin
+               onSuccess={handleGoogleSuccess}
+               onError={() => toast.error('Google login failed')}
+               useOneTap
+               theme="filled_black"
+               shape="pill"
+               size="large"
+             />
+          </div>
+
+          <div className="text-center pt-2">
             <button
               type="button"
               className="text-stone-500 hover:text-orange-600 font-bold text-sm"
@@ -107,5 +140,6 @@ export default function LoginPage() {
         </form>
       </div>
     </div>
+    </GoogleOAuthProvider>
   );
 }
