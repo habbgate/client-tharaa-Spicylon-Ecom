@@ -40,10 +40,15 @@ const ProductCard = ({ product, currency }: { product: any, currency: string }) 
                         </span>
                     </div>
                     <button
+                        disabled={product.stock <= 0}
                         onClick={() => addToCart(product, price)}
-                        className="px-6 py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-xl transition-all shadow-lg shadow-orange-200"
+                        className={`px-6 py-2.5 font-bold rounded-xl transition-all shadow-lg text-sm ${
+                            product.stock <= 0 
+                            ? 'bg-stone-300 text-stone-500 cursor-not-allowed shadow-none' 
+                            : 'bg-orange-500 hover:bg-orange-600 text-white shadow-orange-200'
+                        }`}
                     >
-                        {t('addToCart')}
+                        {product.stock <= 0 ? t('outOfStock') : t('addToCart')}
                     </button>
                 </div>
             </div>

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/db';
-import { Order } from '@/models';
+import { Order, Product } from '@/models';
 import { sendEmailBackground } from '@/lib/sendEmail';
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -13,6 +13,17 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     order.isPaid = true;
     order.paidAt = new Date();
     await order.save();
+
+    // Deduct stock for each product in the order
+    for (const item of order.orderItems) {
+      if (item.product) {
+        const product = await Product.findById(item.product);
+        if (product) {
+          product.stock = Math.max(0, product.stock - item.quantity);
+          await product.save();
+        }
+      }
+    }
 
     // Trigger an email to the user regarding the successful payment
     if (order.userId && order.userId.email) {

@@ -7,6 +7,7 @@ interface CartItem {
   price: number;
   image: string;
   quantity: number;
+  stock: number;
 }
 
 interface StoreState {
@@ -35,19 +36,26 @@ export const useStore = create<StoreState>()(
         if (existing) {
           return {
             cart: state.cart.map((item) =>
-              item.id === product._id ? { ...item, quantity: item.quantity + 1 } : item
+              item.id === product._id 
+                ? { ...item, quantity: Math.min(item.quantity + 1, product.stock) } 
+                : item
             ),
           };
         }
-        return {
-          cart: [...state.cart, { id: product._id, name: product.name, price, image: product.images[0], quantity: 1 }],
-        };
+        if (product.stock > 0) {
+          return {
+            cart: [...state.cart, { id: product._id, name: product.name, price, image: product.images[0], quantity: 1, stock: product.stock }],
+          };
+        }
+        return state;
       }),
       removeFromCart: (id) => set((state) => ({
         cart: state.cart.filter((item) => item.id !== id),
       })),
       updateQuantity: (id, quantity) => set((state) => ({
-        cart: state.cart.map((item) => (item.id === id ? { ...item, quantity } : item)),
+        cart: state.cart.map((item) => 
+          (item.id === id ? { ...item, quantity: Math.min(Math.max(quantity, 1), item.stock || Infinity) } : item)
+        ),
       })),
       clearCart: () => set({ cart: [] }),
       setUser: (user) => set({ user }),

@@ -5,17 +5,49 @@ import axios from 'axios';
 import { useStore } from '@/store/useStore';
 import toast from 'react-hot-toast';
 import { HiOutlinePlus, HiOutlinePencil, HiOutlineTrash, HiOutlineEye } from 'react-icons/hi';
+import { Pagination } from '@/components/Pagination';
 
 export default function AdminDashboard() {
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
   const [users, setUsers] = useState([]);
+  const [usersPage, setUsersPage] = useState(1);
+  const [productsPage, setProductsPage] = useState(1);
+  const [ordersPage, setOrdersPage] = useState(1);
+  const [reviewsPage, setReviewsPage] = useState(1);
+  const ITEMS_PER_PAGE = 10;
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState('products'); // 'products', 'orders', 'reviews', 'orderDetails'
   
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState<any>(null);
   const [viewingOrder, setViewingOrder] = useState<any>(null);
+
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+
+  const uploadImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingImage(true);
+    const dataForm = new FormData();
+    dataForm.append('image', file);
+    dataForm.append('key', '93fb3524249e8f39be550a4b8804904e');
+
+    try {
+      const { data } = await axios.post('https://api.imgbb.com/1/upload', dataForm);
+      const url = data.data.url;
+      setFormData(prev => ({
+        ...prev,
+        images: prev.images ? `${prev.images}, ${url}` : url
+      }));
+      toast.success('Image uploaded successfully');
+    } catch (error) {
+      toast.error('Image upload failed');
+    } finally {
+      setIsUploadingImage(false);
+    }
+  };
 
   const [deliverySettings, setDeliverySettings] = useState({ USD: 0, EUR: 0, LKR: 0 });
 
@@ -234,7 +266,7 @@ export default function AdminDashboard() {
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-100">
-              {users.map((u: any) => (
+              {users.slice((usersPage - 1) * ITEMS_PER_PAGE, usersPage * ITEMS_PER_PAGE).map((u: any) => (
                 <tr key={u._id} className="hover:bg-stone-50/50 transition-colors">
                   <td className="px-8 py-6 font-medium text-stone-600">{u._id}</td>
                   <td className="px-8 py-6 font-bold text-stone-900">{u.name} <br/><span className="text-xs text-stone-500 font-normal">{u.email}</span></td>
@@ -263,6 +295,7 @@ export default function AdminDashboard() {
               ))}
             </tbody>
           </table>
+          <Pagination currentPage={usersPage} totalItems={users.length} itemsPerPage={ITEMS_PER_PAGE} onPageChange={setUsersPage} />
         </div>
       )}
 
@@ -283,7 +316,7 @@ export default function AdminDashboard() {
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-100">
-              {products.map((product: any) => (
+              {products.slice((productsPage - 1) * ITEMS_PER_PAGE, productsPage * ITEMS_PER_PAGE).map((product: any) => (
                 <tr key={product._id} className="hover:bg-stone-50/50 transition-colors">
                   <td className="px-8 py-6">
                     <div className="flex items-center gap-4">
@@ -316,6 +349,7 @@ export default function AdminDashboard() {
               ))}
             </tbody>
           </table>
+          <Pagination currentPage={productsPage} totalItems={products.length} itemsPerPage={ITEMS_PER_PAGE} onPageChange={setProductsPage} />
         </div>
       )}
 
@@ -333,7 +367,7 @@ export default function AdminDashboard() {
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-100">
-              {orders.map((order: any) => (
+              {orders.slice((ordersPage - 1) * ITEMS_PER_PAGE, ordersPage * ITEMS_PER_PAGE).map((order: any) => (
                 <tr key={order._id} className="hover:bg-stone-50/50 transition-colors">
                   <td className="px-8 py-6 font-medium text-stone-600 text-sm">
                     {order._id}
@@ -383,6 +417,7 @@ export default function AdminDashboard() {
               )}
             </tbody>
           </table>
+          <Pagination currentPage={ordersPage} totalItems={orders.length} itemsPerPage={ITEMS_PER_PAGE} onPageChange={setOrdersPage} />
         </div>
       )}
 
@@ -397,7 +432,7 @@ export default function AdminDashboard() {
              <p className="text-stone-500">No reviews found for this product.</p>
            ) : (
              <div className="space-y-4">
-               {productReviews.map((review: any) => (
+               {productReviews.slice((reviewsPage - 1) * ITEMS_PER_PAGE, reviewsPage * ITEMS_PER_PAGE).map((review: any) => (
                  <div key={review._id} className="p-4 border border-stone-100 rounded-xl bg-stone-50">
                     <div className="flex justify-between">
                       <span className="font-bold text-stone-800">{review.userName}</span>
@@ -408,6 +443,7 @@ export default function AdminDashboard() {
                ))}
              </div>
            )}
+           <div className="mt-4"><Pagination currentPage={reviewsPage} totalItems={productReviews.length} itemsPerPage={ITEMS_PER_PAGE} onPageChange={setReviewsPage} /></div>
         </div>
       )}
 
@@ -585,8 +621,19 @@ export default function AdminDashboard() {
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-stone-700 mb-1">Images (Comma-separated URLs)</label>
-                <input required type="text" value={formData.images} onChange={(e) => setFormData({...formData, images: e.target.value})} className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="https://domain.com/img1.png, https://domain.com/img2.png" />
+                  <label className="block text-sm font-bold text-stone-700 mb-1">Images (Upload or Comma-separated URLs)</label>
+                  
+                  <div className="flex items-center gap-4 mb-3">
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      onChange={uploadImage}
+                      disabled={isUploadingImage}
+                      className="block w-full text-sm text-stone-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100"
+                    />
+                    {isUploadingImage && <span className="text-orange-600 text-sm font-bold animate-pulse">Uploading...</span>}
+                  </div>
+
               </div>
 
               <div className="flex justify-end gap-2 pt-6 border-t border-stone-200 mt-6">

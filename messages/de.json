@@ -110,7 +110,8 @@
     "cancel": "Cancel",
     "noReviews": "No reviews yet for this harvest. Be the first to share your experience!",
     "loginToReview": "Please",
-    "anonymous": "Anonymous"
+    "anonymous": "Anonymous",
+    "outOfStock": "Ausverkauft"
   },
   "Products": {
     "title": "Our",

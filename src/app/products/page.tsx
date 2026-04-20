@@ -1,6 +1,8 @@
 import ProductCard from '@/components/ProductCard';
 import { cookies } from 'next/headers';
 import { getTranslations } from 'next-intl/server';
+import { Pagination } from '@/components/Pagination';
+import { redirect } from 'next/navigation';
 
 async function getProducts() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products`, { cache: 'no-store' });
@@ -8,11 +10,24 @@ async function getProducts() {
   return res.json();
 }
 
-export default async function ProductsPage() {
+export default async function ProductsPage({ searchParams }: { searchParams: { page?: string } }) {
+  const params = await searchParams;
+  const currentPage = Number(params.page) || 1;
+  const ITEMS_PER_PAGE = 8;
+
   const products = await getProducts();
   const cookieStore = await cookies();
   const currency = cookieStore.get('currency')?.value || 'USD';
   const t = await getTranslations('Products');
+
+  const totalItems = products.length;
+  const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE) || 1;
+  
+  if (currentPage > totalPages && totalItems > 0) {
+      redirect(`/products?page=${totalPages}`);
+  }
+
+  const paginatedProducts = products.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   return (
     <div className="pb-20">
@@ -31,7 +46,7 @@ export default async function ProductsPage() {
       {/* Products Grid */}
       <section className="max-w-7xl mx-auto px-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {products.map((product: any) => (
+          {paginatedProducts.map((product: any) => (
             <ProductCard key={product._id} product={product} currency={currency} />
           ))}
         </div>
@@ -40,6 +55,17 @@ export default async function ProductsPage() {
           <div className="text-center py-20">
             <h3 className="text-2xl font-bold text-stone-700">No products found</h3>
             <p className="text-stone-500 mt-2">Please check back later.</p>
+          </div>
+        )}
+
+        {products.length > 0 && (
+          <div className="mt-12 flex justify-center">
+            <Pagination 
+              currentPage={currentPage}
+              totalItems={totalItems}
+              itemsPerPage={ITEMS_PER_PAGE}
+              pageRoute="/products?page=" 
+            />
           </div>
         )}
       </section>

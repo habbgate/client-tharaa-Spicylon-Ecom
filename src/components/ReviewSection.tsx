@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useStore } from '@/store/useStore';
 import { HiStar, HiOutlineStar } from 'react-icons/hi';
 import { useTranslations } from 'next-intl';
+import { Pagination } from '@/components/Pagination';
 
 export default function ReviewSection({ productId, initialReviews }: { productId: string, initialReviews: any[] }) {
   const { user } = useStore();
@@ -14,6 +15,10 @@ export default function ReviewSection({ productId, initialReviews }: { productId
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [showForm, setShowForm] = useState(false);
+
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 5;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,6 +55,8 @@ export default function ReviewSection({ productId, initialReviews }: { productId
       setIsSubmitting(false);
     }
   };
+
+  const paginatedReviews = reviews.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   return (
     <div className="mt-32">
@@ -137,7 +144,7 @@ export default function ReviewSection({ productId, initialReviews }: { productId
         </div>
       ) : (
         <div className="space-y-6">
-          {reviews.map((review: any, index: number) => (
+          {paginatedReviews.map((review: any, index: number) => (
             <div key={review._id || index} className="bg-white p-6 rounded-3xl border border-stone-200 flex flex-col sm:flex-row gap-6">
               <div className="flex-shrink-0 w-12 h-12 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center font-bold text-xl uppercase">
                 {review.userName?.charAt(0) || 'U'}
@@ -158,6 +165,15 @@ export default function ReviewSection({ productId, initialReviews }: { productId
               </div>
             </div>
           ))}
+          
+          {reviews.length > ITEMS_PER_PAGE && (
+            <Pagination 
+              currentPage={currentPage} 
+              totalItems={reviews.length} 
+              itemsPerPage={ITEMS_PER_PAGE} 
+              onPageChange={setCurrentPage} 
+            />
+          )}
         </div>
       )}
     </div>
