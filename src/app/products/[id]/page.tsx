@@ -4,11 +4,19 @@ import AddToCartButton from '@/components/AddToCartButton';
 import ReviewSection from '@/components/ReviewSection';
 import { HiOutlineShieldCheck, HiOutlineTruck, HiOutlineRefresh, HiStar } from 'react-icons/hi';
 import { getTranslations } from 'next-intl/server';
+import dbConnect from '@/lib/db';
+import { Product } from '@/models';
 
 async function getProduct(id: string) {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products/${id}`, { cache: 'no-store' });
-  if (!res.ok) return null;
-  return res.json();
+  try {
+    await dbConnect();
+    const product = await Product.findById(id).lean();
+    if (!product) return null;
+    return JSON.parse(JSON.stringify(product));
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
 }
 
 export default async function ProductDetails({ params }: { params: Promise<{ id: string }> }) {

@@ -2,11 +2,18 @@ import ProductCard from '@/components/ProductCard';
 import { getTranslations } from 'next-intl/server';
 import { cookies } from 'next/headers';
 import Link from 'next/link';
+import dbConnect from '@/lib/db';
+import { Product } from '@/models';
 
 async function getProducts() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products`, { cache: 'no-store' });
-  if (!res.ok) return [];
-  return res.json();
+  try {
+    await dbConnect();
+    const products = await Product.find({}).lean();
+    return JSON.parse(JSON.stringify(products));
+  } catch (err) {
+    console.error(err);
+    return [];
+  }
 }
 
 export default async function Home() {
