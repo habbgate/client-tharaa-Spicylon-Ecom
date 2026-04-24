@@ -34,9 +34,9 @@ export async function POST(req: Request) {
       });
     }
 
-    const host = req.headers.get('host');
-    const protocol = req.headers.get('x-forwarded-proto') || (host?.includes('localhost') ? 'http' : 'https');
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || `${protocol}://${host}`;
+    const requestUrl = new URL(req.url);
+    const origin = req.headers.get('origin');
+    const baseUrl = origin || `${requestUrl.protocol}//${requestUrl.host}`;
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
