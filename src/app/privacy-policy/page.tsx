@@ -1,10 +1,11 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: 'Privacy Policy',
-  description: 'Learn how Spicylon collects, uses, and protects your personal data when you shop with us.',
+  title: "Privacy Policy",
+  description:
+    "Learn how Spicylon collects, uses, and protects your personal data when you shop with us.",
   robots: { index: false, follow: false },
-  alternates: { canonical: 'https://spicylon.com/privacy-policy' },
+  alternates: { canonical: "https://spicylon.com/privacy-policy" },
 };
 
 const sections = [

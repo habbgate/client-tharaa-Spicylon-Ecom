@@ -1,20 +1,14 @@
-import type { MetadataRoute } from 'next';
+import type { MetadataRoute } from "next";
 
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
       {
-        userAgent: '*',
-        allow: '/',
-        disallow: [
-          '/api/',
-          '/admin/',
-          '/profile',
-          '/cart',
-          '/order-success',
-        ],
+        userAgent: "*",
+        allow: "/",
+        disallow: ["/api/", "/admin/", "/profile", "/cart", "/order-success"],
       },
     ],
-    sitemap: 'https://spicylon.com/sitemap.xml',
+    sitemap: "https://spicylon.com/sitemap.xml",
   };
 }

@@ -1,14 +1,16 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: 'FAQ',
-  description: 'Answers to common questions about ordering, shipping, returns, and our Ceylon spice products at Spicylon.',
+  title: "FAQ",
+  description:
+    "Answers to common questions about ordering, shipping, returns, and our Ceylon spice products at Spicylon.",
   openGraph: {
-    title: 'FAQ | Spicylon',
-    description: 'Got questions? Find answers about orders, shipping, returns, and our products.',
-    url: 'https://spicylon.com/faq',
+    title: "FAQ | Spicylon",
+    description:
+      "Got questions? Find answers about orders, shipping, returns, and our products.",
+    url: "https://spicylon.com/faq",
   },
-  alternates: { canonical: 'https://spicylon.com/faq' },
+  alternates: { canonical: "https://spicylon.com/faq" },
 };
 
 const faqs = [

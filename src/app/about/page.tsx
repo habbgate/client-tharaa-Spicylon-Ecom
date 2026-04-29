@@ -3,14 +3,16 @@ import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 
 export const metadata = {
-  title: 'Our Story',
-  description: 'Learn about Spicylon — our mission to bring authentic single-origin Ceylon spices from Sri Lankan highland farms to kitchens around the world.',
+  title: "Our Story",
+  description:
+    "Learn about Spicylon — our mission to bring authentic single-origin Ceylon spices from Sri Lankan highland farms to kitchens around the world.",
   openGraph: {
-    title: 'Our Story | Spicylon',
-    description: 'The story behind Spicylon — authentic Ceylon spices, sourced with purpose.',
-    url: 'https://spicylon.com/about',
+    title: "Our Story | Spicylon",
+    description:
+      "The story behind Spicylon — authentic Ceylon spices, sourced with purpose.",
+    url: "https://spicylon.com/about",
   },
-  alternates: { canonical: 'https://spicylon.com/about' },
+  alternates: { canonical: "https://spicylon.com/about" },
 };
 
 export default async function AboutPage() {

@@ -5,14 +5,16 @@ import { Pagination } from "@/components/Pagination";
 import { redirect } from "next/navigation";
 
 export const metadata = {
-  title: 'All Spices',
-  description: 'Shop our complete collection of authentic Ceylon spices. Single-origin, no fillers — cinnamon, turmeric, cardamom, pepper, cloves and more from Sri Lanka.',
+  title: "All Spices",
+  description:
+    "Shop our complete collection of authentic Ceylon spices. Single-origin, no fillers — cinnamon, turmeric, cardamom, pepper, cloves and more from Sri Lanka.",
   openGraph: {
-    title: 'All Ceylon Spices | Spicylon',
-    description: 'Browse the full Spicylon spice collection. Sourced from Sri Lankan highland farms.',
-    url: 'https://spicylon.com/products',
+    title: "All Ceylon Spices | Spicylon",
+    description:
+      "Browse the full Spicylon spice collection. Sourced from Sri Lankan highland farms.",
+    url: "https://spicylon.com/products",
   },
-  alternates: { canonical: 'https://spicylon.com/products' },
+  alternates: { canonical: "https://spicylon.com/products" },
 };
 import dbConnect from "@/lib/db";
 import { Product } from "@/models";

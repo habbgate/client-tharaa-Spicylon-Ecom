@@ -5,14 +5,16 @@ import Link from "next/link";
 import dbConnect from "@/lib/db";
 
 export const metadata = {
-  title: 'Shop Authentic Ceylon Spices',
-  description: 'Browse our full range of single-origin Ceylon spices — cinnamon, cardamom, turmeric, black pepper, cloves and more. Sourced directly from Sri Lankan highland farms.',
+  title: "Shop Authentic Ceylon Spices",
+  description:
+    "Browse our full range of single-origin Ceylon spices — cinnamon, cardamom, turmeric, black pepper, cloves and more. Sourced directly from Sri Lankan highland farms.",
   openGraph: {
-    title: 'Spicylon | Shop Ceylon Spices',
-    description: 'Authentic single-origin spices from Sri Lanka, shipped worldwide.',
-    url: 'https://spicylon.com',
+    title: "Spicylon | Shop Ceylon Spices",
+    description:
+      "Authentic single-origin spices from Sri Lanka, shipped worldwide.",
+    url: "https://spicylon.com",
   },
-  alternates: { canonical: 'https://spicylon.com' },
+  alternates: { canonical: "https://spicylon.com" },
 };
 import { Product } from "@/models";
 
@@ -35,40 +37,42 @@ export default async function Home() {
   const t = await getTranslations("Home");
 
   const jsonLd = {
-    '@context': 'https://schema.org',
-    '@graph': [
+    "@context": "https://schema.org",
+    "@graph": [
       {
-        '@type': 'Organization',
-        '@id': 'https://spicylon.com/#organization',
-        name: 'Spicylon',
-        url: 'https://spicylon.com',
+        "@type": "Organization",
+        "@id": "https://spicylon.com/#organization",
+        name: "Spicylon",
+        url: "https://spicylon.com",
         logo: {
-          '@type': 'ImageObject',
-          url: 'https://spicylon.com/logo.png',
+          "@type": "ImageObject",
+          url: "https://spicylon.com/logo.png",
         },
-        description: 'Authentic single-origin Ceylon spices sourced directly from highland farms in Sri Lanka.',
+        description:
+          "Authentic single-origin Ceylon spices sourced directly from highland farms in Sri Lanka.",
         address: {
-          '@type': 'PostalAddress',
-          addressCountry: 'LK',
+          "@type": "PostalAddress",
+          addressCountry: "LK",
         },
         sameAs: [
-          'https://www.facebook.com/spicylon',
-          'https://www.instagram.com/spicylon',
+          "https://www.facebook.com/spicylon",
+          "https://www.instagram.com/spicylon",
         ],
       },
       {
-        '@type': 'WebSite',
-        '@id': 'https://spicylon.com/#website',
-        url: 'https://spicylon.com',
-        name: 'Spicylon',
-        publisher: { '@id': 'https://spicylon.com/#organization' },
+        "@type": "WebSite",
+        "@id": "https://spicylon.com/#website",
+        url: "https://spicylon.com",
+        name: "Spicylon",
+        publisher: { "@id": "https://spicylon.com/#organization" },
         potentialAction: {
-          '@type': 'SearchAction',
+          "@type": "SearchAction",
           target: {
-            '@type': 'EntryPoint',
-            urlTemplate: 'https://spicylon.com/products?search={search_term_string}',
+            "@type": "EntryPoint",
+            urlTemplate:
+              "https://spicylon.com/products?search={search_term_string}",
           },
-          'query-input': 'required name=search_term_string',
+          "query-input": "required name=search_term_string",
         },
       },
     ],
