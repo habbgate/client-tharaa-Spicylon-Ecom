@@ -1,8 +1,11 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: "Terms of Service | Spicylon",
-  description: "The terms and conditions that govern your use of Spicylon.",
+  title: "Terms of Service",
+  description:
+    "Read the terms and conditions that govern your use of Spicylon, including orders, shipping, returns, and your rights as a customer.",
+  robots: { index: false, follow: false },
+  alternates: { canonical: "https://spicylon.com/terms-of-service" },
 };
 
 const sections = [

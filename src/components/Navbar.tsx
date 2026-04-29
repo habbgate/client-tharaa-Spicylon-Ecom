@@ -50,8 +50,7 @@ const Navbar = () => {
     <>
       {/* Announcement bar */}
       <div className="bg-orange-600 text-white text-center text-xs font-bold py-2 px-4 tracking-widest uppercase">
-        🌿 Pure Ceylon. No Fillers. No Compromise. &nbsp;·&nbsp; 🫙 Every Jar
-        Tells a Story from Sri Lanka
+        🌿 Pure Ceylon. No Fillers. No Compromise.
       </div>
       <nav
         className={`sticky top-0 z-50 border-b transition-all duration-300 ${
