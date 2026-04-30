@@ -124,13 +124,17 @@ export default async function RootLayout({
                   {/* Social Icons */}
                   <div className="flex gap-4 mb-8 lg:mb-0">
                     <a
-                      href="#"
+                      href="https://www.facebook.com/spicylon"
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="w-12 h-12 rounded-full border border-stone-800 bg-stone-900/50 flex items-center justify-center text-stone-400 hover:text-white hover:border-orange-500 hover:bg-orange-600 transition-all group"
                     >
                       <FaFacebookF className="w-5 h-5 group-hover:scale-110 transition-transform" />
                     </a>
                     <a
-                      href="#"
+                      href="https://www.instagram.com/spicylon.official"
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="w-12 h-12 rounded-full border border-stone-800 bg-stone-900/50 flex items-center justify-center text-stone-400 hover:text-white hover:border-orange-500 hover:bg-orange-600 transition-all group"
                     >
                       <FaInstagram className="w-5 h-5 group-hover:scale-110 transition-transform" />
