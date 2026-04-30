@@ -1460,7 +1460,7 @@ export default function AdminDashboard() {
 
               <div>
                 <label className="block text-sm font-bold text-stone-700 mb-1">
-                  Images (Upload or Comma-separated URLs)
+                  Images
                 </label>
 
                 {formData.images && (
@@ -1470,28 +1470,32 @@ export default function AdminDashboard() {
                         url.trim() && (
                           <div
                             key={i}
-                            className="relative w-16 h-16 rounded-lg overflow-hidden border border-stone-200"
+                            className="relative w-16 h-16 rounded-lg overflow-hidden border border-stone-200 group"
                           >
                             <img
                               src={url.trim()}
                               alt=""
                               className="w-full h-full object-cover"
                             />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const urls = formData.images
+                                  .split(",")
+                                  .map((u) => u.trim())
+                                  .filter((u, idx) => u && idx !== i);
+                                setFormData({ ...formData, images: urls.join(", ") });
+                              }}
+                              className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity text-white text-xl font-bold"
+                              title="Remove image"
+                            >
+                              ×
+                            </button>
                           </div>
                         ),
                     )}
                   </div>
                 )}
-
-                <input
-                  type="text"
-                  placeholder="E.g. https://...image.jpg, https://..."
-                  value={formData.images}
-                  onChange={(e) =>
-                    setFormData({ ...formData, images: e.target.value })
-                  }
-                  className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-orange-500 mb-3 bg-stone-50"
-                />
 
                 <div className="flex items-center gap-4">
                   <input

@@ -1,6 +1,6 @@
-import Image from "next/image";
 import { cookies } from "next/headers";
 import AddToCartButton from "@/components/AddToCartButton";
+import ProductGallery from "@/components/ProductGallery";
 import ReviewSection from "@/components/ReviewSection";
 import {
   HiOutlineShieldCheck,
@@ -98,37 +98,11 @@ export default async function ProductDetails({
 
       <div className="flex flex-col lg:flex-row gap-12 lg:gap-20">
         {/* Gallery */}
-        <div className="lg:w-1/2">
-          <div className="relative aspect-square rounded-3xl overflow-hidden shadow-2xl border border-stone-100 bg-stone-50">
-            <Image
-              src={product.images[0]}
-              alt={product.name}
-              fill
-              className="object-cover"
-              priority
-            />
-            {product.stock <= 0 && (
-              <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                <span className="px-6 py-3 bg-stone-900 text-white font-black uppercase tracking-widest rounded-full text-sm">
-                  {t("outOfStock")}
-                </span>
-              </div>
-            )}
-          </div>
-          {/* Thumbnails if multiple images */}
-          {product.images?.length > 1 && (
-            <div className="flex gap-3 mt-4">
-              {product.images.slice(0, 4).map((img: string, i: number) => (
-                <div
-                  key={i}
-                  className="relative w-20 h-20 rounded-xl overflow-hidden border-2 border-stone-200 hover:border-orange-400 transition-colors cursor-pointer flex-shrink-0"
-                >
-                  <Image src={img} alt="" fill className="object-cover" />
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        <ProductGallery
+          images={product.images}
+          name={product.name}
+          outOfStockLabel={product.stock <= 0 ? t("outOfStock") : undefined}
+        />
 
         {/* Info */}
         <div className="lg:w-1/2 flex flex-col">
