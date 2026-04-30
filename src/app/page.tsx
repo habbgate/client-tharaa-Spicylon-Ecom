@@ -1,4 +1,5 @@
 import ProductCard from "@/components/ProductCard";
+import NewsletterForm from "@/components/NewsletterForm";
 import { getTranslations } from "next-intl/server";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -390,17 +391,10 @@ export default async function Home() {
           <p className="text-stone-600 mb-8 leading-relaxed text-sm sm:text-base px-2 md:px-0">
             {t("joinDesc")}
           </p>
-          <div className="flex flex-col sm:flex-row gap-3 w-full max-w-md">
-            <input
-              type="email"
-              placeholder={t("emailPlace")}
-              className="px-5 py-3.5 rounded-xl flex-1 focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white shadow-sm border border-orange-100 text-sm"
-              suppressHydrationWarning
-            />
-            <button className="px-7 py-3.5 bg-stone-900 text-white font-bold rounded-xl hover:bg-stone-800 transition-all shadow-lg text-sm whitespace-nowrap">
-              {t("joinBtn")}
-            </button>
-          </div>
+          <NewsletterForm
+            placeholder={t("emailPlace")}
+            buttonLabel={t("joinBtn")}
+          />
           <p className="text-stone-400 text-xs mt-3">
             No spam. Unsubscribe anytime.
           </p>

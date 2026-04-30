@@ -1,11 +1,18 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useStore } from '@/store/useStore';
-import toast from 'react-hot-toast';
-import { HiOutlinePlus, HiOutlinePencil, HiOutlineTrash, HiOutlineEye } from 'react-icons/hi';
-import { Pagination } from '@/components/Pagination';
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { useStore } from "@/store/useStore";
+import toast from "react-hot-toast";
+import {
+  HiOutlinePlus,
+  HiOutlinePencil,
+  HiOutlineTrash,
+  HiOutlineEye,
+} from "react-icons/hi";
+import { Pagination } from "@/components/Pagination";
+import { generateInvoice } from "@/lib/generateInvoice";
+import { generateShippingLabel } from "@/lib/generateShippingLabel";
 
 export default function AdminDashboard() {
   const [products, setProducts] = useState([]);
@@ -17,8 +24,10 @@ export default function AdminDashboard() {
   const [reviewsPage, setReviewsPage] = useState(1);
   const ITEMS_PER_PAGE = 10;
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState('products'); // 'products', 'orders', 'reviews', 'orderDetails'
-  
+  const [tab, setTab] = useState("products"); // 'products', 'orders', 'reviews', 'orderDetails', 'newsletter'
+  const [subscribers, setSubscribers] = useState<any[]>([]);
+  const [subscribersPage, setSubscribersPage] = useState(1);
+
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState<any>(null);
   const [viewingOrder, setViewingOrder] = useState<any>(null);
@@ -31,37 +40,43 @@ export default function AdminDashboard() {
 
     setIsUploadingImage(true);
     const dataForm = new FormData();
-    dataForm.append('image', file);
-    dataForm.append('key', process.env.NEXT_PUBLIC_IMGBB_API_KEY as string);
+    dataForm.append("image", file);
+    dataForm.append("key", process.env.NEXT_PUBLIC_IMGBB_API_KEY as string);
 
     try {
-      const { data } = await axios.post('https://api.imgbb.com/1/upload', dataForm);
+      const { data } = await axios.post(
+        "https://api.imgbb.com/1/upload",
+        dataForm,
+      );
       const url = data.data.url;
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        images: prev.images ? `${prev.images}, ${url}` : url
+        images: prev.images ? `${prev.images}, ${url}` : url,
       }));
-      toast.success('Image uploaded successfully');
+      toast.success("Image uploaded successfully");
     } catch (error) {
-      toast.error('Image upload failed');
+      toast.error("Image upload failed");
     } finally {
       setIsUploadingImage(false);
     }
   };
 
-  const [deliverySettings, setDeliverySettings] = useState({ USD: 0, EUR: 0, LKR: 0 });
+  const [deliverySettings, setDeliverySettings] = useState({
+    USD: 0,
+    EUR: 0,
+    LKR: 0,
+  });
 
-  
   // Form State
   const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    category: 'Spices',
+    name: "",
+    description: "",
+    category: "Spices",
     priceUSD: 0,
     priceEUR: 0,
     priceLKR: 0,
     stock: 0,
-    images: ''
+    images: "",
   });
 
   const [reviewsProduct, setReviewsProduct] = useState<any>(null);
@@ -70,57 +85,94 @@ export default function AdminDashboard() {
   const user = useStore((state) => state.user);
 
   useEffect(() => {
-    if (user?.role === 'admin') {
+    if (user?.role === "admin") {
       fetchProducts();
       fetchOrders();
       fetchUsers();
       fetchSettings();
+      fetchSubscribers();
     }
   }, [user]);
 
+  const fetchSubscribers = async () => {
+    try {
+      const { data } = await axios.get("/api/newsletter");
+      setSubscribers(data);
+    } catch {
+      // silently ignore — may not be admin yet
+    }
+  };
+
+  const downloadSubscribersCSV = () => {
+    const rows = [
+      ["Email", "Subscribed At"],
+      ...subscribers.map((s) => [
+        s.email,
+        new Date(s.createdAt).toLocaleString(),
+      ]),
+    ];
+    const csv = rows.map((r) => r.map((v) => `"${v}"`).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `newsletter_subscribers_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const fetchSettings = async () => {
     try {
-      const { data } = await axios.get('/api/settings');
-      const usd = data.find((s: any) => s.key === 'deliveryCost_USD');
-      const eur = data.find((s: any) => s.key === 'deliveryCost_EUR');
-      const lkr = data.find((s: any) => s.key === 'deliveryCost_LKR');
+      const { data } = await axios.get("/api/settings");
+      const usd = data.find((s: any) => s.key === "deliveryCost_USD");
+      const eur = data.find((s: any) => s.key === "deliveryCost_EUR");
+      const lkr = data.find((s: any) => s.key === "deliveryCost_LKR");
       setDeliverySettings({
         USD: usd?.value ? Number(usd.value) : 0,
         EUR: eur?.value ? Number(eur.value) : 0,
         LKR: lkr?.value ? Number(lkr.value) : 0,
       });
     } catch {
-      toast.error('Failed to load settings');
+      toast.error("Failed to load settings");
     }
   };
 
   const saveSettings = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await axios.put('/api/settings', { key: 'deliveryCost_USD', value: deliverySettings.USD.toString() });
-      await axios.put('/api/settings', { key: 'deliveryCost_EUR', value: deliverySettings.EUR.toString() });
-      await axios.put('/api/settings', { key: 'deliveryCost_LKR', value: deliverySettings.LKR.toString() });
-      toast.success('Settings updated');
+      await axios.put("/api/settings", {
+        key: "deliveryCost_USD",
+        value: deliverySettings.USD.toString(),
+      });
+      await axios.put("/api/settings", {
+        key: "deliveryCost_EUR",
+        value: deliverySettings.EUR.toString(),
+      });
+      await axios.put("/api/settings", {
+        key: "deliveryCost_LKR",
+        value: deliverySettings.LKR.toString(),
+      });
+      toast.success("Settings updated");
     } catch {
-      toast.error('Failed to update settings');
+      toast.error("Failed to update settings");
     }
   };
 
   const fetchUsers = async () => {
     try {
-      const { data } = await axios.get('/api/admin/users');
+      const { data } = await axios.get("/api/admin/users");
       setUsers(data);
     } catch (error) {
-      toast.error('Failed to load users');
+      toast.error("Failed to load users");
     }
   };
 
   const fetchProducts = async () => {
     try {
-      const { data } = await axios.get('/api/products');
+      const { data } = await axios.get("/api/products");
       setProducts(data);
     } catch (error) {
-      toast.error('Failed to load products');
+      toast.error("Failed to load products");
     } finally {
       setLoading(false);
     }
@@ -128,32 +180,34 @@ export default function AdminDashboard() {
 
   const fetchOrders = async () => {
     try {
-      const { data } = await axios.get('/api/orders');
+      const { data } = await axios.get("/api/orders");
       setOrders(data);
     } catch (error) {
-      toast.error('Failed to load orders');
+      toast.error("Failed to load orders");
     }
   };
 
   const toggleOrderStatus = async (id: string) => {
     try {
       await axios.put(`/api/orders/${id}/deliver`);
-      toast.success('Order status updated');
+      toast.success("Order status updated");
       fetchOrders();
-      setViewingOrder((prev: any) => prev?._id === id ? { ...prev, isDelivered: !prev.isDelivered } : prev);
+      setViewingOrder((prev: any) =>
+        prev?._id === id ? { ...prev, isDelivered: !prev.isDelivered } : prev,
+      );
     } catch (error) {
-      toast.error('Failed to update status');
+      toast.error("Failed to update status");
     }
   };
 
   const deleteProduct = async (id: string) => {
-    if (!confirm('Are you sure?')) return;
+    if (!confirm("Are you sure?")) return;
     try {
       await axios.delete(`/api/products/${id}`);
-      toast.success('Product deleted');
+      toast.success("Product deleted");
       fetchProducts();
     } catch (error) {
-      toast.error('Failed to delete');
+      toast.error("Failed to delete");
     }
   };
 
@@ -162,9 +216,9 @@ export default function AdminDashboard() {
       const { data } = await axios.get(`/api/products/${product._id}/reviews`);
       setReviewsProduct(product);
       setProductReviews(data);
-      setTab('reviews');
+      setTab("reviews");
     } catch (error) {
-      toast.error('Failed to load reviews');
+      toast.error("Failed to load reviews");
     }
   };
 
@@ -179,12 +233,18 @@ export default function AdminDashboard() {
         priceEUR: product.price?.EUR || 0,
         priceLKR: product.price?.LKR || 0,
         stock: product.stock,
-        images: product.images?.join(', ') || ''
+        images: product.images?.join(", ") || "",
       });
     } else {
       setFormData({
-        name: '', description: '', category: 'Spices', 
-        priceUSD: 0, priceEUR: 0, priceLKR: 0, stock: 0, images: ''
+        name: "",
+        description: "",
+        category: "Spices",
+        priceUSD: 0,
+        priceEUR: 0,
+        priceLKR: 0,
+        stock: 0,
+        images: "",
       });
     }
     setShowModal(true);
@@ -202,378 +262,819 @@ export default function AdminDashboard() {
         LKR: Number(formData.priceLKR),
       },
       stock: Number(formData.stock),
-      images: formData.images.split(',').map(s => s.trim()).filter(s => s !== '')
+      images: formData.images
+        .split(",")
+        .map((s) => s.trim())
+        .filter((s) => s !== ""),
     };
 
     try {
       if (editingProduct) {
         await axios.put(`/api/products/${editingProduct._id}`, payload);
-        toast.success('Product updated');
+        toast.success("Product updated");
       } else {
-        await axios.post('/api/products', payload);
-        toast.success('Product added');
+        await axios.post("/api/products", payload);
+        toast.success("Product added");
       }
       setShowModal(false);
       fetchProducts();
     } catch (error: any) {
-      toast.error(error?.response?.data?.message || 'Failed to save product');
+      toast.error(error?.response?.data?.message || "Failed to save product");
     }
   };
 
-  if (user?.role !== 'admin') {
-    return <div className="text-center py-20 font-bold text-red-500">Access Denied</div>;
+  if (user?.role !== "admin") {
+    return (
+      <div className="text-center py-20 font-bold text-red-500">
+        Access Denied
+      </div>
+    );
   }
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-16">
       <div className="flex justify-between items-center mb-12">
-        <h1 className="text-5xl font-black tracking-tighter italic">Admin <span className="text-orange-600">Dashboard</span></h1>
+        <h1 className="text-5xl font-black tracking-tighter italic">
+          Admin <span className="text-orange-600">Dashboard</span>
+        </h1>
         <div className="flex gap-4">
-          <button             onClick={() => setTab('users')} 
-            className={`px-6 py-3 font-bold rounded-xl transition-all ${tab === 'users' ? 'bg-orange-500 text-white' : 'bg-stone-200 text-stone-600 hover:bg-stone-300'}`}
+          <button
+            onClick={() => setTab("users")}
+            className={`px-6 py-3 font-bold rounded-xl transition-all ${tab === "users" ? "bg-orange-500 text-white" : "bg-stone-200 text-stone-600 hover:bg-stone-300"}`}
           >
             Users
           </button>
-          <button             onClick={() => setTab('products')} 
-            className={`px-6 py-3 font-bold rounded-xl transition-all ${tab === 'products' ? 'bg-orange-500 text-white' : 'bg-stone-200 text-stone-600 hover:bg-stone-300'}`}
+          <button
+            onClick={() => setTab("products")}
+            className={`px-6 py-3 font-bold rounded-xl transition-all ${tab === "products" ? "bg-orange-500 text-white" : "bg-stone-200 text-stone-600 hover:bg-stone-300"}`}
           >
             Products
           </button>
-          <button 
-            onClick={() => setTab('orders')} 
-            className={`px-6 py-3 font-bold rounded-xl transition-all ${tab === 'orders' ? 'bg-orange-500 text-white' : 'bg-stone-200 text-stone-600 hover:bg-stone-300'}`}
+          <button
+            onClick={() => setTab("orders")}
+            className={`px-6 py-3 font-bold rounded-xl transition-all ${tab === "orders" ? "bg-orange-500 text-white" : "bg-stone-200 text-stone-600 hover:bg-stone-300"}`}
           >
             Orders
           </button>
-          <button 
-            onClick={() => setTab('settings')} 
-            className={`px-6 py-3 font-bold rounded-xl transition-all ${tab === 'settings' ? 'bg-orange-500 text-white' : 'bg-stone-200 text-stone-600 hover:bg-stone-300'}`}
+          <button
+            onClick={() => setTab("settings")}
+            className={`px-6 py-3 font-bold rounded-xl transition-all ${tab === "settings" ? "bg-orange-500 text-white" : "bg-stone-200 text-stone-600 hover:bg-stone-300"}`}
           >
             Settings
+          </button>
+          <button
+            onClick={() => setTab("newsletter")}
+            className={`px-6 py-3 font-bold rounded-xl transition-all ${tab === "newsletter" ? "bg-orange-500 text-white" : "bg-stone-200 text-stone-600 hover:bg-stone-300"}`}
+          >
+            Newsletter
           </button>
         </div>
       </div>
 
-      {tab === 'users' && (
+      {tab === "users" && (
         <div className="bg-white rounded-3xl border border-stone-200 overflow-hidden shadow-xl">
           <table className="w-full text-left">
             <thead className="bg-stone-50 border-b border-stone-200">
               <tr>
-                <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest">User ID</th>
-                <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest">Name/Email</th>
-                <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest">Role</th>
-                <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest text-right">Actions</th>
+                <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest">
+                  User ID
+                </th>
+                <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest">
+                  Name/Email
+                </th>
+                <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest">
+                  Role
+                </th>
+                <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest text-right">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-100">
-              {users.slice((usersPage - 1) * ITEMS_PER_PAGE, usersPage * ITEMS_PER_PAGE).map((u: any) => (
-                <tr key={u._id} className="hover:bg-stone-50/50 transition-colors">
-                  <td className="px-8 py-6 font-medium text-stone-600">{u._id}</td>
-                  <td className="px-8 py-6 font-bold text-stone-900">{u.name} <br/><span className="text-xs text-stone-500 font-normal">{u.email}</span></td>
-                  <td className="px-8 py-6"><span className={`px-3 py-1 rounded-full text-xs font-bold ${u.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>{u.role}</span></td>
-                  <td className="px-8 py-6 text-right">
-                    <button onClick={async () => {
-                      if(confirm('Toggle role?')) {
-                        try {
-                          await axios.put(`/api/admin/users/${u._id}`, { role: u.role === 'admin' ? 'customer' : 'admin' });
-                          toast.success('User updated');
-                          fetchUsers();
-                        } catch { toast.error('Failed'); }
-                      }
-                    }} className="px-4 py-2 border border-stone-300 rounded-lg text-sm font-bold hover:bg-stone-100 transition-all mr-2">Toggle Role</button>
-                    <button onClick={async () => {
-                      if(confirm('Delete user?')) {
-                        try {
-                          await axios.delete(`/api/admin/users/${u._id}`);
-                          toast.success('User deleted');
-                          fetchUsers();
-                        } catch { toast.error('Failed'); }
-                      }
-                    }} className="px-4 py-2 bg-red-100 text-red-600 rounded-lg text-sm font-bold hover:bg-red-200 transition-all">Delete</button>
-                  </td>
-                </tr>
-              ))}
+              {users
+                .slice(
+                  (usersPage - 1) * ITEMS_PER_PAGE,
+                  usersPage * ITEMS_PER_PAGE,
+                )
+                .map((u: any) => (
+                  <tr
+                    key={u._id}
+                    className="hover:bg-stone-50/50 transition-colors"
+                  >
+                    <td className="px-8 py-6 font-medium text-stone-600">
+                      {u._id}
+                    </td>
+                    <td className="px-8 py-6 font-bold text-stone-900">
+                      {u.name} <br />
+                      <span className="text-xs text-stone-500 font-normal">
+                        {u.email}
+                      </span>
+                    </td>
+                    <td className="px-8 py-6">
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-bold ${u.role === "admin" ? "bg-purple-100 text-purple-700" : "bg-blue-100 text-blue-700"}`}
+                      >
+                        {u.role}
+                      </span>
+                    </td>
+                    <td className="px-8 py-6 text-right">
+                      <button
+                        onClick={async () => {
+                          if (confirm("Toggle role?")) {
+                            try {
+                              await axios.put(`/api/admin/users/${u._id}`, {
+                                role: u.role === "admin" ? "customer" : "admin",
+                              });
+                              toast.success("User updated");
+                              fetchUsers();
+                            } catch {
+                              toast.error("Failed");
+                            }
+                          }
+                        }}
+                        className="px-4 py-2 border border-stone-300 rounded-lg text-sm font-bold hover:bg-stone-100 transition-all mr-2"
+                      >
+                        Toggle Role
+                      </button>
+                      <button
+                        onClick={async () => {
+                          if (confirm("Delete user?")) {
+                            try {
+                              await axios.delete(`/api/admin/users/${u._id}`);
+                              toast.success("User deleted");
+                              fetchUsers();
+                            } catch {
+                              toast.error("Failed");
+                            }
+                          }
+                        }}
+                        className="px-4 py-2 bg-red-100 text-red-600 rounded-lg text-sm font-bold hover:bg-red-200 transition-all"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
-          <Pagination currentPage={usersPage} totalItems={users.length} itemsPerPage={ITEMS_PER_PAGE} onPageChange={setUsersPage} />
+          <Pagination
+            currentPage={usersPage}
+            totalItems={users.length}
+            itemsPerPage={ITEMS_PER_PAGE}
+            onPageChange={setUsersPage}
+          />
         </div>
       )}
 
-      {tab === 'products' && (
+      {tab === "products" && (
         <div className="bg-white rounded-3xl border border-stone-200 overflow-hidden shadow-xl">
           <div className="p-6 border-b border-stone-200 flex justify-end">
-            <button onClick={() => openForm()} className="flex items-center gap-2 px-6 py-3 bg-stone-900 text-white font-bold rounded-xl hover:bg-stone-800 transition-all">
+            <button
+              onClick={() => openForm()}
+              className="flex items-center gap-2 px-6 py-3 bg-stone-900 text-white font-bold rounded-xl hover:bg-stone-800 transition-all"
+            >
               <HiOutlinePlus className="h-5 w-5" /> Add Product
             </button>
           </div>
           <table className="w-full text-left">
             <thead className="bg-stone-50 border-b border-stone-200">
               <tr>
-                <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest">Product</th>
-                <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest">Prices (USD/EUR/LKR)</th>
-                <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest">Stock</th>
-                <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest text-right">Actions</th>
+                <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest">
+                  Product
+                </th>
+                <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest">
+                  Prices (USD/EUR/LKR)
+                </th>
+                <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest">
+                  Stock
+                </th>
+                <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest text-right">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-100">
-              {products.slice((productsPage - 1) * ITEMS_PER_PAGE, productsPage * ITEMS_PER_PAGE).map((product: any) => (
-                <tr key={product._id} className="hover:bg-stone-50/50 transition-colors">
-                  <td className="px-8 py-6">
-                    <div className="flex items-center gap-4">
-                      {product.images?.[0] && <img src={product.images[0]} className="w-12 h-12 rounded-lg object-cover" />}
-                      <span className="font-bold text-stone-900">{product.name}</span>
-                    </div>
-                  </td>
-                  <td className="px-8 py-6 font-medium text-stone-600">
-                    {product.price?.USD} / {product.price?.EUR} / {product.price?.LKR}
-                  </td>
-                  <td className="px-8 py-6">
-                    <span className={`px-3 py-1 rounded-full text-xs font-bold ${product.stock > 10 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                      {product.stock} in stock
-                    </span>
-                  </td>
-                  <td className="px-8 py-6 text-right">
-                    <div className="flex justify-end gap-2">
-                      <button onClick={() => viewReviews(product)} className="p-2 text-stone-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-all" title="View Reviews">
-                        <HiOutlineEye className="h-5 w-5" />
-                      </button>
-                      <button onClick={() => openForm(product)} className="p-2 text-stone-400 hover:text-orange-500 hover:bg-orange-50 rounded-lg transition-all" title="Edit Product">
-                        <HiOutlinePencil className="h-5 w-5" />
-                      </button>
-                      <button onClick={() => deleteProduct(product._id)} className="p-2 text-stone-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all" title="Delete Product">
-                        <HiOutlineTrash className="h-5 w-5" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+              {products
+                .slice(
+                  (productsPage - 1) * ITEMS_PER_PAGE,
+                  productsPage * ITEMS_PER_PAGE,
+                )
+                .map((product: any) => (
+                  <tr
+                    key={product._id}
+                    className="hover:bg-stone-50/50 transition-colors"
+                  >
+                    <td className="px-8 py-6">
+                      <div className="flex items-center gap-4">
+                        {product.images?.[0] && (
+                          <img
+                            src={product.images[0]}
+                            className="w-12 h-12 rounded-lg object-cover"
+                          />
+                        )}
+                        <span className="font-bold text-stone-900">
+                          {product.name}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-8 py-6 font-medium text-stone-600">
+                      {product.price?.USD} / {product.price?.EUR} /{" "}
+                      {product.price?.LKR}
+                    </td>
+                    <td className="px-8 py-6">
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-bold ${product.stock > 10 ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}
+                      >
+                        {product.stock} in stock
+                      </span>
+                    </td>
+                    <td className="px-8 py-6 text-right">
+                      <div className="flex justify-end gap-2">
+                        <button
+                          onClick={() => viewReviews(product)}
+                          className="p-2 text-stone-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-all"
+                          title="View Reviews"
+                        >
+                          <HiOutlineEye className="h-5 w-5" />
+                        </button>
+                        <button
+                          onClick={() => openForm(product)}
+                          className="p-2 text-stone-400 hover:text-orange-500 hover:bg-orange-50 rounded-lg transition-all"
+                          title="Edit Product"
+                        >
+                          <HiOutlinePencil className="h-5 w-5" />
+                        </button>
+                        <button
+                          onClick={() => deleteProduct(product._id)}
+                          className="p-2 text-stone-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                          title="Delete Product"
+                        >
+                          <HiOutlineTrash className="h-5 w-5" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
-          <Pagination currentPage={productsPage} totalItems={products.length} itemsPerPage={ITEMS_PER_PAGE} onPageChange={setProductsPage} />
+          <Pagination
+            currentPage={productsPage}
+            totalItems={products.length}
+            itemsPerPage={ITEMS_PER_PAGE}
+            onPageChange={setProductsPage}
+          />
         </div>
       )}
 
-      {tab === 'orders' && (
+      {tab === "orders" && (
         <div className="bg-white rounded-3xl border border-stone-200 overflow-hidden shadow-xl overflow-x-auto">
-           <table className="w-full text-left min-w-[800px]">
+          <table className="w-full text-left min-w-[800px]">
             <thead className="bg-stone-50 border-b border-stone-200">
               <tr>
-                <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest">Order ID</th>
-                <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest">Customer</th>
-                <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest">Shipping</th>
-                <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest">Total</th>
-                <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest">Status</th>
-                <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest text-right">Actions</th>
+                <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest">
+                  Order ID
+                </th>
+                <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest">
+                  Customer
+                </th>
+                <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest">
+                  Shipping
+                </th>
+                <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest">
+                  Total
+                </th>
+                <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest">
+                  Status
+                </th>
+                <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest text-right">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-100">
-              {orders.slice((ordersPage - 1) * ITEMS_PER_PAGE, ordersPage * ITEMS_PER_PAGE).map((order: any) => (
-                <tr key={order._id} className="hover:bg-stone-50/50 transition-colors">
-                  <td className="px-8 py-6 font-medium text-stone-600 text-sm">
-                    {order._id}
-                    <div className="text-xs text-stone-400 mt-1">{new Date(order.createdAt).toLocaleDateString()}</div>
-                  </td>
-                  <td className="px-8 py-6 font-bold text-stone-900">
-                    {order.userId?.name} <br/><span className="text-xs text-stone-500 font-normal">{order.userId?.email}</span>
-                  </td>
-                  <td className="px-8 py-6 text-sm text-stone-600 max-w-[200px] truncate">
-                    {order.shippingAddress ? (
-                      <>
-                        <span className="font-bold">{order.shippingAddress.fullName}</span><br />
-                        {order.shippingAddress.address}, {order.shippingAddress.city}<br />
-                        {order.shippingAddress.postalCode} {order.shippingAddress.country}<br />
-                        {order.shippingAddress.phone}
-                      </>
-                    ) : 'No Address'}
-                  </td>
-                  <td className="px-8 py-6 font-bold text-stone-900">
-                    {order.currency} {order.totalPrice?.toFixed(2)}
-                  </td>
-                  <td className="px-8 py-6">
-                    <span className={`px-3 py-1 rounded-full text-xs font-bold ${order.isDelivered ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`}>
-                      {order.isDelivered ? 'Delivered' : 'Processing'}
-                    </span>
-                  </td>
-                  <td className="px-8 py-6 text-right">
-                    <button 
-                      onClick={() => { setViewingOrder(order); setTab('orderDetails'); }}
-                      className="px-4 py-2 border border-stone-300 rounded-lg text-sm font-bold hover:bg-stone-100 transition-all mr-2"
-                    >
-                      <HiOutlineEye className="inline-block mr-1 h-4 w-4 -mt-0.5" /> View
-                    </button>
-                    <button 
-                      onClick={() => toggleOrderStatus(order._id)}
-                      className="px-4 py-2 border border-stone-300 rounded-lg text-sm font-bold hover:bg-stone-100 transition-all"
-                    >
-                      {order.isDelivered ? 'Processing' : 'Delivered'}
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {orders
+                .slice(
+                  (ordersPage - 1) * ITEMS_PER_PAGE,
+                  ordersPage * ITEMS_PER_PAGE,
+                )
+                .map((order: any) => (
+                  <tr
+                    key={order._id}
+                    className="hover:bg-stone-50/50 transition-colors"
+                  >
+                    <td className="px-8 py-6 font-medium text-stone-600 text-sm">
+                      {order._id}
+                      <div className="text-xs text-stone-400 mt-1">
+                        {new Date(order.createdAt).toLocaleDateString()}
+                      </div>
+                    </td>
+                    <td className="px-8 py-6 font-bold text-stone-900">
+                      {order.userId?.name} <br />
+                      <span className="text-xs text-stone-500 font-normal">
+                        {order.userId?.email}
+                      </span>
+                    </td>
+                    <td className="px-8 py-6 text-sm text-stone-600 max-w-[200px] truncate">
+                      {order.shippingAddress ? (
+                        <>
+                          <span className="font-bold">
+                            {order.shippingAddress.fullName}
+                          </span>
+                          <br />
+                          {order.shippingAddress.address},{" "}
+                          {order.shippingAddress.city}
+                          <br />
+                          {order.shippingAddress.postalCode}{" "}
+                          {order.shippingAddress.country}
+                          <br />
+                          {order.shippingAddress.phone}
+                        </>
+                      ) : (
+                        "No Address"
+                      )}
+                    </td>
+                    <td className="px-8 py-6 font-bold text-stone-900">
+                      {order.currency} {order.totalPrice?.toFixed(2)}
+                    </td>
+                    <td className="px-8 py-6">
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-bold ${order.isDelivered ? "bg-green-100 text-green-700" : "bg-orange-100 text-orange-700"}`}
+                      >
+                        {order.isDelivered ? "Delivered" : "Processing"}
+                      </span>
+                    </td>
+                    <td className="px-8 py-6 text-right">
+                      <div className="flex justify-end gap-2 flex-wrap">
+                        <button
+                          onClick={() => {
+                            setViewingOrder(order);
+                            setTab("orderDetails");
+                          }}
+                          className="px-4 py-2 border border-stone-300 rounded-lg text-sm font-bold hover:bg-stone-100 transition-all"
+                        >
+                          <HiOutlineEye className="inline-block mr-1 h-4 w-4 -mt-0.5" />{" "}
+                          View
+                        </button>
+                        <button
+                          onClick={() => generateInvoice(order)}
+                          className="px-4 py-2 border border-orange-200 bg-orange-50 text-orange-700 rounded-lg text-sm font-bold hover:bg-orange-100 transition-all"
+                          title="Print Invoice"
+                        >
+                          🖨 Invoice
+                        </button>
+                        <button
+                          onClick={() => generateShippingLabel(order)}
+                          className="px-4 py-2 border border-stone-200 bg-stone-900 text-white rounded-lg text-sm font-bold hover:bg-stone-700 transition-all"
+                          title="Print Shipping Label"
+                        >
+                          📦 Label
+                        </button>
+                        <button
+                          onClick={() => toggleOrderStatus(order._id)}
+                          className="px-4 py-2 border border-stone-300 rounded-lg text-sm font-bold hover:bg-stone-100 transition-all"
+                        >
+                          {order.isDelivered ? "Processing" : "Delivered"}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
               {orders.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-8 py-10 text-center text-stone-500">No orders found.</td>
+                  <td
+                    colSpan={5}
+                    className="px-8 py-10 text-center text-stone-500"
+                  >
+                    No orders found.
+                  </td>
                 </tr>
               )}
             </tbody>
           </table>
-          <Pagination currentPage={ordersPage} totalItems={orders.length} itemsPerPage={ITEMS_PER_PAGE} onPageChange={setOrdersPage} />
+          <Pagination
+            currentPage={ordersPage}
+            totalItems={orders.length}
+            itemsPerPage={ITEMS_PER_PAGE}
+            onPageChange={setOrdersPage}
+          />
         </div>
       )}
 
-      {tab === 'reviews' && (
+      {tab === "reviews" && (
         <div className="bg-white rounded-3xl border border-stone-200 overflow-hidden shadow-xl p-8">
-           <div className="flex justify-between items-center mb-6">
-             <h2 className="text-2xl font-black text-stone-900">Reviews for {reviewsProduct?.name}</h2>
-             <button onClick={() => setTab('products')} className="px-4 py-2 bg-stone-200 hover:bg-stone-300 text-stone-800 font-bold rounded-lg transition-all">Back to Products</button>
-           </div>
-           
-           {productReviews.length === 0 ? (
-             <p className="text-stone-500">No reviews found for this product.</p>
-           ) : (
-             <div className="space-y-4">
-               {productReviews.slice((reviewsPage - 1) * ITEMS_PER_PAGE, reviewsPage * ITEMS_PER_PAGE).map((review: any) => (
-                 <div key={review._id} className="p-4 border border-stone-100 rounded-xl bg-stone-50">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-black text-stone-900">
+              Reviews for {reviewsProduct?.name}
+            </h2>
+            <button
+              onClick={() => setTab("products")}
+              className="px-4 py-2 bg-stone-200 hover:bg-stone-300 text-stone-800 font-bold rounded-lg transition-all"
+            >
+              Back to Products
+            </button>
+          </div>
+
+          {productReviews.length === 0 ? (
+            <p className="text-stone-500">No reviews found for this product.</p>
+          ) : (
+            <div className="space-y-4">
+              {productReviews
+                .slice(
+                  (reviewsPage - 1) * ITEMS_PER_PAGE,
+                  reviewsPage * ITEMS_PER_PAGE,
+                )
+                .map((review: any) => (
+                  <div
+                    key={review._id}
+                    className="p-4 border border-stone-100 rounded-xl bg-stone-50"
+                  >
                     <div className="flex justify-between">
-                      <span className="font-bold text-stone-800">{review.userName}</span>
-                      <span className="text-orange-500 font-black">★ {review.rating}/5</span>
+                      <span className="font-bold text-stone-800">
+                        {review.userName}
+                      </span>
+                      <span className="text-orange-500 font-black">
+                        ★ {review.rating}/5
+                      </span>
                     </div>
                     <p className="text-stone-600 mt-2">{review.comment}</p>
-                 </div>
-               ))}
-             </div>
-           )}
-           <div className="mt-4"><Pagination currentPage={reviewsPage} totalItems={productReviews.length} itemsPerPage={ITEMS_PER_PAGE} onPageChange={setReviewsPage} /></div>
+                  </div>
+                ))}
+            </div>
+          )}
+          <div className="mt-4">
+            <Pagination
+              currentPage={reviewsPage}
+              totalItems={productReviews.length}
+              itemsPerPage={ITEMS_PER_PAGE}
+              onPageChange={setReviewsPage}
+            />
+          </div>
         </div>
       )}
 
-      {tab === 'settings' && (
+      {tab === "settings" && (
         <div className="bg-white rounded-3xl border border-stone-200 overflow-hidden shadow-xl p-8">
-          <h2 className="text-2xl font-black text-stone-900 mb-6">Store Settings</h2>
+          <h2 className="text-2xl font-black text-stone-900 mb-6">
+            Store Settings
+          </h2>
           <form onSubmit={saveSettings} className="space-y-6 max-w-lg">
             <h3 className="font-bold text-lg text-stone-800">Delivery Costs</h3>
             <div>
-              <label className="block text-sm font-bold text-stone-700 mb-1">USD Cost</label>
-              <input type="number" step="0.01" value={deliverySettings.USD} onChange={(e) => setDeliverySettings({...deliverySettings, USD: Number(e.target.value)})} className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
+              <label className="block text-sm font-bold text-stone-700 mb-1">
+                USD Cost
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                value={deliverySettings.USD}
+                onChange={(e) =>
+                  setDeliverySettings({
+                    ...deliverySettings,
+                    USD: Number(e.target.value),
+                  })
+                }
+                className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+              />
             </div>
             <div>
-              <label className="block text-sm font-bold text-stone-700 mb-1">EUR Cost</label>
-              <input type="number" step="0.01" value={deliverySettings.EUR} onChange={(e) => setDeliverySettings({...deliverySettings, EUR: Number(e.target.value)})} className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
+              <label className="block text-sm font-bold text-stone-700 mb-1">
+                EUR Cost
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                value={deliverySettings.EUR}
+                onChange={(e) =>
+                  setDeliverySettings({
+                    ...deliverySettings,
+                    EUR: Number(e.target.value),
+                  })
+                }
+                className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+              />
             </div>
             <div>
-              <label className="block text-sm font-bold text-stone-700 mb-1">LKR Cost</label>
-              <input type="number" step="0.01" value={deliverySettings.LKR} onChange={(e) => setDeliverySettings({...deliverySettings, LKR: Number(e.target.value)})} className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
+              <label className="block text-sm font-bold text-stone-700 mb-1">
+                LKR Cost
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                value={deliverySettings.LKR}
+                onChange={(e) =>
+                  setDeliverySettings({
+                    ...deliverySettings,
+                    LKR: Number(e.target.value),
+                  })
+                }
+                className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+              />
             </div>
-            <button type="submit" className="w-full py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl transition-all">Save Settings</button>
+            <button
+              type="submit"
+              className="w-full py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl transition-all"
+            >
+              Save Settings
+            </button>
           </form>
         </div>
       )}
 
-      {tab === 'orderDetails' && viewingOrder && (
+      {tab === "newsletter" && (
+        <div className="bg-white rounded-3xl border border-stone-200 overflow-hidden shadow-xl">
+          <div className="p-6 border-b border-stone-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-black text-stone-900">
+                Newsletter Subscribers
+              </h2>
+              <p className="text-stone-500 text-sm mt-1">
+                {subscribers.length} subscriber
+                {subscribers.length !== 1 ? "s" : ""}
+              </p>
+            </div>
+            <button
+              onClick={downloadSubscribersCSV}
+              disabled={subscribers.length === 0}
+              className="flex items-center gap-2 px-6 py-3 bg-stone-900 text-white font-bold rounded-xl hover:bg-stone-700 transition-all disabled:opacity-50"
+            >
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                />
+              </svg>
+              Download CSV
+            </button>
+          </div>
+          {subscribers.length === 0 ? (
+            <div className="px-8 py-16 text-center text-stone-400">
+              <svg
+                className="w-12 h-12 mx-auto mb-4 opacity-30"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                />
+              </svg>
+              No subscribers yet.
+            </div>
+          ) : (
+            <>
+              <table className="w-full text-left">
+                <thead className="bg-stone-50 border-b border-stone-200">
+                  <tr>
+                    <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest">
+                      #
+                    </th>
+                    <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest">
+                      Email
+                    </th>
+                    <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest">
+                      Subscribed At
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-stone-100">
+                  {subscribers
+                    .slice(
+                      (subscribersPage - 1) * ITEMS_PER_PAGE,
+                      subscribersPage * ITEMS_PER_PAGE,
+                    )
+                    .map((s: any, idx: number) => (
+                      <tr
+                        key={s._id}
+                        className="hover:bg-stone-50/50 transition-colors"
+                      >
+                        <td className="px-8 py-5 text-stone-400 text-sm">
+                          {(subscribersPage - 1) * ITEMS_PER_PAGE + idx + 1}
+                        </td>
+                        <td className="px-8 py-5 font-bold text-stone-900">
+                          {s.email}
+                        </td>
+                        <td className="px-8 py-5 text-stone-500 text-sm">
+                          {new Date(s.createdAt).toLocaleString()}
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+              <Pagination
+                currentPage={subscribersPage}
+                totalItems={subscribers.length}
+                itemsPerPage={ITEMS_PER_PAGE}
+                onPageChange={setSubscribersPage}
+              />
+            </>
+          )}
+        </div>
+      )}
+
+      {tab === "orderDetails" && viewingOrder && (
         <div className="bg-white rounded-3xl border border-stone-200 overflow-hidden shadow-xl p-8">
-           <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 border-b border-stone-100 pb-6 gap-4">
-             <div>
-               <h2 className="text-3xl font-black text-stone-900 tracking-tighter italic">Order #{viewingOrder._id}</h2>
-               <p className="text-stone-500 mt-2 font-bold uppercase tracking-widest text-xs">Placed on {new Date(viewingOrder.createdAt).toLocaleString()}</p>
-             </div>
-             <div className="flex flex-wrap gap-3">
-               <button 
-                 onClick={() => toggleOrderStatus(viewingOrder._id)}
-                 className={`px-6 py-3 rounded-xl text-sm font-bold transition-all shadow-sm ${viewingOrder.isDelivered ? 'bg-orange-100 text-orange-700 hover:bg-orange-200' : 'bg-green-100 text-green-700 hover:bg-green-200'}`}
-               >
-                 {viewingOrder.isDelivered ? 'Mark Processing' : 'Mark Delivered'}
-               </button>
-               <button onClick={() => setTab('orders')} className="px-6 py-3 bg-stone-900 hover:bg-stone-800 text-white font-bold rounded-xl transition-all shadow-sm">
-                 Back to Orders
-               </button>
-             </div>
-           </div>
-           
-           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mt-8">
-             {/* Customer & Shipping */}
-             <div className="space-y-6">
-               <div className="bg-stone-50 rounded-2xl p-8 border border-stone-200 overflow-hidden relative">
-                 <div className="absolute top-0 right-0 w-32 h-32 bg-stone-200 rounded-full -mr-16 -mt-16 blur-2xl opacity-50"></div>
-                 <h3 className="text-xl font-black mb-6 uppercase tracking-wider text-stone-800 relative z-10 flex items-center gap-2">
-                   <div className="w-2 h-6 bg-orange-500 rounded-full"></div>
-                   Customer Details
-                 </h3>
-                 <div className="space-y-5 text-stone-600 relative z-10">
-                   <div className="flex flex-col border-b border-stone-200 pb-3">
-                     <span className="text-xs uppercase font-bold text-stone-400 tracking-widest mb-1">Name</span>
-                     <span className="font-bold text-stone-900 text-lg">{viewingOrder.userId?.name || 'N/A'}</span>
-                   </div>
-                   <div className="flex flex-col border-b border-stone-200 pb-3">
-                     <span className="text-xs uppercase font-bold text-stone-400 tracking-widest mb-1">Email</span>
-                     <span className="font-bold text-stone-900 text-lg">{viewingOrder.userId?.email || 'N/A'}</span>
-                   </div>
-                   <div className="flex flex-col">
-                     <span className="text-xs uppercase font-bold text-stone-400 tracking-widest mb-1">Phone</span>
-                     <span className="font-bold text-stone-900 text-lg">{viewingOrder.shippingAddress?.phone || 'N/A'}</span>
-                   </div>
-                 </div>
-               </div>
+          <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 border-b border-stone-100 pb-6 gap-4">
+            <div>
+              <h2 className="text-3xl font-black text-stone-900 tracking-tighter italic">
+                Order #{viewingOrder._id}
+              </h2>
+              <p className="text-stone-500 mt-2 font-bold uppercase tracking-widest text-xs">
+                Placed on {new Date(viewingOrder.createdAt).toLocaleString()}
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <button
+                onClick={() => generateInvoice(viewingOrder)}
+                className="px-6 py-3 rounded-xl text-sm font-bold transition-all shadow-sm bg-orange-50 border border-orange-200 text-orange-700 hover:bg-orange-100 flex items-center gap-2"
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"
+                  />
+                </svg>
+                Print Invoice
+              </button>
+              <button
+                onClick={() => generateShippingLabel(viewingOrder)}
+                className="px-6 py-3 rounded-xl text-sm font-bold transition-all shadow-sm bg-stone-900 text-white hover:bg-stone-700 flex items-center gap-2"
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                  />
+                </svg>
+                Shipping Label
+              </button>
+              <button
+                onClick={() => toggleOrderStatus(viewingOrder._id)}
+                className={`px-6 py-3 rounded-xl text-sm font-bold transition-all shadow-sm ${viewingOrder.isDelivered ? "bg-orange-100 text-orange-700 hover:bg-orange-200" : "bg-green-100 text-green-700 hover:bg-green-200"}`}
+              >
+                {viewingOrder.isDelivered
+                  ? "Mark Processing"
+                  : "Mark Delivered"}
+              </button>
+              <button
+                onClick={() => setTab("orders")}
+                className="px-6 py-3 bg-stone-200 hover:bg-stone-300 text-stone-800 font-bold rounded-xl transition-all shadow-sm"
+              >
+                Back to Orders
+              </button>
+            </div>
+          </div>
 
-               <div className="bg-stone-50 rounded-2xl p-8 border border-stone-200 overflow-hidden relative">
-                 <div className="absolute bottom-0 right-0 w-32 h-32 bg-orange-100 rounded-full -mr-16 -mb-16 blur-2xl opacity-50"></div>
-                 <h3 className="text-xl font-black mb-6 uppercase tracking-wider text-stone-800 relative z-10 flex items-center gap-2">
-                   <div className="w-2 h-6 bg-stone-900 rounded-full"></div>
-                   Shipping Address
-                 </h3>
-                 <div className="space-y-2 text-stone-600 text-lg relative z-10">
-                   <p className="font-bold text-stone-900 pb-2">{viewingOrder.shippingAddress?.fullName}</p>
-                   <p>{viewingOrder.shippingAddress?.address}</p>
-                   <p>{viewingOrder.shippingAddress?.city}, {viewingOrder.shippingAddress?.postalCode}</p>
-                   <p>{viewingOrder.shippingAddress?.country}</p>
-                 </div>
-               </div>
-             </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mt-8">
+            {/* Customer & Shipping */}
+            <div className="space-y-6">
+              <div className="bg-stone-50 rounded-2xl p-8 border border-stone-200 overflow-hidden relative">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-stone-200 rounded-full -mr-16 -mt-16 blur-2xl opacity-50"></div>
+                <h3 className="text-xl font-black mb-6 uppercase tracking-wider text-stone-800 relative z-10 flex items-center gap-2">
+                  <div className="w-2 h-6 bg-orange-500 rounded-full"></div>
+                  Customer Details
+                </h3>
+                <div className="space-y-5 text-stone-600 relative z-10">
+                  <div className="flex flex-col border-b border-stone-200 pb-3">
+                    <span className="text-xs uppercase font-bold text-stone-400 tracking-widest mb-1">
+                      Name
+                    </span>
+                    <span className="font-bold text-stone-900 text-lg">
+                      {viewingOrder.userId?.name || "N/A"}
+                    </span>
+                  </div>
+                  <div className="flex flex-col border-b border-stone-200 pb-3">
+                    <span className="text-xs uppercase font-bold text-stone-400 tracking-widest mb-1">
+                      Email
+                    </span>
+                    <span className="font-bold text-stone-900 text-lg">
+                      {viewingOrder.userId?.email || "N/A"}
+                    </span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-xs uppercase font-bold text-stone-400 tracking-widest mb-1">
+                      Phone
+                    </span>
+                    <span className="font-bold text-stone-900 text-lg">
+                      {viewingOrder.shippingAddress?.phone || "N/A"}
+                    </span>
+                  </div>
+                </div>
+              </div>
 
-             {/* Order Summary */}
-             <div className="bg-white rounded-2xl border border-stone-200 shadow-sm p-8 flex flex-col">
-               <h3 className="text-xl font-black mb-6 uppercase tracking-wider text-stone-800 border-b border-stone-100 pb-6 flex items-center gap-2">
-                 <HiOutlineEye className="w-6 h-6 text-orange-500" />
-                 Order Items
-               </h3>
-               
-               <div className="space-y-4 flex-1 overflow-y-auto pr-2 custom-scrollbar max-h-[400px]">
-                 {viewingOrder.orderItems.map((item: any, i: number) => (
-                   <div key={i} className="flex justify-between items-center bg-stone-50 p-4 rounded-2xl border border-stone-100 hover:border-orange-200 transition-colors">
-                     <div className="flex items-center gap-4">
-                       <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-xl shadow-sm" />
-                       <div>
-                         <p className="font-bold text-stone-900">{item.name}</p>
-                         <p className="text-stone-500 font-medium text-sm mt-1 bg-stone-200 inline-block px-2 py-0.5 rounded-md">Qty: {item.quantity}</p>
-                       </div>
-                     </div>
-                     <span className="font-black text-stone-900 text-lg">{viewingOrder.currency} {(item.price * item.quantity).toFixed(2)}</span>
-                   </div>
-                 ))}
-               </div>
+              <div className="bg-stone-50 rounded-2xl p-8 border border-stone-200 overflow-hidden relative">
+                <div className="absolute bottom-0 right-0 w-32 h-32 bg-orange-100 rounded-full -mr-16 -mb-16 blur-2xl opacity-50"></div>
+                <h3 className="text-xl font-black mb-6 uppercase tracking-wider text-stone-800 relative z-10 flex items-center gap-2">
+                  <div className="w-2 h-6 bg-stone-900 rounded-full"></div>
+                  Shipping Address
+                </h3>
+                <div className="space-y-2 text-stone-600 text-lg relative z-10">
+                  <p className="font-bold text-stone-900 pb-2">
+                    {viewingOrder.shippingAddress?.fullName}
+                  </p>
+                  <p>{viewingOrder.shippingAddress?.address}</p>
+                  <p>
+                    {viewingOrder.shippingAddress?.city},{" "}
+                    {viewingOrder.shippingAddress?.postalCode}
+                  </p>
+                  <p>{viewingOrder.shippingAddress?.country}</p>
+                </div>
+              </div>
+            </div>
 
-               <div className="mt-8 pt-8 border-t border-stone-100 space-y-4">
-                 <div className="flex justify-between text-stone-500 font-bold text-lg">
-                   <span>Items Subtotal</span>
-                   <span>{viewingOrder.currency} {viewingOrder.itemsPrice?.toFixed(2)}</span>
-                 </div>
-                 <div className="flex justify-between text-stone-500 font-bold text-lg">
-                   <span>Shipping</span>
-                   <span>{viewingOrder.currency} {viewingOrder.shippingPrice?.toFixed(2)}</span>
-                 </div>
-                 <div className="flex justify-between text-3xl font-black text-stone-900 mt-6 pt-6 border-t border-stone-200">
-                   <span>Total</span>
-                   <span>{viewingOrder.currency} {viewingOrder.totalPrice?.toFixed(2)}</span>
-                 </div>
-               </div>
+            {/* Order Summary */}
+            <div className="bg-white rounded-2xl border border-stone-200 shadow-sm p-8 flex flex-col">
+              <h3 className="text-xl font-black mb-6 uppercase tracking-wider text-stone-800 border-b border-stone-100 pb-6 flex items-center gap-2">
+                <HiOutlineEye className="w-6 h-6 text-orange-500" />
+                Order Items
+              </h3>
 
-               <div className="mt-8 bg-stone-900 p-6 rounded-2xl flex items-center justify-between shadow-lg">
-                 <span className="font-bold text-stone-300 uppercase text-sm tracking-widest">Payment Status</span>
-                 <span className={`px-6 py-2 rounded-xl text-sm font-black uppercase tracking-widest shadow-inner ${viewingOrder.isPaid ? 'bg-green-500 text-stone-900' : 'bg-red-500 text-white'}`}>
-                   {viewingOrder.isPaid ? 'PAID' : 'PENDING'}
-                 </span>
-               </div>
-             </div>
-           </div>
+              <div className="space-y-4 flex-1 overflow-y-auto pr-2 custom-scrollbar max-h-[400px]">
+                {viewingOrder.orderItems.map((item: any, i: number) => (
+                  <div
+                    key={i}
+                    className="flex justify-between items-center bg-stone-50 p-4 rounded-2xl border border-stone-100 hover:border-orange-200 transition-colors"
+                  >
+                    <div className="flex items-center gap-4">
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="w-16 h-16 object-cover rounded-xl shadow-sm"
+                      />
+                      <div>
+                        <p className="font-bold text-stone-900">{item.name}</p>
+                        <p className="text-stone-500 font-medium text-sm mt-1 bg-stone-200 inline-block px-2 py-0.5 rounded-md">
+                          Qty: {item.quantity}
+                        </p>
+                      </div>
+                    </div>
+                    <span className="font-black text-stone-900 text-lg">
+                      {viewingOrder.currency}{" "}
+                      {(item.price * item.quantity).toFixed(2)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-8 pt-8 border-t border-stone-100 space-y-4">
+                <div className="flex justify-between text-stone-500 font-bold text-lg">
+                  <span>Items Subtotal</span>
+                  <span>
+                    {viewingOrder.currency}{" "}
+                    {viewingOrder.itemsPrice?.toFixed(2)}
+                  </span>
+                </div>
+                <div className="flex justify-between text-stone-500 font-bold text-lg">
+                  <span>Shipping</span>
+                  <span>
+                    {viewingOrder.currency}{" "}
+                    {viewingOrder.shippingPrice?.toFixed(2)}
+                  </span>
+                </div>
+                <div className="flex justify-between text-3xl font-black text-stone-900 mt-6 pt-6 border-t border-stone-200">
+                  <span>Total</span>
+                  <span>
+                    {viewingOrder.currency}{" "}
+                    {viewingOrder.totalPrice?.toFixed(2)}
+                  </span>
+                </div>
+              </div>
+
+              <div className="mt-8 bg-stone-900 p-6 rounded-2xl flex items-center justify-between shadow-lg">
+                <span className="font-bold text-stone-300 uppercase text-sm tracking-widest">
+                  Payment Status
+                </span>
+                <span
+                  className={`px-6 py-2 rounded-xl text-sm font-black uppercase tracking-widest shadow-inner ${viewingOrder.isPaid ? "bg-green-500 text-stone-900" : "bg-red-500 text-white"}`}
+                >
+                  {viewingOrder.isPaid ? "PAID" : "PENDING"}
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
@@ -581,80 +1082,196 @@ export default function AdminDashboard() {
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
           <div className="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl p-8">
-            <h2 className="text-3xl font-black mb-6">{editingProduct ? 'Edit Product' : 'Add New Product'}</h2>
-            
+            <h2 className="text-3xl font-black mb-6">
+              {editingProduct ? "Edit Product" : "Add New Product"}
+            </h2>
+
             <form onSubmit={submitForm} className="space-y-4">
               <div>
-                <label className="block text-sm font-bold text-stone-700 mb-1">Product Name</label>
-                <input required type="text" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                <label className="block text-sm font-bold text-stone-700 mb-1">
+                  Product Name
+                </label>
+                <input
+                  required
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
+                  className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+                />
               </div>
-              
+
               <div>
-                <label className="block text-sm font-bold text-stone-700 mb-1">Description</label>
-                <textarea required value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" rows={3}></textarea>
+                <label className="block text-sm font-bold text-stone-700 mb-1">
+                  Description
+                </label>
+                <textarea
+                  required
+                  value={formData.description}
+                  onChange={(e) =>
+                    setFormData({ ...formData, description: e.target.value })
+                  }
+                  className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  rows={3}
+                ></textarea>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-bold text-stone-700 mb-1">Category</label>
-                  <input required type="text" value={formData.category} onChange={(e) => setFormData({...formData, category: e.target.value})} className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                  <label className="block text-sm font-bold text-stone-700 mb-1">
+                    Category
+                  </label>
+                  <input
+                    required
+                    type="text"
+                    value={formData.category}
+                    onChange={(e) =>
+                      setFormData({ ...formData, category: e.target.value })
+                    }
+                    className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  />
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-stone-700 mb-1">Stock Amount</label>
-                  <input required type="number" value={formData.stock} onChange={(e) => setFormData({...formData, stock: Number(e.target.value)})} className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                  <label className="block text-sm font-bold text-stone-700 mb-1">
+                    Stock Amount
+                  </label>
+                  <input
+                    required
+                    type="number"
+                    value={formData.stock}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        stock: Number(e.target.value),
+                      })
+                    }
+                    className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  />
                 </div>
               </div>
 
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-bold text-stone-700 mb-1">Price (USD)</label>
-                  <input required type="number" step="0.01" value={formData.priceUSD} onChange={(e) => setFormData({...formData, priceUSD: Number(e.target.value)})} className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                  <label className="block text-sm font-bold text-stone-700 mb-1">
+                    Price (USD)
+                  </label>
+                  <input
+                    required
+                    type="number"
+                    step="0.01"
+                    value={formData.priceUSD}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        priceUSD: Number(e.target.value),
+                      })
+                    }
+                    className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  />
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-stone-700 mb-1">Price (EUR)</label>
-                  <input required type="number" step="0.01" value={formData.priceEUR} onChange={(e) => setFormData({...formData, priceEUR: Number(e.target.value)})} className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                  <label className="block text-sm font-bold text-stone-700 mb-1">
+                    Price (EUR)
+                  </label>
+                  <input
+                    required
+                    type="number"
+                    step="0.01"
+                    value={formData.priceEUR}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        priceEUR: Number(e.target.value),
+                      })
+                    }
+                    className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  />
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-stone-700 mb-1">Price (LKR)</label>
-                  <input required type="number" step="0.01" value={formData.priceLKR} onChange={(e) => setFormData({...formData, priceLKR: Number(e.target.value)})} className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                  <label className="block text-sm font-bold text-stone-700 mb-1">
+                    Price (LKR)
+                  </label>
+                  <input
+                    required
+                    type="number"
+                    step="0.01"
+                    value={formData.priceLKR}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        priceLKR: Number(e.target.value),
+                      })
+                    }
+                    className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  />
                 </div>
               </div>
 
               <div>
-                  <label className="block text-sm font-bold text-stone-700 mb-1">Images (Upload or Comma-separated URLs)</label>
-                  
-                  {formData.images && (
-                    <div className="flex flex-wrap gap-2 mb-3">
-                      {formData.images.split(',').map((url, i) => url.trim() && (
-                        <div key={i} className="relative w-16 h-16 rounded-lg overflow-hidden border border-stone-200">
-                          <img src={url.trim()} alt="" className="w-full h-full object-cover" />
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                <label className="block text-sm font-bold text-stone-700 mb-1">
+                  Images (Upload or Comma-separated URLs)
+                </label>
 
-                  <input 
-                    type="text" 
-                    placeholder="E.g. https://...image.jpg, https://..."
-                    value={formData.images}
-                    onChange={(e) => setFormData({ ...formData, images: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-orange-500 mb-3 bg-stone-50"
-                  />
-                  
-                  <div className="flex items-center gap-4">
-                    <input 
-                      type="file" 
-                      accept="image/*" 
-                      onChange={uploadImage}
-                      disabled={isUploadingImage}
-                      className="block w-full text-sm text-stone-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100 cursor-pointer"
-                    />
-                    {isUploadingImage && <span className="text-orange-600 text-sm font-bold animate-pulse whitespace-nowrap">Uploading...</span>}
+                {formData.images && (
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {formData.images.split(",").map(
+                      (url, i) =>
+                        url.trim() && (
+                          <div
+                            key={i}
+                            className="relative w-16 h-16 rounded-lg overflow-hidden border border-stone-200"
+                          >
+                            <img
+                              src={url.trim()}
+                              alt=""
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        ),
+                    )}
                   </div>
+                )}
+
+                <input
+                  type="text"
+                  placeholder="E.g. https://...image.jpg, https://..."
+                  value={formData.images}
+                  onChange={(e) =>
+                    setFormData({ ...formData, images: e.target.value })
+                  }
+                  className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-orange-500 mb-3 bg-stone-50"
+                />
+
+                <div className="flex items-center gap-4">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={uploadImage}
+                    disabled={isUploadingImage}
+                    className="block w-full text-sm text-stone-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100 cursor-pointer"
+                  />
+                  {isUploadingImage && (
+                    <span className="text-orange-600 text-sm font-bold animate-pulse whitespace-nowrap">
+                      Uploading...
+                    </span>
+                  )}
                 </div>
+              </div>
               <div className="flex justify-end gap-2 pt-6 border-t border-stone-200 mt-6">
-                <button type="button" onClick={() => setShowModal(false)} className="px-6 py-3 bg-stone-200 hover:bg-stone-300 text-stone-800 font-bold rounded-xl transition-all">Cancel</button>
-                <button type="submit" className="px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl transition-all">Save Product</button>
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="px-6 py-3 bg-stone-200 hover:bg-stone-300 text-stone-800 font-bold rounded-xl transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl transition-all"
+                >
+                  Save Product
+                </button>
               </div>
             </form>
           </div>
