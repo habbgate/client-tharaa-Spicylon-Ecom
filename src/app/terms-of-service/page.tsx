@@ -202,7 +202,7 @@ export default function TermsOfServicePage() {
               <div className="px-6 py-5 space-y-5">
                 {section.content.map((item, i) => (
                   <div key={i}>
-                    {item.subtitle && (
+                    {"subtitle" in item && item.subtitle && (
                       <p className="text-xs font-bold text-orange-600 uppercase tracking-wider mb-1.5">
                         {item.subtitle}
                       </p>
