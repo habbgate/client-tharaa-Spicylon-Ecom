@@ -1,6 +1,10 @@
 ﻿import jsPDF from "jspdf";
 
-async function toDataUrl(src: string, w: number, h: number): Promise<string | null> {
+async function toDataUrl(
+  src: string,
+  w: number,
+  h: number,
+): Promise<string | null> {
   return new Promise((resolve) => {
     const img = new window.Image();
     img.crossOrigin = "anonymous";
@@ -9,7 +13,10 @@ async function toDataUrl(src: string, w: number, h: number): Promise<string | nu
       canvas.width = w;
       canvas.height = h;
       const ctx = canvas.getContext("2d");
-      if (!ctx) { resolve(null); return; }
+      if (!ctx) {
+        resolve(null);
+        return;
+      }
       ctx.drawImage(img, 0, 0, w, h);
       resolve(canvas.toDataURL("image/png"));
     };
@@ -22,15 +29,27 @@ async function toDataUrl(src: string, w: number, h: number): Promise<string | nu
 export const generateShippingLabel = async (order: any) => {
   const W = 102;
   const H = 152;
-  const doc = new jsPDF({ unit: "mm", format: [W, H], orientation: "portrait" });
-
-  const addr       = order.shippingAddress || {};
-  const orderId    = String(order._id || "");
-  const shortId    = orderId.slice(-12).toUpperCase();
-  const date       = new Date(order.createdAt || Date.now()).toLocaleDateString("en-GB", {
-    day: "2-digit", month: "short", year: "numeric",
+  const doc = new jsPDF({
+    unit: "mm",
+    format: [W, H],
+    orientation: "portrait",
   });
-  const itemCount  = (order.orderItems || []).reduce((a: number, i: any) => a + (i.quantity || 1), 0);
+
+  const addr = order.shippingAddress || {};
+  const orderId = String(order._id || "");
+  const shortId = orderId.slice(-12).toUpperCase();
+  const date = new Date(order.createdAt || Date.now()).toLocaleDateString(
+    "en-GB",
+    {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    },
+  );
+  const itemCount = (order.orderItems || []).reduce(
+    (a: number, i: any) => a + (i.quantity || 1),
+    0,
+  );
   const recipientName = addr.fullName || order.userId?.name || "Customer";
 
   const [logoData, qrData] = await Promise.all([
@@ -51,7 +70,7 @@ export const generateShippingLabel = async (order: any) => {
   const HEADER_H = 24;
   doc.setFillColor(15, 15, 15);
   doc.roundedRect(2, 2, W - 4, HEADER_H, 3, 3, "F");
-  doc.rect(2, 14, W - 4, HEADER_H - 12, "F");          // flatten bottom corners
+  doc.rect(2, 14, W - 4, HEADER_H - 12, "F"); // flatten bottom corners
 
   // Left stripe
   doc.setFillColor(60, 60, 60);
@@ -59,13 +78,13 @@ export const generateShippingLabel = async (order: any) => {
 
   // Logo — centred vertically in bar: bar interior y=2..26, logo 18×18
   const LOGO_SIZE = 18;
-  const logoY = 2 + (HEADER_H - LOGO_SIZE) / 2;        // = 5  → centred
+  const logoY = 2 + (HEADER_H - LOGO_SIZE) / 2; // = 5  → centred
   if (logoData) {
     doc.addImage(logoData, "PNG", 9, logoY, LOGO_SIZE, LOGO_SIZE);
   }
 
   // Subtitle text — vertically centred alongside logo
-  const textX = 9 + LOGO_SIZE + 3;                     // = 30
+  const textX = 9 + LOGO_SIZE + 3; // = 30
   doc.setFont("helvetica", "normal");
   doc.setFontSize(6);
   doc.setTextColor(160, 160, 160);
@@ -76,12 +95,20 @@ export const generateShippingLabel = async (order: any) => {
 
   // QR code — right side of header, vertically centred
   const HEADER_QR = 18;
-  const headerQrX = W - 2 - HEADER_QR - 3;             // 3 mm from right edge
-  const headerQrY = 2 + (HEADER_H - HEADER_QR) / 2;    // vertically centred
+  const headerQrX = W - 2 - HEADER_QR - 3; // 3 mm from right edge
+  const headerQrY = 2 + (HEADER_H - HEADER_QR) / 2; // vertically centred
   if (qrData) {
     // white background so QR is readable on dark bar
     doc.setFillColor(255, 255, 255);
-    doc.roundedRect(headerQrX - 1.5, headerQrY - 1.5, HEADER_QR + 3, HEADER_QR + 3, 1.5, 1.5, "F");
+    doc.roundedRect(
+      headerQrX - 1.5,
+      headerQrY - 1.5,
+      HEADER_QR + 3,
+      HEADER_QR + 3,
+      1.5,
+      1.5,
+      "F",
+    );
     doc.addImage(qrData, "PNG", headerQrX, headerQrY, HEADER_QR, HEADER_QR);
   }
 
@@ -94,7 +121,8 @@ export const generateShippingLabel = async (order: any) => {
   const dashed = (y: number) => {
     doc.setDrawColor(220, 220, 220);
     doc.setLineWidth(0.22);
-    for (let x = 4; x < W - 4; x += 3.5) doc.line(x, y, Math.min(x + 2, W - 4), y);
+    for (let x = 4; x < W - 4; x += 3.5)
+      doc.line(x, y, Math.min(x + 2, W - 4), y);
   };
 
   // ── FROM ────────────────────────────────────────────────────────
@@ -144,19 +172,23 @@ export const generateShippingLabel = async (order: any) => {
   doc.setTextColor(55, 55, 55);
   let ay = toTop + 22;
   const lines: string[] = [];
-  if (addr.address)               lines.push(addr.address);
-  if (addr.city || addr.postalCode) lines.push([addr.city, addr.postalCode].filter(Boolean).join(", "));
-  if (addr.country)               lines.push(addr.country);
-  if (addr.phone)                 lines.push("\u260E  " + addr.phone);
+  if (addr.address) lines.push(addr.address);
+  if (addr.city || addr.postalCode)
+    lines.push([addr.city, addr.postalCode].filter(Boolean).join(", "));
+  if (addr.country) lines.push(addr.country);
+  if (addr.phone) lines.push("\u260E  " + addr.phone);
   lines.forEach((ln) => {
-    doc.splitTextToSize(ln, W - 10).forEach((l: string) => { doc.text(l, 4, ay); ay += 5; });
+    doc.splitTextToSize(ln, W - 10).forEach((l: string) => {
+      doc.text(l, 4, ay);
+      ay += 5;
+    });
   });
 
   dashed(ay + 2);
 
   // ── ORDER META ──────────────────────────────────────────────────
   const metaTop = ay + 7;
-  const halfW   = (W - 12) / 2;
+  const halfW = (W - 12) / 2;
 
   // ORDER REF box
   doc.setFillColor(245, 245, 244);
@@ -168,7 +200,9 @@ export const generateShippingLabel = async (order: any) => {
   doc.setFontSize(7.5);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(15, 15, 15);
-  doc.text("#" + shortId.slice(-8), 4 + halfW / 2, metaTop + 10, { align: "center" });
+  doc.text("#" + shortId.slice(-8), 4 + halfW / 2, metaTop + 10, {
+    align: "center",
+  });
 
   // DATE box
   const bx2 = 4 + halfW + 4;
@@ -190,7 +224,12 @@ export const generateShippingLabel = async (order: any) => {
   doc.setFontSize(5.5);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(255, 255, 255);
-  doc.text(itemCount + " ITEM" + (itemCount !== 1 ? "S" : ""), 17, pillTop + 4.4, { align: "center" });
+  doc.text(
+    itemCount + " ITEM" + (itemCount !== 1 ? "S" : ""),
+    17,
+    pillTop + 4.4,
+    { align: "center" },
+  );
 
   doc.setFillColor(245, 245, 244);
   doc.roundedRect(34, pillTop, 42, 6.5, 2, 2, "F");
@@ -210,15 +249,22 @@ export const generateShippingLabel = async (order: any) => {
   doc.setFontSize(5.5);
   doc.setFont("helvetica", "normal");
   doc.setTextColor(160, 160, 160);
-  doc.text("spicylon.com  ·  Authentic Ceylon Spices  ·  Est. 2026", W / 2, footerY + 6, { align: "center" });
+  doc.text(
+    "spicylon.com  ·  Authentic Ceylon Spices  ·  Est. 2026",
+    W / 2,
+    footerY + 6,
+    { align: "center" },
+  );
   doc.setFontSize(4.5);
   doc.setTextColor(100, 100, 100);
-  doc.text("Keep dry  ·  Fragile contents", W / 2, footerY + 10.5, { align: "center" });
+  doc.text("Keep dry  ·  Fragile contents", W / 2, footerY + 10.5, {
+    align: "center",
+  });
 
   // ── Print ───────────────────────────────────────────────────────
   doc.autoPrint();
   const blob = doc.output("blob");
-  const url  = URL.createObjectURL(blob);
-  const win  = window.open(url, "_blank");
+  const url = URL.createObjectURL(blob);
+  const win = window.open(url, "_blank");
   if (!win) doc.save("ShippingLabel_" + shortId + ".pdf");
 };

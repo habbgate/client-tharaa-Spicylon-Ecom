@@ -127,5 +127,4 @@ export const NewsletterSubscriber =
   models.NewsletterSubscriber ||
   model("NewsletterSubscriber", NewsletterSubscriberSchema);
 export const ContactMessage =
-  models.ContactMessage ||
-  model("ContactMessage", ContactMessageSchema);
+  models.ContactMessage || model("ContactMessage", ContactMessageSchema);

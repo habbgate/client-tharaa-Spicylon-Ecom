@@ -107,7 +107,13 @@ export default async function RootLayout({
                 {/* Brand & Mission */}
                 <div className="col-span-1 md:col-span-12 lg:col-span-5 flex flex-col items-center lg:items-start text-center lg:text-left">
                   <div className="mb-6">
-                    <Image src="/logo.png" alt="Spicylon" width={240} height={80} className="h-24 w-auto object-contain" />
+                    <Image
+                      src="/logo.png"
+                      alt="Spicylon"
+                      width={240}
+                      height={80}
+                      className="h-24 w-auto object-contain"
+                    />
                   </div>
                   <p className="text-stone-400 mb-8 max-w-md leading-relaxed text-lg">
                     Authentic flavors, directly from Sri Lankan plantations. We
@@ -129,7 +135,6 @@ export default async function RootLayout({
                     >
                       <FaInstagram className="w-5 h-5 group-hover:scale-110 transition-transform" />
                     </a>
-
                   </div>
                 </div>
 

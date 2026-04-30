@@ -142,7 +142,13 @@ export default function LoginPage() {
                   />
                 </svg>
               </div>
-              <Image src="/logo.png" alt="Spicylon" width={100} height={34} className="h-8 w-auto object-contain" />
+              <Image
+                src="/logo.png"
+                alt="Spicylon"
+                width={100}
+                height={34}
+                className="h-8 w-auto object-contain"
+              />
             </div>
           </div>
 
@@ -202,7 +208,13 @@ export default function LoginPage() {
           <div className="w-full max-w-md relative z-10">
             {/* Mobile logo */}
             <div className="lg:hidden text-center mb-8">
-              <Image src="/logo.png" alt="Spicylon" width={130} height={44} className="h-11 w-auto object-contain mx-auto" />
+              <Image
+                src="/logo.png"
+                alt="Spicylon"
+                width={130}
+                height={44}
+                className="h-11 w-auto object-contain mx-auto"
+              />
             </div>
 
             {/* Tab switcher (only shown when not in OTP mode) */}

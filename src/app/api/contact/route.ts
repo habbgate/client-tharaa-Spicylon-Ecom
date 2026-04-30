@@ -9,7 +9,9 @@ async function getAdminUser() {
     const cookieStore = await cookies();
     const token = cookieStore.get("token")?.value;
     if (!token) return null;
-    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as { id: string };
+    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
+      id: string;
+    };
     const user = await User.findById(decoded.id).select("role").lean();
     return user as { role: string } | null;
   } catch {
@@ -22,14 +24,28 @@ export async function POST(req: NextRequest) {
   try {
     const { name, email, subject, message } = await req.json();
     if (!name || !email || !message) {
-      return NextResponse.json({ message: "Name, email and message are required." }, { status: 400 });
+      return NextResponse.json(
+        { message: "Name, email and message are required." },
+        { status: 400 },
+      );
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      return NextResponse.json({ message: "Invalid email address." }, { status: 400 });
+      return NextResponse.json(
+        { message: "Invalid email address." },
+        { status: 400 },
+      );
     }
     await dbConnect();
-    await ContactMessage.create({ name: name.trim(), email, subject: subject?.trim() || "", message: message.trim() });
-    return NextResponse.json({ message: "Message received. We'll get back to you soon!" }, { status: 201 });
+    await ContactMessage.create({
+      name: name.trim(),
+      email,
+      subject: subject?.trim() || "",
+      message: message.trim(),
+    });
+    return NextResponse.json(
+      { message: "Message received. We'll get back to you soon!" },
+      { status: 201 },
+    );
   } catch {
     return NextResponse.json({ message: "Server error." }, { status: 500 });
   }

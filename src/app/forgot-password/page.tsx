@@ -115,7 +115,13 @@ export default function ForgotPasswordPage() {
                 />
               </svg>
             </div>
-            <Image src="/logo.png" alt="Spicylon" width={100} height={34} className="h-8 w-auto object-contain" />
+            <Image
+              src="/logo.png"
+              alt="Spicylon"
+              width={100}
+              height={34}
+              className="h-8 w-auto object-contain"
+            />
           </Link>
         </div>
 
@@ -151,7 +157,13 @@ export default function ForgotPasswordPage() {
           {/* Mobile logo */}
           <div className="lg:hidden text-center mb-8">
             <Link href="/">
-              <Image src="/logo.png" alt="Spicylon" width={130} height={44} className="h-11 w-auto object-contain mx-auto" />
+              <Image
+                src="/logo.png"
+                alt="Spicylon"
+                width={130}
+                height={44}
+                className="h-11 w-auto object-contain mx-auto"
+              />
             </Link>
           </div>
 
