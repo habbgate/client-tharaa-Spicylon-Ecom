@@ -50,14 +50,26 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// GET /api/newsletter — list all subscribers (admin only)
-export async function GET(req: NextRequest) {
+// DELETE /api/newsletter — remove a subscriber (admin only)
+export async function DELETE(req: NextRequest) {
   try {
     const user = await getRequestingUser(req);
     if (!user || user.role !== "admin") {
       return NextResponse.json({ message: "Forbidden" }, { status: 403 });
     }
+    const { id } = await req.json();
     await dbConnect();
+    await NewsletterSubscriber.findByIdAndDelete(id);
+    return NextResponse.json({ message: "Subscriber removed." });
+  } catch (err: any) {
+    console.error("[newsletter DELETE]", err);
+    return NextResponse.json({ message: "Server error." }, { status: 500 });
+  }
+}
+
+// GET /api/newsletter — list all subscribers (admin only)
+export async function GET(req: NextRequest) {
+  try {
     const subscribers = await NewsletterSubscriber.find({})
       .sort({ createdAt: -1 })
       .lean();

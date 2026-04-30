@@ -66,6 +66,22 @@ export async function GET() {
   }
 }
 
+// DELETE /api/contact — remove a message (admin only)
+export async function DELETE(req: NextRequest) {
+  try {
+    const user = await getAdminUser();
+    if (!user || user.role !== "admin") {
+      return NextResponse.json({ message: "Unauthorized." }, { status: 401 });
+    }
+    const { id } = await req.json();
+    await dbConnect();
+    await ContactMessage.findByIdAndDelete(id);
+    return NextResponse.json({ message: "Message deleted." });
+  } catch {
+    return NextResponse.json({ message: "Server error." }, { status: 500 });
+  }
+}
+
 // PATCH /api/contact — mark message as read
 export async function PATCH(req: NextRequest) {
   try {

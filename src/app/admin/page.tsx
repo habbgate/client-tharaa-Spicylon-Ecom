@@ -127,6 +127,40 @@ export default function AdminDashboard() {
     }
   };
 
+  const deleteOrder = async (id: string) => {
+    if (!confirm("Delete this order? This cannot be undone.")) return;
+    try {
+      await axios.delete("/api/orders", { data: { id } });
+      setOrders((prev: any) => prev.filter((o: any) => o._id !== id));
+      toast.success("Order deleted.");
+    } catch {
+      toast.error("Failed to delete order.");
+    }
+  };
+
+  const deleteSubscriber = async (id: string) => {
+    if (!confirm("Remove this subscriber?")) return;
+    try {
+      await axios.delete("/api/newsletter", { data: { id } });
+      setSubscribers((prev) => prev.filter((s: any) => s._id !== id));
+      toast.success("Subscriber removed.");
+    } catch {
+      toast.error("Failed to remove subscriber.");
+    }
+  };
+
+  const deleteMessage = async (id: string) => {
+    if (!confirm("Delete this message?")) return;
+    try {
+      await axios.delete("/api/contact", { data: { id } });
+      setMessages((prev: any) => prev.filter((m: any) => m._id !== id));
+      if (expandedMessage === id) setExpandedMessage(null);
+      toast.success("Message deleted.");
+    } catch {
+      toast.error("Failed to delete message.");
+    }
+  };
+
   const downloadSubscribersCSV = () => {
     const rows = [
       ["Email", "Subscribed At"],
@@ -670,6 +704,13 @@ export default function AdminDashboard() {
                         >
                           {order.isDelivered ? "Processing" : "Delivered"}
                         </button>
+                        <button
+                          onClick={() => deleteOrder(order._id)}
+                          className="px-4 py-2 border border-red-200 bg-red-50 text-red-600 rounded-lg text-sm font-bold hover:bg-red-100 transition-all"
+                          title="Delete Order"
+                        >
+                          <HiOutlineTrash className="inline-block h-4 w-4" />
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -879,6 +920,7 @@ export default function AdminDashboard() {
                     <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest">
                       Subscribed At
                     </th>
+                    <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest"></th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-stone-100">
@@ -900,6 +942,15 @@ export default function AdminDashboard() {
                         </td>
                         <td className="px-8 py-5 text-stone-500 text-sm">
                           {new Date(s.createdAt).toLocaleString()}
+                        </td>
+                        <td className="px-8 py-5">
+                          <button
+                            onClick={() => deleteSubscriber(s._id)}
+                            className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                            title="Remove subscriber"
+                          >
+                            <HiOutlineTrash className="h-4 w-4" />
+                          </button>
                         </td>
                       </tr>
                     ))}
@@ -1022,17 +1073,29 @@ export default function AdminDashboard() {
                             </span>
                           </td>
                           <td className="px-6 py-4">
-                            {!msg.isRead && (
+                            <div className="flex gap-2">
+                              {!msg.isRead && (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    markMessageRead(msg._id);
+                                  }}
+                                  className="text-xs font-bold text-stone-500 hover:text-stone-900 underline"
+                                >
+                                  Mark read
+                                </button>
+                              )}
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  markMessageRead(msg._id);
+                                  deleteMessage(msg._id);
                                 }}
-                                className="text-xs font-bold text-stone-500 hover:text-stone-900 underline"
+                                className="p-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                                title="Delete message"
                               >
-                                Mark read
+                                <HiOutlineTrash className="h-4 w-4" />
                               </button>
-                            )}
+                            </div>
                           </td>
                         </tr>
                         {expandedMessage === msg._id && (
