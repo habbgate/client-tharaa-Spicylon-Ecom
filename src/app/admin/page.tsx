@@ -1484,7 +1484,10 @@ export default function AdminDashboard() {
                                   .split(",")
                                   .map((u) => u.trim())
                                   .filter((u, idx) => u && idx !== i);
-                                setFormData({ ...formData, images: urls.join(", ") });
+                                setFormData({
+                                  ...formData,
+                                  images: urls.join(", "),
+                                });
                               }}
                               className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity text-white text-xl font-bold"
                               title="Remove image"
