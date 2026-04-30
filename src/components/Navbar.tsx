@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useStore } from "@/store/useStore";
 import {
   HiOutlineShoppingBag,
@@ -62,11 +63,8 @@ const Navbar = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             <div className="flex-shrink-0">
-              <Link
-                href="/"
-                className="text-3xl font-extrabold tracking-tighter text-orange-500 italic drop-shadow-md hover:text-orange-400 transition-colors"
-              >
-                Spicylon
+              <Link href="/" className="flex items-center">
+                <Image src="/logo.png" alt="Spicylon" width={180} height={60} className="h-16 w-auto object-contain" priority />
               </Link>
             </div>
 
@@ -75,6 +73,7 @@ const Navbar = () => {
                 { href: "/", label: tNav("home") },
                 { href: "/products", label: tNav("spices") },
                 { href: "/about", label: tNav("ourStory") },
+                { href: "/contact", label: tNav("contact") },
               ].map((link) => (
                 <Link
                   key={link.href}
@@ -179,6 +178,7 @@ const Navbar = () => {
               { href: "/", label: tNav("home") },
               { href: "/products", label: tNav("spices") },
               { href: "/about", label: tNav("ourStory") },
+              { href: "/contact", label: tNav("contact") },
             ].map((link) => (
               <Link
                 key={link.href}

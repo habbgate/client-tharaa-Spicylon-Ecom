@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import toast from "react-hot-toast";
 import Link from "next/link";
+import Image from "next/image";
 
 type Step = "email" | "reset" | "done";
 
@@ -114,9 +115,7 @@ export default function ForgotPasswordPage() {
                 />
               </svg>
             </div>
-            <span className="text-xl font-black italic tracking-tighter">
-              Spicylon
-            </span>
+            <Image src="/logo.png" alt="Spicylon" width={100} height={34} className="h-8 w-auto object-contain" />
           </Link>
         </div>
 
@@ -151,11 +150,8 @@ export default function ForgotPasswordPage() {
         <div className="w-full max-w-md relative z-10">
           {/* Mobile logo */}
           <div className="lg:hidden text-center mb-8">
-            <Link
-              href="/"
-              className="text-4xl font-black italic text-orange-600 tracking-tighter"
-            >
-              Spicylon
+            <Link href="/">
+              <Image src="/logo.png" alt="Spicylon" width={130} height={44} className="h-11 w-auto object-contain mx-auto" />
             </Link>
           </div>
 

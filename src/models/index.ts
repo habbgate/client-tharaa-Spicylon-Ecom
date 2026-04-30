@@ -108,6 +108,17 @@ const NewsletterSubscriberSchema = new Schema(
   { timestamps: true },
 );
 
+const ContactMessageSchema = new Schema(
+  {
+    name: { type: String, required: true, trim: true },
+    email: { type: String, required: true, lowercase: true, trim: true },
+    subject: { type: String, trim: true, default: "" },
+    message: { type: String, required: true },
+    isRead: { type: Boolean, default: false },
+  },
+  { timestamps: true },
+);
+
 export const User = models.User || model("User", UserSchema);
 export const Product = models.Product || model("Product", ProductSchema);
 export const Order = models.Order || model("Order", OrderSchema);
@@ -115,3 +126,6 @@ export const Setting = models.Setting || model("Setting", SettingSchema);
 export const NewsletterSubscriber =
   models.NewsletterSubscriber ||
   model("NewsletterSubscriber", NewsletterSubscriberSchema);
+export const ContactMessage =
+  models.ContactMessage ||
+  model("ContactMessage", ContactMessageSchema);

@@ -24,9 +24,12 @@ export default function AdminDashboard() {
   const [reviewsPage, setReviewsPage] = useState(1);
   const ITEMS_PER_PAGE = 10;
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState("products"); // 'products', 'orders', 'reviews', 'orderDetails', 'newsletter'
+  const [tab, setTab] = useState("products"); // 'products', 'orders', 'reviews', 'orderDetails', 'newsletter', 'messages'
   const [subscribers, setSubscribers] = useState<any[]>([]);
   const [subscribersPage, setSubscribersPage] = useState(1);
+  const [messages, setMessages] = useState<any[]>([]);
+  const [messagesPage, setMessagesPage] = useState(1);
+  const [expandedMessage, setExpandedMessage] = useState<string | null>(null);
 
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState<any>(null);
@@ -91,6 +94,7 @@ export default function AdminDashboard() {
       fetchUsers();
       fetchSettings();
       fetchSubscribers();
+      fetchMessages();
     }
   }, [user]);
 
@@ -100,6 +104,24 @@ export default function AdminDashboard() {
       setSubscribers(data);
     } catch {
       // silently ignore — may not be admin yet
+    }
+  };
+
+  const fetchMessages = async () => {
+    try {
+      const { data } = await axios.get("/api/contact");
+      setMessages(data);
+    } catch {
+      // silently ignore
+    }
+  };
+
+  const markMessageRead = async (id: string) => {
+    try {
+      await axios.patch("/api/contact", { id });
+      setMessages((prev) => prev.map((m) => m._id === id ? { ...m, isRead: true } : m));
+    } catch {
+      // ignore
     }
   };
 
@@ -327,6 +349,17 @@ export default function AdminDashboard() {
             className={`px-6 py-3 font-bold rounded-xl transition-all ${tab === "newsletter" ? "bg-orange-500 text-white" : "bg-stone-200 text-stone-600 hover:bg-stone-300"}`}
           >
             Newsletter
+          </button>
+          <button
+            onClick={() => setTab("messages")}
+            className={`relative px-6 py-3 font-bold rounded-xl transition-all ${tab === "messages" ? "bg-orange-500 text-white" : "bg-stone-200 text-stone-600 hover:bg-stone-300"}`}
+          >
+            Messages
+            {messages.filter((m) => !m.isRead).length > 0 && (
+              <span className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 text-white rounded-full flex items-center justify-center text-[10px] font-black">
+                {messages.filter((m) => !m.isRead).length}
+              </span>
+            )}
           </button>
         </div>
       </div>
@@ -875,6 +908,102 @@ export default function AdminDashboard() {
                 totalItems={subscribers.length}
                 itemsPerPage={ITEMS_PER_PAGE}
                 onPageChange={setSubscribersPage}
+              />
+            </>
+          )}
+        </div>
+      )}
+
+      {tab === "messages" && (
+        <div className="bg-white rounded-3xl border border-stone-200 overflow-hidden shadow-xl">
+          <div className="p-6 border-b border-stone-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-black text-stone-900">Contact Messages</h2>
+              <p className="text-stone-500 text-sm mt-1">
+                {messages.length} message{messages.length !== 1 ? "s" : ""} &nbsp;·&nbsp;
+                <span className="text-red-500 font-bold">{messages.filter((m) => !m.isRead).length} unread</span>
+              </p>
+            </div>
+          </div>
+          {messages.length === 0 ? (
+            <div className="px-8 py-16 text-center text-stone-400">
+              <svg className="w-12 h-12 mx-auto mb-4 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0l-8 5-8-5" />
+              </svg>
+              No messages yet.
+            </div>
+          ) : (
+            <>
+              <table className="w-full text-left">
+                <thead className="bg-stone-50 border-b border-stone-200">
+                  <tr>
+                    <th className="px-6 py-4 font-black text-stone-400 uppercase text-xs tracking-widest">#</th>
+                    <th className="px-6 py-4 font-black text-stone-400 uppercase text-xs tracking-widest">Name</th>
+                    <th className="px-6 py-4 font-black text-stone-400 uppercase text-xs tracking-widest">Email</th>
+                    <th className="px-6 py-4 font-black text-stone-400 uppercase text-xs tracking-widest">Subject</th>
+                    <th className="px-6 py-4 font-black text-stone-400 uppercase text-xs tracking-widest">Date</th>
+                    <th className="px-6 py-4 font-black text-stone-400 uppercase text-xs tracking-widest">Status</th>
+                    <th className="px-6 py-4 font-black text-stone-400 uppercase text-xs tracking-widest">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-stone-100">
+                  {messages
+                    .slice((messagesPage - 1) * ITEMS_PER_PAGE, messagesPage * ITEMS_PER_PAGE)
+                    .map((msg: any, idx: number) => (
+                      <>
+                        <tr
+                          key={msg._id}
+                          className={`transition-colors cursor-pointer ${!msg.isRead ? "bg-orange-50 hover:bg-orange-100/60" : "hover:bg-stone-50"}`}
+                          onClick={() => setExpandedMessage(expandedMessage === msg._id ? null : msg._id)}
+                        >
+                          <td className="px-6 py-4 text-stone-400 text-sm">
+                            {(messagesPage - 1) * ITEMS_PER_PAGE + idx + 1}
+                          </td>
+                          <td className="px-6 py-4 font-bold text-stone-900 flex items-center gap-2">
+                            {!msg.isRead && <span className="w-2 h-2 rounded-full bg-orange-500 flex-shrink-0" />}
+                            {msg.name}
+                          </td>
+                          <td className="px-6 py-4 text-stone-600 text-sm">{msg.email}</td>
+                          <td className="px-6 py-4 text-stone-500 text-sm">{msg.subject || <span className="italic text-stone-300">—</span>}</td>
+                          <td className="px-6 py-4 text-stone-500 text-sm">{new Date(msg.createdAt).toLocaleString()}</td>
+                          <td className="px-6 py-4">
+                            <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${msg.isRead ? "bg-stone-100 text-stone-500" : "bg-orange-100 text-orange-600"}`}>
+                              {msg.isRead ? "Read" : "Unread"}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            {!msg.isRead && (
+                              <button
+                                onClick={(e) => { e.stopPropagation(); markMessageRead(msg._id); }}
+                                className="text-xs font-bold text-stone-500 hover:text-stone-900 underline"
+                              >
+                                Mark read
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                        {expandedMessage === msg._id && (
+                          <tr key={`${msg._id}-expanded`} className="bg-stone-50">
+                            <td colSpan={7} className="px-8 py-5">
+                              <p className="text-stone-700 text-sm whitespace-pre-wrap leading-relaxed">{msg.message}</p>
+                              <a
+                                href={`mailto:${msg.email}?subject=Re: ${encodeURIComponent(msg.subject || "Your message")}`}
+                                className="mt-3 inline-block px-4 py-2 bg-stone-900 text-white text-xs font-bold rounded-xl hover:bg-stone-700 transition-colors"
+                              >
+                                Reply via Email
+                              </a>
+                            </td>
+                          </tr>
+                        )}
+                      </>
+                    ))}
+                </tbody>
+              </table>
+              <Pagination
+                currentPage={messagesPage}
+                totalItems={messages.length}
+                itemsPerPage={ITEMS_PER_PAGE}
+                onPageChange={setMessagesPage}
               />
             </>
           )}

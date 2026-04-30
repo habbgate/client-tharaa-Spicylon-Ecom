@@ -4,17 +4,39 @@
  */
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import fs from "fs";
+import path from "path";
+
+function getLogoBase64(): string | null {
+  try {
+    const logoPath = path.join(process.cwd(), "public", "logo.png");
+    const buf = fs.readFileSync(logoPath);
+    return `data:image/png;base64,${buf.toString("base64")}`;
+  } catch {
+    return null;
+  }
+}
 
 export function generateInvoiceBuffer(order: any): Buffer {
+  const logoBase64 = getLogoBase64();
   const doc = new jsPDF();
 
-  // ── Header ────────────────────────────────────────────
-  doc.setFontSize(24);
-  doc.setTextColor(234, 88, 12);
-  doc.text("SPICYLON", 14, 25);
-  doc.setFontSize(10);
-  doc.setTextColor(100);
-  doc.text("Authentic Ceylon Spices", 14, 32);
+  // ── Header ──────────────────────────────────────────
+  if (logoBase64) {
+    doc.addImage(logoBase64, "PNG", 14, 10, 22, 22);
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text("Authentic Ceylon Spices", 38, 19);
+    doc.setFontSize(8);
+    doc.text("spicylon.com", 38, 25);
+  } else {
+    doc.setFontSize(24);
+    doc.setTextColor(234, 88, 12);
+    doc.text("SPICYLON", 14, 25);
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text("Authentic Ceylon Spices", 14, 32);
+  }
 
   doc.setFontSize(18);
   doc.setTextColor(40);

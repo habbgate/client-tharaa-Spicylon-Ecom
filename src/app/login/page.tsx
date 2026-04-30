@@ -6,6 +6,7 @@ import axios from "axios";
 import { useStore } from "@/store/useStore";
 import toast from "react-hot-toast";
 import Link from "next/link";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 
@@ -141,9 +142,7 @@ export default function LoginPage() {
                   />
                 </svg>
               </div>
-              <span className="text-xl font-black italic tracking-tighter">
-                Spicylon
-              </span>
+              <Image src="/logo.png" alt="Spicylon" width={100} height={34} className="h-8 w-auto object-contain" />
             </div>
           </div>
 
@@ -203,9 +202,7 @@ export default function LoginPage() {
           <div className="w-full max-w-md relative z-10">
             {/* Mobile logo */}
             <div className="lg:hidden text-center mb-8">
-              <span className="text-4xl font-black italic text-orange-600 tracking-tighter">
-                Spicylon
-              </span>
+              <Image src="/logo.png" alt="Spicylon" width={130} height={44} className="h-11 w-auto object-contain mx-auto" />
             </div>
 
             {/* Tab switcher (only shown when not in OTP mode) */}

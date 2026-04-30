@@ -1,11 +1,6 @@
 ﻿import jsPDF from "jspdf";
 
-/** Convert an image URL to a PNG data-URL via an off-screen canvas (browser only) */
-async function toDataUrl(
-  src: string,
-  w: number,
-  h: number,
-): Promise<string | null> {
+async function toDataUrl(src: string, w: number, h: number): Promise<string | null> {
   return new Promise((resolve) => {
     const img = new window.Image();
     img.crossOrigin = "anonymous";
@@ -14,10 +9,7 @@ async function toDataUrl(
       canvas.width = w;
       canvas.height = h;
       const ctx = canvas.getContext("2d");
-      if (!ctx) {
-        resolve(null);
-        return;
-      }
+      if (!ctx) { resolve(null); return; }
       ctx.drawImage(img, 0, 0, w, h);
       resolve(canvas.toDataURL("image/png"));
     };
@@ -26,278 +18,207 @@ async function toDataUrl(
   });
 }
 
-// 102mm x 152mm standard thermal/courier shipping label size
+// 102 x 152 mm shipping label
 export const generateShippingLabel = async (order: any) => {
   const W = 102;
   const H = 152;
-  const doc = new jsPDF({
-    unit: "mm",
-    format: [W, H],
-    orientation: "portrait",
-  });
+  const doc = new jsPDF({ unit: "mm", format: [W, H], orientation: "portrait" });
 
-  const addr = order.shippingAddress || {};
-  const orderId = String(order._id || "");
-  const shortId = orderId.slice(-12).toUpperCase();
-  const date = new Date(order.createdAt || Date.now()).toLocaleDateString(
-    "en-GB",
-    {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    },
-  );
-  const itemCount = (order.orderItems || []).reduce(
-    (acc: number, i: any) => acc + (i.quantity || 1),
-    0,
-  );
+  const addr       = order.shippingAddress || {};
+  const orderId    = String(order._id || "");
+  const shortId    = orderId.slice(-12).toUpperCase();
+  const date       = new Date(order.createdAt || Date.now()).toLocaleDateString("en-GB", {
+    day: "2-digit", month: "short", year: "numeric",
+  });
+  const itemCount  = (order.orderItems || []).reduce((a: number, i: any) => a + (i.quantity || 1), 0);
   const recipientName = addr.fullName || order.userId?.name || "Customer";
 
-  // Load logo
-  const logoData = await toDataUrl("/logoqr.svg", 160, 160);
+  const [logoData, qrData] = await Promise.all([
+    toDataUrl("/logo.png", 200, 200),
+    toDataUrl("/logoqr.svg", 200, 200),
+  ]);
 
-  // White canvas
+  // ── White canvas ────────────────────────────────────────────────
   doc.setFillColor(255, 255, 255);
   doc.rect(0, 0, W, H, "F");
 
-  // Outer rounded border
+  // ── Outer border ────────────────────────────────────────────────
   doc.setDrawColor(220, 220, 220);
-  doc.setLineWidth(0.4);
+  doc.setLineWidth(0.35);
   doc.roundedRect(2, 2, W - 4, H - 4, 3, 3);
 
-  // HEADER dark bar
+  // ── HEADER — dark bar (h = 24 mm) ───────────────────────────────
+  const HEADER_H = 24;
   doc.setFillColor(15, 15, 15);
-  doc.roundedRect(2, 2, W - 4, 22, 3, 3, "F");
-  doc.rect(2, 16, W - 4, 8, "F");
+  doc.roundedRect(2, 2, W - 4, HEADER_H, 3, 3, "F");
+  doc.rect(2, 14, W - 4, HEADER_H - 12, "F");          // flatten bottom corners
 
-  // Orange left accent stripe
-  doc.setFillColor(234, 88, 12);
-  doc.rect(2, 2, 4, 22, "F");
+  // Left stripe
+  doc.setFillColor(60, 60, 60);
+  doc.rect(2, 2, 5, HEADER_H, "F");
 
-  // Logo in header
+  // Logo — centred vertically in bar: bar interior y=2..26, logo 18×18
+  const LOGO_SIZE = 18;
+  const logoY = 2 + (HEADER_H - LOGO_SIZE) / 2;        // = 5  → centred
   if (logoData) {
-    doc.addImage(logoData, "PNG", 8, 3.5, 15, 15);
-  } else {
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(14);
-    doc.setTextColor(255, 255, 255);
-    doc.text("SPICYLON", 11, 12);
+    doc.addImage(logoData, "PNG", 9, logoY, LOGO_SIZE, LOGO_SIZE);
   }
 
-  // Brand text beside logo
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(11);
-  doc.setTextColor(255, 255, 255);
-  doc.text("SPICYLON", 26, 12);
-  doc.setFontSize(5.5);
+  // Subtitle text — vertically centred alongside logo
+  const textX = 9 + LOGO_SIZE + 3;                     // = 30
   doc.setFont("helvetica", "normal");
-  doc.setTextColor(160, 160, 160);
-  doc.text("AUTHENTIC CEYLON SPICES", 26, 18);
-
-  // SHIPPING LABEL pill
-  doc.setFillColor(234, 88, 12);
-  doc.roundedRect(W - 36, 7.5, 32, 7, 2, 2, "F");
   doc.setFontSize(6);
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor(255, 255, 255);
-  doc.text("SHIPPING LABEL", W - 20, 12.5, { align: "center" });
+  doc.setTextColor(160, 160, 160);
+  doc.text("AUTHENTIC CEYLON SPICES", textX, 12);
+  doc.setFontSize(5);
+  doc.setTextColor(110, 110, 110);
+  doc.text("spicylon.com", textX, 17);
 
-  // Orange accent line below header
-  doc.setDrawColor(234, 88, 12);
+  // QR code — right side of header, vertically centred
+  const HEADER_QR = 18;
+  const headerQrX = W - 2 - HEADER_QR - 3;             // 3 mm from right edge
+  const headerQrY = 2 + (HEADER_H - HEADER_QR) / 2;    // vertically centred
+  if (qrData) {
+    // white background so QR is readable on dark bar
+    doc.setFillColor(255, 255, 255);
+    doc.roundedRect(headerQrX - 1.5, headerQrY - 1.5, HEADER_QR + 3, HEADER_QR + 3, 1.5, 1.5, "F");
+    doc.addImage(qrData, "PNG", headerQrX, headerQrY, HEADER_QR, HEADER_QR);
+  }
+
+  // Accent line under header
+  doc.setDrawColor(80, 80, 80);
   doc.setLineWidth(0.5);
-  doc.line(2, 24, W - 2, 24);
+  doc.line(2, 2 + HEADER_H, W - 2, 2 + HEADER_H);
 
-  // Dashed separator helper
-  const dashedLine = (y: number) => {
+  // ── Dashed-line helper ──────────────────────────────────────────
+  const dashed = (y: number) => {
     doc.setDrawColor(220, 220, 220);
-    doc.setLineWidth(0.25);
-    const dashLen = 2,
-      gap = 1.5;
-    for (let x = 4; x < W - 4; x += dashLen + gap) {
-      doc.line(x, y, Math.min(x + dashLen, W - 4), y);
-    }
+    doc.setLineWidth(0.22);
+    for (let x = 4; x < W - 4; x += 3.5) doc.line(x, y, Math.min(x + 2, W - 4), y);
   };
 
-  // FROM section
+  // ── FROM ────────────────────────────────────────────────────────
+  const fromTop = 28;
   doc.setFillColor(245, 245, 244);
-  doc.roundedRect(4, 27, 14, 5, 1.5, 1.5, "F");
-  doc.setFontSize(5.5);
+  doc.roundedRect(4, fromTop, 13, 4.5, 1.2, 1.2, "F");
+  doc.setFontSize(5);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(130, 130, 130);
-  doc.text("FROM", 11, 30.8, { align: "center" });
+  doc.text("FROM", 10.5, fromTop + 3.2, { align: "center" });
 
-  doc.setFontSize(8);
+  doc.setFontSize(7.5);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(20, 20, 20);
-  doc.text("Spicylon - Ceylon Spice Trading Co.", 4, 39);
-  doc.setFontSize(7);
+  doc.text("Spicylon — Ceylon Spice Trading Co.", 4, fromTop + 11);
+  doc.setFontSize(6.5);
   doc.setFont("helvetica", "normal");
-  doc.setTextColor(100, 100, 100);
-  doc.text("Highland Farms District, Sri Lanka", 4, 45);
-  doc.text("support@spicylon.com", 4, 50);
+  doc.setTextColor(110, 110, 110);
+  doc.text("Highland Farms District, Sri Lanka", 4, fromTop + 17);
+  doc.text("support@spicylon.com", 4, fromTop + 22);
 
-  dashedLine(54);
+  dashed(fromTop + 26);
 
-  // TO section
+  // ── TO ──────────────────────────────────────────────────────────
+  const toTop = fromTop + 30;
   doc.setFillColor(15, 15, 15);
-  doc.roundedRect(4, 57, 22, 5.5, 1.5, 1.5, "F");
-  doc.setFontSize(5.5);
+  doc.roundedRect(4, toTop, 22, 5, 1.2, 1.2, "F");
+  doc.setFontSize(5);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(255, 255, 255);
-  doc.text("DELIVER TO", 15, 61, { align: "center" });
+  doc.text("DELIVER TO", 15, toTop + 3.4, { align: "center" });
 
   // Recipient name
-  doc.setFontSize(13);
+  doc.setFontSize(12);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(10, 10, 10);
-  const maxNameW = W - 10;
-  const nameStr = doc.splitTextToSize(recipientName, maxNameW)[0];
-  doc.text(nameStr, 4, 72);
+  const nameStr = doc.splitTextToSize(recipientName, W - 10)[0];
+  doc.text(nameStr, 4, toTop + 13);
+  // Underline
+  doc.setDrawColor(40, 40, 40);
+  doc.setLineWidth(0.55);
+  doc.line(4, toTop + 15, 4 + doc.getTextWidth(nameStr), toTop + 15);
 
-  // Orange underline
-  doc.setDrawColor(234, 88, 12);
-  doc.setLineWidth(0.6);
-  doc.line(4, 74, 4 + doc.getTextWidth(nameStr), 74);
-
-  // Address lines
-  doc.setFontSize(8);
+  // Address block
+  doc.setFontSize(7.5);
   doc.setFont("helvetica", "normal");
-  doc.setTextColor(50, 50, 50);
-
-  let addrY = 81;
-  const addrLines: string[] = [];
-  if (addr.address) addrLines.push(addr.address);
-  if (addr.city || addr.postalCode)
-    addrLines.push([addr.city, addr.postalCode].filter(Boolean).join(", "));
-  if (addr.country) addrLines.push(addr.country);
-  if (addr.phone) addrLines.push("\u260E  " + addr.phone);
-
-  addrLines.forEach((line) => {
-    const wrapped = doc.splitTextToSize(line, W - 10);
-    wrapped.forEach((l: string) => {
-      doc.text(l, 4, addrY);
-      addrY += 5.5;
-    });
+  doc.setTextColor(55, 55, 55);
+  let ay = toTop + 22;
+  const lines: string[] = [];
+  if (addr.address)               lines.push(addr.address);
+  if (addr.city || addr.postalCode) lines.push([addr.city, addr.postalCode].filter(Boolean).join(", "));
+  if (addr.country)               lines.push(addr.country);
+  if (addr.phone)                 lines.push("\u260E  " + addr.phone);
+  lines.forEach((ln) => {
+    doc.splitTextToSize(ln, W - 10).forEach((l: string) => { doc.text(l, 4, ay); ay += 5; });
   });
 
-  dashedLine(addrY + 3);
+  dashed(ay + 2);
 
-  // ORDER METADATA row
-  const metaY = addrY + 9;
+  // ── ORDER META ──────────────────────────────────────────────────
+  const metaTop = ay + 7;
+  const halfW   = (W - 12) / 2;
 
   // ORDER REF box
-  const halfW = (W - 12) / 2;
   doc.setFillColor(245, 245, 244);
-  doc.roundedRect(4, metaY - 5, halfW, 15, 2, 2, "F");
-  doc.setFontSize(5.5);
+  doc.roundedRect(4, metaTop, halfW, 13, 2, 2, "F");
+  doc.setFontSize(5);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(130, 130, 130);
-  doc.text("ORDER REF", 4 + halfW / 2, metaY - 1, { align: "center" });
-  doc.setFontSize(8);
+  doc.text("ORDER REF", 4 + halfW / 2, metaTop + 4, { align: "center" });
+  doc.setFontSize(7.5);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(15, 15, 15);
-  doc.text("#" + shortId.slice(-8), 4 + halfW / 2, metaY + 5.5, {
-    align: "center",
-  });
+  doc.text("#" + shortId.slice(-8), 4 + halfW / 2, metaTop + 10, { align: "center" });
 
   // DATE box
-  const boxR = 4 + halfW + 4;
+  const bx2 = 4 + halfW + 4;
   doc.setFillColor(245, 245, 244);
-  doc.roundedRect(boxR, metaY - 5, halfW, 15, 2, 2, "F");
-  doc.setFontSize(5.5);
+  doc.roundedRect(bx2, metaTop, halfW, 13, 2, 2, "F");
+  doc.setFontSize(5);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(130, 130, 130);
-  doc.text("DISPATCH DATE", boxR + halfW / 2, metaY - 1, { align: "center" });
-  doc.setFontSize(8);
+  doc.text("DISPATCH DATE", bx2 + halfW / 2, metaTop + 4, { align: "center" });
+  doc.setFontSize(7.5);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(15, 15, 15);
-  doc.text(date, boxR + halfW / 2, metaY + 5.5, { align: "center" });
+  doc.text(date, bx2 + halfW / 2, metaTop + 10, { align: "center" });
 
-  // Pills row
-  const pillY = metaY + 18;
-  doc.setFillColor(234, 88, 12);
-  doc.roundedRect(4, pillY, 28, 7, 2, 2, "F");
-  doc.setFontSize(6);
+  // ── PILLS ───────────────────────────────────────────────────────
+  const pillTop = metaTop + 17;
+  doc.setFillColor(30, 30, 30);
+  doc.roundedRect(4, pillTop, 26, 6.5, 2, 2, "F");
+  doc.setFontSize(5.5);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(255, 255, 255);
-  doc.text(
-    itemCount + " ITEM" + (itemCount !== 1 ? "S" : ""),
-    18,
-    pillY + 4.8,
-    { align: "center" },
-  );
+  doc.text(itemCount + " ITEM" + (itemCount !== 1 ? "S" : ""), 17, pillTop + 4.4, { align: "center" });
 
   doc.setFillColor(245, 245, 244);
-  doc.roundedRect(36, pillY, 44, 7, 2, 2, "F");
-  doc.setFontSize(6);
+  doc.roundedRect(34, pillTop, 42, 6.5, 2, 2, "F");
+  doc.setFontSize(5.5);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(80, 80, 80);
-  doc.text("HANDLE WITH CARE", 58, pillY + 4.8, { align: "center" });
+  doc.text("HANDLE WITH CARE", 55, pillTop + 4.4, { align: "center" });
 
-  dashedLine(pillY + 11);
-
-  // BARCODE
-  const bcY = pillY + 16;
-  const bcH = 14;
-  const bcX0 = 4;
-  const bcW = W - 8;
-
-  const barSeed = shortId + "0000000000000";
-  const pattern: Array<{ w: number; dark: boolean }> = [];
-  let totalW = 0;
-  for (let i = 0; i < barSeed.length && totalW < bcW - 4; i++) {
-    const code = barSeed.charCodeAt(i);
-    const widths = [
-      code % 3 === 0 ? 1.4 : 0.7,
-      0.4,
-      code % 2 === 0 ? 1.2 : 0.6,
-      0.4,
-      code % 5 < 2 ? 1.0 : 0.6,
-    ];
-    widths.forEach((w, j) => {
-      pattern.push({ w, dark: j % 2 === 0 });
-      totalW += w + 0.3;
-    });
-  }
-
-  let bx = bcX0 + 1;
-  pattern.forEach(({ w, dark }) => {
-    if (bx + w > bcX0 + bcW - 1) return;
-    if (dark) {
-      doc.setFillColor(10, 10, 10);
-      doc.rect(bx, bcY, w, bcH, "F");
-    }
-    bx += w + 0.3;
-  });
-
-  doc.setFontSize(6.5);
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor(30, 30, 30);
-  doc.text(shortId, W / 2, bcY + bcH + 5, { align: "center" });
-
-  // FOOTER dark bar
+  // ── FOOTER ──────────────────────────────────────────────────────
+  const footerY = H - 13;
   doc.setFillColor(15, 15, 15);
-  doc.roundedRect(2, H - 13, W - 4, 11, 3, 3, "F");
-  doc.rect(2, H - 13, W - 4, 5, "F");
-  doc.setFillColor(234, 88, 12);
-  doc.rect(2, H - 13, 4, 11, "F");
+  doc.roundedRect(2, footerY, W - 4, H - footerY - 2, 3, 3, "F");
+  doc.rect(2, footerY, W - 4, 5, "F");
+  doc.setFillColor(60, 60, 60);
+  doc.rect(2, footerY, 5, H - footerY - 2, "F");
 
   doc.setFontSize(5.5);
   doc.setFont("helvetica", "normal");
   doc.setTextColor(160, 160, 160);
-  doc.text("spicylon.com  Authentic Ceylon Spices  Est. 2026", W / 2, H - 7, {
-    align: "center",
-  });
-  doc.setFontSize(5);
+  doc.text("spicylon.com  ·  Authentic Ceylon Spices  ·  Est. 2026", W / 2, footerY + 6, { align: "center" });
+  doc.setFontSize(4.5);
   doc.setTextColor(100, 100, 100);
-  doc.text("Keep dry  Fragile contents", W / 2, H - 3.5, { align: "center" });
+  doc.text("Keep dry  ·  Fragile contents", W / 2, footerY + 10.5, { align: "center" });
 
-  // Print in new window
+  // ── Print ───────────────────────────────────────────────────────
   doc.autoPrint();
   const blob = doc.output("blob");
-  const url = URL.createObjectURL(blob);
-  const win = window.open(url, "_blank");
-  if (!win) {
-    doc.save("ShippingLabel_" + shortId + ".pdf");
-  }
+  const url  = URL.createObjectURL(blob);
+  const win  = window.open(url, "_blank");
+  if (!win) doc.save("ShippingLabel_" + shortId + ".pdf");
 };

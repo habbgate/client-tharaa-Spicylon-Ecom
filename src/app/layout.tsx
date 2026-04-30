@@ -3,8 +3,9 @@ import { getLocale, getMessages } from "next-intl/server";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
+import Image from "next/image";
 import { Toaster } from "react-hot-toast";
-import { FaFacebookF, FaInstagram, FaTwitter, FaYoutube } from "react-icons/fa";
+import { FaFacebookF, FaInstagram } from "react-icons/fa";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -72,6 +73,10 @@ export const metadata = {
   alternates: {
     canonical: "https://spicylon.com",
   },
+  icons: {
+    icon: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 export default async function RootLayout({
@@ -101,9 +106,9 @@ export default async function RootLayout({
               <div className="grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-8 mb-16">
                 {/* Brand & Mission */}
                 <div className="col-span-1 md:col-span-12 lg:col-span-5 flex flex-col items-center lg:items-start text-center lg:text-left">
-                  <h3 className="text-4xl font-extrabold text-orange-500 mb-6 tracking-tighter italic">
-                    Spicylon
-                  </h3>
+                  <div className="mb-6">
+                    <Image src="/logo.png" alt="Spicylon" width={240} height={80} className="h-24 w-auto object-contain" />
+                  </div>
                   <p className="text-stone-400 mb-8 max-w-md leading-relaxed text-lg">
                     Authentic flavors, directly from Sri Lankan plantations. We
                     celebrate the rich heritage of the ancient Ceylon spice
@@ -124,18 +129,7 @@ export default async function RootLayout({
                     >
                       <FaInstagram className="w-5 h-5 group-hover:scale-110 transition-transform" />
                     </a>
-                    <a
-                      href="#"
-                      className="w-12 h-12 rounded-full border border-stone-800 bg-stone-900/50 flex items-center justify-center text-stone-400 hover:text-white hover:border-orange-500 hover:bg-orange-600 transition-all group"
-                    >
-                      <FaTwitter className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                    </a>
-                    <a
-                      href="#"
-                      className="w-12 h-12 rounded-full border border-stone-800 bg-stone-900/50 flex items-center justify-center text-stone-400 hover:text-white hover:border-orange-500 hover:bg-orange-600 transition-all group"
-                    >
-                      <FaYoutube className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                    </a>
+
                   </div>
                 </div>
 
