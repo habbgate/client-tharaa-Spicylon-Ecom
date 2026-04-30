@@ -1,15 +1,20 @@
 import nodemailer from "nodemailer";
 
-// Create generic transporter
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: parseInt(process.env.SMTP_PORT || "587"),
-  secure: process.env.SMTP_PORT === "465",
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
+function createTransporter() {
+  const port = parseInt(process.env.SMTP_PORT || "587");
+  return nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port,
+    secure: port === 465,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+    tls: {
+      rejectUnauthorized: false,
+    },
+  });
+}
 
 /**
  * Sends an email and awaits delivery before resolving.
@@ -22,6 +27,7 @@ export const sendEmailBackground = async (
   attachments?: any[],
 ): Promise<void> => {
   try {
+    const transporter = createTransporter();
     const info = await transporter.sendMail({
       from: process.env.EMAIL_FROM || '"Spicylon" <noreply@spicylon.com>',
       to,
