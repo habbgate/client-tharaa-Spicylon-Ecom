@@ -711,7 +711,12 @@ export default function AdminDashboard() {
                       </div>
                     </td>
                     <td className="px-8 py-6 font-bold text-stone-900">
-                      {order.userId?.name || <span className="text-orange-600 font-semibold italic">Non Registered User</span>} <br />
+                      {order.userId?.name || (
+                        <span className="text-orange-600 font-semibold italic">
+                          Non Registered User
+                        </span>
+                      )}{" "}
+                      <br />
                       <span className="text-xs text-stone-500 font-normal">
                         {order.userId?.email || order.guestEmail || "—"}
                       </span>
@@ -1317,7 +1322,11 @@ export default function AdminDashboard() {
                       Name
                     </span>
                     <span className="font-bold text-stone-900 text-lg">
-                      {viewingOrder.userId?.name || <span className="text-orange-600 italic">Non Registered User</span>}
+                      {viewingOrder.userId?.name || (
+                        <span className="text-orange-600 italic">
+                          Non Registered User
+                        </span>
+                      )}
                     </span>
                   </div>
                   <div className="flex flex-col border-b border-stone-200 pb-3">
@@ -1325,7 +1334,9 @@ export default function AdminDashboard() {
                       Email
                     </span>
                     <span className="font-bold text-stone-900 text-lg">
-                      {viewingOrder.userId?.email || viewingOrder.guestEmail || "—"}
+                      {viewingOrder.userId?.email ||
+                        viewingOrder.guestEmail ||
+                        "—"}
                     </span>
                   </div>
                   <div className="flex flex-col">

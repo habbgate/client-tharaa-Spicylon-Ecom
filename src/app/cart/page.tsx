@@ -243,7 +243,10 @@ export default function CartPage() {
             {!user && (
               <div className="mb-4 p-4 bg-orange-50 border border-orange-200 rounded-xl">
                 <label className="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1.5">
-                  Your Email * <span className="normal-case font-normal text-stone-400">(for order confirmation)</span>
+                  Your Email *{" "}
+                  <span className="normal-case font-normal text-stone-400">
+                    (for order confirmation)
+                  </span>
                 </label>
                 <input
                   type="email"
