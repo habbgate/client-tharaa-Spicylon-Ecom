@@ -3,6 +3,7 @@ import { cookies } from 'next/headers';
 import dbConnect from '@/lib/db';
 import { Product } from '@/models';
 import { verifyToken } from '@/lib/auth';
+import { Types } from 'mongoose';
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -21,46 +22,54 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    const cookieStore = await cookies();
-    const token = cookieStore.get('token')?.value;
-
-    if (!token) {
-      return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
-    }
-
-    const decoded = verifyToken(token) as any;
-    if (!decoded || !decoded.id) {
-      return NextResponse.json({ message: 'Invalid token' }, { status: 401 });
-    }
-
     const { rating, comment, userName } = await req.json();
 
     if (!rating || !comment) {
       return NextResponse.json({ message: 'Rating and comment are required' }, { status: 400 });
     }
 
+    // Try to get logged-in user — optional
+    let userId: Types.ObjectId | undefined;
+    let resolvedName = 'Anonymous';
+    try {
+      const cookieStore = await cookies();
+      const token = cookieStore.get('token')?.value;
+      if (token) {
+        const decoded = verifyToken(token) as any;
+        if (decoded?.id) {
+          userId = decoded.id;
+          resolvedName = userName || decoded.name || 'Anonymous';
+        }
+      }
+    } catch { /* guest — ignore */ }
+
+    if (!userId) {
+      resolvedName = 'Anonymous';
+    }
+
     await dbConnect();
     const product = await Product.findById(id);
-
     if (!product) {
       return NextResponse.json({ message: 'Product not found' }, { status: 404 });
     }
 
-    const alreadyReviewed = product.reviews?.find(
-      (r: any) => r.userId.toString() === decoded.id
-    );
-
-    if (alreadyReviewed) {
-      return NextResponse.json({ message: 'Product already reviewed' }, { status: 400 });
+    // Prevent a logged-in user from reviewing the same product twice
+    if (userId) {
+      const alreadyReviewed = product.reviews?.find(
+        (r: any) => r.userId?.toString() === userId!.toString()
+      );
+      if (alreadyReviewed) {
+        return NextResponse.json({ message: 'Product already reviewed' }, { status: 400 });
+      }
     }
 
-    const review = {
-      userId: decoded.id,
+    const review: any = {
       productId: id,
-      userName: userName || decoded.name || 'Anonymous',
+      userName: resolvedName,
       rating: Number(rating),
       comment,
     };
+    if (userId) review.userId = userId;
 
     product.reviews.push(review);
     product.numReviews = product.reviews.length;

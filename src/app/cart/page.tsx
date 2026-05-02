@@ -20,6 +20,7 @@ export default function CartPage() {
   const t = useTranslations("Cart");
 
   const [deliveryAmount, setDeliveryAmount] = useState(0);
+  const [guestEmail, setGuestEmail] = useState("");
   const [shipping, setShipping] = useState({
     fullName: "",
     address: "",
@@ -75,8 +76,9 @@ export default function CartPage() {
   const total = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
   const handleCheckout = async () => {
-    if (!user) {
-      toast.error(t("loginReq"));
+    // Guest checkout: require an email if not logged in
+    if (!user && !guestEmail.trim()) {
+      toast.error("Please enter your email to proceed.");
       return;
     }
 
@@ -90,9 +92,11 @@ export default function CartPage() {
       return;
     }
 
+    const emailForCheckout = user ? user.email : guestEmail.trim();
+
     try {
-      // First, create the order in MongoDB
-      const orderRes = await axios.post("/api/orders", {
+      // Create the order — userId is optional for guests
+      const orderPayload: any = {
         orderItems: cart.map((i) => ({
           name: i.name,
           quantity: i.quantity,
@@ -105,14 +109,20 @@ export default function CartPage() {
         itemsPrice: total,
         shippingPrice: deliveryAmount,
         totalPrice: total + deliveryAmount,
-        userId: user._id || user.id,
         currency: currency,
-      });
+      };
+      if (user) {
+        orderPayload.userId = user._id || user.id;
+      } else {
+        orderPayload.guestEmail = emailForCheckout;
+      }
+
+      const orderRes = await axios.post("/api/orders", orderPayload);
 
       // Pass the created orderId to Stripe checkout
       const { data } = await axios.post("/api/checkout", {
         items: cart,
-        email: user.email,
+        email: emailForCheckout,
         currency: currency,
         orderId: orderRes.data._id,
         deliveryAmount,
@@ -228,6 +238,24 @@ export default function CartPage() {
               </span>
               Delivery Details
             </h2>
+
+            {/* Guest email — only shown when not logged in */}
+            {!user && (
+              <div className="mb-4 p-4 bg-orange-50 border border-orange-200 rounded-xl">
+                <label className="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1.5">
+                  Your Email * <span className="normal-case font-normal text-stone-400">(for order confirmation)</span>
+                </label>
+                <input
+                  type="email"
+                  required
+                  className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-orange-500 outline-none bg-white text-sm"
+                  placeholder="your@email.com"
+                  value={guestEmail}
+                  onChange={(e) => setGuestEmail(e.target.value)}
+                />
+              </div>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="md:col-span-2">
                 <label className="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1.5">

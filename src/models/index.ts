@@ -2,8 +2,8 @@ import mongoose, { Schema, model, models } from "mongoose";
 
 const ReviewSchema = new Schema(
   {
-    userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    productId: { type: Schema.Types.ObjectId, ref: "Product", required: true },
+    userId: { type: Schema.Types.ObjectId, ref: "User", required: false },
+    productId: { type: Schema.Types.ObjectId, ref: "Product", required: false },
     rating: { type: Number, required: true, min: 1, max: 5 },
     comment: { type: String, required: true },
     userName: { type: String, required: true },
@@ -56,7 +56,8 @@ const ProductSchema = new Schema(
 
 const OrderSchema = new Schema(
   {
-    userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    userId: { type: Schema.Types.ObjectId, ref: "User", required: false },
+    guestEmail: { type: String },
     orderItems: [
       {
         name: { type: String, required: true },
@@ -128,7 +129,8 @@ export const User = models.User || model("User", UserSchema);
 // Mongoose model (without CHF/AED) from being reused.
 if (models.Product) delete (models as any).Product;
 export const Product = model("Product", ProductSchema);
-export const Order = models.Order || model("Order", OrderSchema);
+if (models.Order) delete (models as any).Order;
+export const Order = model("Order", OrderSchema);
 export const Setting = models.Setting || model("Setting", SettingSchema);
 export const NewsletterSubscriber =
   models.NewsletterSubscriber ||

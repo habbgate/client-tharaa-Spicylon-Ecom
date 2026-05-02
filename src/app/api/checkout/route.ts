@@ -44,7 +44,8 @@ export async function POST(req: Request) {
       mode: 'payment',
       success_url: `${baseUrl}/order-success?session_id={CHECKOUT_SESSION_ID}&orderId=${orderId}`,
       cancel_url: `${baseUrl}/cart`,
-      customer_email: email,
+      // Stripe requires a valid email or no field at all
+      ...(email ? { customer_email: email } : {}),
       metadata: {
         orderId: orderId,
       }

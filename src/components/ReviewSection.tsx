@@ -16,36 +16,28 @@ export default function ReviewSection({ productId, initialReviews }: { productId
   const [error, setError] = useState('');
   const [showForm, setShowForm] = useState(false);
 
-  // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 5;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) {
-      setError(t('loginToReview'));
-      return;
-    }
-    
     setIsSubmitting(true);
     setError('');
+
+    // Logged-in users use their name; guests are "Anonymous"
+    const displayName = user?.name || 'Anonymous';
 
     try {
       const res = await fetch(`/api/products/${productId}/reviews`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ rating, comment, userName: user.name }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rating, comment, userName: displayName }),
       });
 
       const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Failed to submit review');
 
-      if (!res.ok) {
-        throw new Error(data.message || 'Failed to submit review');
-      }
-
-      setReviews([...reviews, { _id: Date.now(), userName: user.name, rating, comment, createdAt: new Date().toISOString() }]);
+      setReviews([...reviews, { _id: Date.now(), userName: displayName, rating, comment, createdAt: new Date().toISOString() }]);
       setComment('');
       setRating(5);
       setShowForm(false);
@@ -62,7 +54,7 @@ export default function ReviewSection({ productId, initialReviews }: { productId
     <div className="mt-32">
       <div className="flex items-center justify-between mb-12">
         <h2 className="text-3xl font-black">{t('customerReviews')}</h2>
-        {!showForm && user && (
+        {!showForm && (
           <button 
             onClick={() => setShowForm(true)}
             className="px-6 py-2 bg-stone-900 text-white font-bold rounded-xl hover:bg-stone-800 transition-all text-sm"
@@ -135,10 +127,7 @@ export default function ReviewSection({ productId, initialReviews }: { productId
       {reviews.length === 0 ? (
         <div className="bg-stone-50 rounded-3xl p-12 text-center border-2 border-dashed border-stone-200">
            <p className="text-stone-400 font-medium mb-6">{t('noReviews')}</p>
-           {!user && (
-               <p className="text-sm text-stone-500">{t('loginToReview')} <a href="/login" className="text-orange-600 font-bold hover:underline">login</a>.</p>
-           )}
-           {user && !showForm && (
+           {!showForm && (
              <button onClick={() => setShowForm(true)} className="px-8 py-3 bg-stone-900 text-white font-bold rounded-xl hover:bg-stone-800">{t('writeReview')}</button>
            )}
         </div>
