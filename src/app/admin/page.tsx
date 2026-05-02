@@ -207,11 +207,26 @@ export default function AdminDashboard() {
     e.preventDefault();
     try {
       await Promise.all([
-        axios.put("/api/settings", { key: "deliveryCost_USD", value: deliverySettings.USD.toString() }),
-        axios.put("/api/settings", { key: "deliveryCost_EUR", value: deliverySettings.EUR.toString() }),
-        axios.put("/api/settings", { key: "deliveryCost_LKR", value: deliverySettings.LKR.toString() }),
-        axios.put("/api/settings", { key: "deliveryCost_CHF", value: deliverySettings.CHF.toString() }),
-        axios.put("/api/settings", { key: "deliveryCost_AED", value: deliverySettings.AED.toString() }),
+        axios.put("/api/settings", {
+          key: "deliveryCost_USD",
+          value: deliverySettings.USD.toString(),
+        }),
+        axios.put("/api/settings", {
+          key: "deliveryCost_EUR",
+          value: deliverySettings.EUR.toString(),
+        }),
+        axios.put("/api/settings", {
+          key: "deliveryCost_LKR",
+          value: deliverySettings.LKR.toString(),
+        }),
+        axios.put("/api/settings", {
+          key: "deliveryCost_CHF",
+          value: deliverySettings.CHF.toString(),
+        }),
+        axios.put("/api/settings", {
+          key: "deliveryCost_AED",
+          value: deliverySettings.AED.toString(),
+        }),
       ]);
       toast.success("Settings updated");
     } catch {
@@ -556,11 +571,36 @@ export default function AdminDashboard() {
                       </div>
                     </td>
                     <td className="px-8 py-6 text-sm text-stone-600 space-y-0.5">
-                      <div><span className="font-black text-stone-400 text-xs">USD</span> {product.price?.USD}</div>
-                      <div><span className="font-black text-stone-400 text-xs">EUR</span> {product.price?.EUR}</div>
-                      <div><span className="font-black text-stone-400 text-xs">LKR</span> {product.price?.LKR}</div>
-                      <div><span className="font-black text-stone-400 text-xs">CHF</span> {product.price?.CHF}</div>
-                      <div><span className="font-black text-stone-400 text-xs">AED</span> {product.price?.AED}</div>
+                      <div>
+                        <span className="font-black text-stone-400 text-xs">
+                          USD
+                        </span>{" "}
+                        {product.price?.USD}
+                      </div>
+                      <div>
+                        <span className="font-black text-stone-400 text-xs">
+                          EUR
+                        </span>{" "}
+                        {product.price?.EUR}
+                      </div>
+                      <div>
+                        <span className="font-black text-stone-400 text-xs">
+                          LKR
+                        </span>{" "}
+                        {product.price?.LKR}
+                      </div>
+                      <div>
+                        <span className="font-black text-stone-400 text-xs">
+                          CHF
+                        </span>{" "}
+                        {product.price?.CHF}
+                      </div>
+                      <div>
+                        <span className="font-black text-stone-400 text-xs">
+                          AED
+                        </span>{" "}
+                        {product.price?.AED}
+                      </div>
                     </td>
                     <td className="px-8 py-6">
                       <span
@@ -816,7 +856,10 @@ export default function AdminDashboard() {
                 step="0.01"
                 value={deliverySettings.USD}
                 onChange={(e) =>
-                  setDeliverySettings({ ...deliverySettings, USD: Number(e.target.value) })
+                  setDeliverySettings({
+                    ...deliverySettings,
+                    USD: Number(e.target.value),
+                  })
                 }
                 className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
               />
@@ -830,7 +873,10 @@ export default function AdminDashboard() {
                 step="0.01"
                 value={deliverySettings.EUR}
                 onChange={(e) =>
-                  setDeliverySettings({ ...deliverySettings, EUR: Number(e.target.value) })
+                  setDeliverySettings({
+                    ...deliverySettings,
+                    EUR: Number(e.target.value),
+                  })
                 }
                 className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
               />
@@ -844,7 +890,10 @@ export default function AdminDashboard() {
                 step="0.01"
                 value={deliverySettings.LKR}
                 onChange={(e) =>
-                  setDeliverySettings({ ...deliverySettings, LKR: Number(e.target.value) })
+                  setDeliverySettings({
+                    ...deliverySettings,
+                    LKR: Number(e.target.value),
+                  })
                 }
                 className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
               />
@@ -858,7 +907,10 @@ export default function AdminDashboard() {
                 step="0.01"
                 value={deliverySettings.CHF}
                 onChange={(e) =>
-                  setDeliverySettings({ ...deliverySettings, CHF: Number(e.target.value) })
+                  setDeliverySettings({
+                    ...deliverySettings,
+                    CHF: Number(e.target.value),
+                  })
                 }
                 className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
               />
@@ -872,7 +924,10 @@ export default function AdminDashboard() {
                 step="0.01"
                 value={deliverySettings.AED}
                 onChange={(e) =>
-                  setDeliverySettings({ ...deliverySettings, AED: Number(e.target.value) })
+                  setDeliverySettings({
+                    ...deliverySettings,
+                    AED: Number(e.target.value),
+                  })
                 }
                 className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
               />
@@ -1443,7 +1498,10 @@ export default function AdminDashboard() {
                     step="0.01"
                     value={formData.priceUSD}
                     onChange={(e) =>
-                      setFormData({ ...formData, priceUSD: Number(e.target.value) })
+                      setFormData({
+                        ...formData,
+                        priceUSD: Number(e.target.value),
+                      })
                     }
                     className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
                   />
@@ -1458,7 +1516,10 @@ export default function AdminDashboard() {
                     step="0.01"
                     value={formData.priceEUR}
                     onChange={(e) =>
-                      setFormData({ ...formData, priceEUR: Number(e.target.value) })
+                      setFormData({
+                        ...formData,
+                        priceEUR: Number(e.target.value),
+                      })
                     }
                     className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
                   />
@@ -1473,7 +1534,10 @@ export default function AdminDashboard() {
                     step="0.01"
                     value={formData.priceLKR}
                     onChange={(e) =>
-                      setFormData({ ...formData, priceLKR: Number(e.target.value) })
+                      setFormData({
+                        ...formData,
+                        priceLKR: Number(e.target.value),
+                      })
                     }
                     className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
                   />
@@ -1488,7 +1552,10 @@ export default function AdminDashboard() {
                     step="0.01"
                     value={formData.priceCHF}
                     onChange={(e) =>
-                      setFormData({ ...formData, priceCHF: Number(e.target.value) })
+                      setFormData({
+                        ...formData,
+                        priceCHF: Number(e.target.value),
+                      })
                     }
                     className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
                   />
@@ -1503,7 +1570,10 @@ export default function AdminDashboard() {
                     step="0.01"
                     value={formData.priceAED}
                     onChange={(e) =>
-                      setFormData({ ...formData, priceAED: Number(e.target.value) })
+                      setFormData({
+                        ...formData,
+                        priceAED: Number(e.target.value),
+                      })
                     }
                     className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
                   />

@@ -33,7 +33,7 @@ const Navbar = () => {
     // Always detect currency from IP on every mount so VPN changes are picked
     // up immediately. Only refresh the page if the detected currency differs
     // from what is currently stored (avoids unnecessary flicker).
-    fetch('/api/currency')
+    fetch("/api/currency")
       .then((r) => r.json())
       .then(({ currency: detected }) => {
         if (!detected) return;
@@ -45,7 +45,9 @@ const Navbar = () => {
           router.refresh();
         }
       })
-      .catch(() => {/* silently ignore */});
+      .catch(() => {
+        /* silently ignore */
+      });
 
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll, { passive: true });
