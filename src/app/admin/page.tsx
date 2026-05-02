@@ -72,8 +72,8 @@ export default function AdminDashboard() {
     AED: 0,
   });
 
-  const CURRENCIES = ['USD', 'EUR', 'LKR', 'CHF', 'AED'] as const;
-  type Currency = typeof CURRENCIES[number];
+  const CURRENCIES = ["USD", "EUR", "LKR", "CHF", "AED"] as const;
+  type Currency = (typeof CURRENCIES)[number];
 
   const emptyTiers = () => ({
     USD: { t1: 0, t2: 0, t3: 0, t4: 0 },
@@ -84,7 +84,10 @@ export default function AdminDashboard() {
   });
 
   // tierDelivery[currency].t1 = 1-3 items, t2 = 4-6, t3 = 7-10, t4 = 11+
-  const [tierDelivery, setTierDelivery] = useState<Record<Currency, { t1: number; t2: number; t3: number; t4: number }>>(emptyTiers());
+  const [tierDelivery, setTierDelivery] =
+    useState<
+      Record<Currency, { t1: number; t2: number; t3: number; t4: number }>
+    >(emptyTiers());
 
   // Form State
   const [formData, setFormData] = useState({
@@ -215,8 +218,10 @@ export default function AdminDashboard() {
       // Load tier delivery settings
       const tiers: any = emptyTiers();
       for (const cur of CURRENCIES) {
-        for (const tier of ['t1','t2','t3','t4'] as const) {
-          const entry = data.find((s: any) => s.key === `deliveryTier_${cur}_${tier}`);
+        for (const tier of ["t1", "t2", "t3", "t4"] as const) {
+          const entry = data.find(
+            (s: any) => s.key === `deliveryTier_${cur}_${tier}`,
+          );
           if (entry) tiers[cur][tier] = Number(entry.value);
         }
       }
@@ -230,12 +235,18 @@ export default function AdminDashboard() {
     e.preventDefault();
     try {
       const baseSaves = CURRENCIES.map((cur) =>
-        axios.put("/api/settings", { key: `deliveryCost_${cur}`, value: (deliverySettings as any)[cur].toString() })
+        axios.put("/api/settings", {
+          key: `deliveryCost_${cur}`,
+          value: (deliverySettings as any)[cur].toString(),
+        }),
       );
       const tierSaves = CURRENCIES.flatMap((cur) =>
         (["t1", "t2", "t3", "t4"] as const).map((tier) =>
-          axios.put("/api/settings", { key: `deliveryTier_${cur}_${tier}`, value: tierDelivery[cur][tier].toString() })
-        )
+          axios.put("/api/settings", {
+            key: `deliveryTier_${cur}_${tier}`,
+            value: tierDelivery[cur][tier].toString(),
+          }),
+        ),
       );
       await Promise.all([...baseSaves, ...tierSaves]);
       toast.success("Settings updated");
@@ -856,21 +867,30 @@ export default function AdminDashboard() {
             Store Settings
           </h2>
           <form onSubmit={saveSettings} className="space-y-10 max-w-2xl">
-
             {/* Base delivery costs */}
             <div>
               <h3 className="font-black text-lg text-stone-800 mb-4 pb-2 border-b border-stone-100">
-                Base Delivery Cost <span className="text-stone-400 font-normal text-sm">(1–3 items or when no tier matches)</span>
+                Base Delivery Cost{" "}
+                <span className="text-stone-400 font-normal text-sm">
+                  (1–3 items or when no tier matches)
+                </span>
               </h3>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                {(["USD","EUR","LKR","CHF","AED"] as const).map((cur) => (
+                {(["USD", "EUR", "LKR", "CHF", "AED"] as const).map((cur) => (
                   <div key={cur}>
-                    <label className="block text-sm font-bold text-stone-700 mb-1">{cur}</label>
+                    <label className="block text-sm font-bold text-stone-700 mb-1">
+                      {cur}
+                    </label>
                     <input
                       type="number"
                       step="0.01"
                       value={(deliverySettings as any)[cur]}
-                      onChange={(e) => setDeliverySettings({ ...deliverySettings, [cur]: Number(e.target.value) })}
+                      onChange={(e) =>
+                        setDeliverySettings({
+                          ...deliverySettings,
+                          [cur]: Number(e.target.value),
+                        })
+                      }
                       className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
                     />
                   </div>
@@ -883,34 +903,48 @@ export default function AdminDashboard() {
               <h3 className="font-black text-lg text-stone-800 mb-1 pb-2 border-b border-stone-100">
                 Quantity-Based Delivery Tiers
               </h3>
-              <p className="text-stone-400 text-xs mb-5">Set the delivery charge per currency based on total number of items in the cart. Leave 0 to fall back to the base cost above.</p>
+              <p className="text-stone-400 text-xs mb-5">
+                Set the delivery charge per currency based on total number of
+                items in the cart. Leave 0 to fall back to the base cost above.
+              </p>
 
-              {([
-                { key: "t1", label: "1 – 3 items" },
-                { key: "t2", label: "4 – 6 items" },
-                { key: "t3", label: "7 – 10 items" },
-                { key: "t4", label: "11+ items" },
-              ] as const).map(({ key: tier, label }) => (
+              {(
+                [
+                  { key: "t1", label: "1 – 3 items" },
+                  { key: "t2", label: "4 – 6 items" },
+                  { key: "t3", label: "7 – 10 items" },
+                  { key: "t4", label: "11+ items" },
+                ] as const
+              ).map(({ key: tier, label }) => (
                 <div key={tier} className="mb-6">
-                  <p className="text-sm font-black text-stone-600 uppercase tracking-wider mb-3">{label}</p>
+                  <p className="text-sm font-black text-stone-600 uppercase tracking-wider mb-3">
+                    {label}
+                  </p>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                    {(["USD","EUR","LKR","CHF","AED"] as const).map((cur) => (
-                      <div key={cur}>
-                        <label className="block text-xs font-bold text-stone-500 mb-1">{cur}</label>
-                        <input
-                          type="number"
-                          step="0.01"
-                          value={tierDelivery[cur][tier]}
-                          onChange={(e) =>
-                            setTierDelivery((prev) => ({
-                              ...prev,
-                              [cur]: { ...prev[cur], [tier]: Number(e.target.value) },
-                            }))
-                          }
-                          className="w-full px-3 py-2.5 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm"
-                        />
-                      </div>
-                    ))}
+                    {(["USD", "EUR", "LKR", "CHF", "AED"] as const).map(
+                      (cur) => (
+                        <div key={cur}>
+                          <label className="block text-xs font-bold text-stone-500 mb-1">
+                            {cur}
+                          </label>
+                          <input
+                            type="number"
+                            step="0.01"
+                            value={tierDelivery[cur][tier]}
+                            onChange={(e) =>
+                              setTierDelivery((prev) => ({
+                                ...prev,
+                                [cur]: {
+                                  ...prev[cur],
+                                  [tier]: Number(e.target.value),
+                                },
+                              }))
+                            }
+                            className="w-full px-3 py-2.5 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm"
+                          />
+                        </div>
+                      ),
+                    )}
                   </div>
                 </div>
               ))}

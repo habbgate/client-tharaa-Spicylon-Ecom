@@ -44,13 +44,17 @@ export default function CartPage() {
         else tierKey = "t4";
 
         // Try tier-specific cost first, fall back to base cost
-        const tierEntry = data.find((s: any) => s.key === `deliveryTier_${currency}_${tierKey}`);
+        const tierEntry = data.find(
+          (s: any) => s.key === `deliveryTier_${currency}_${tierKey}`,
+        );
         const tierValue = tierEntry ? Number(tierEntry.value) : 0;
 
         if (tierValue > 0) {
           setDeliveryAmount(tierValue);
         } else {
-          const base = data.find((s: any) => s.key === "deliveryCost_" + currency);
+          const base = data.find(
+            (s: any) => s.key === "deliveryCost_" + currency,
+          );
           if (base) setDeliveryAmount(Number(base.value));
         }
       })
