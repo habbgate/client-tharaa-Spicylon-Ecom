@@ -72,6 +72,20 @@ export default function AdminDashboard() {
     AED: 0,
   });
 
+  const CURRENCIES = ['USD', 'EUR', 'LKR', 'CHF', 'AED'] as const;
+  type Currency = typeof CURRENCIES[number];
+
+  const emptyTiers = () => ({
+    USD: { t1: 0, t2: 0, t3: 0, t4: 0 },
+    EUR: { t1: 0, t2: 0, t3: 0, t4: 0 },
+    LKR: { t1: 0, t2: 0, t3: 0, t4: 0 },
+    CHF: { t1: 0, t2: 0, t3: 0, t4: 0 },
+    AED: { t1: 0, t2: 0, t3: 0, t4: 0 },
+  });
+
+  // tierDelivery[currency].t1 = 1-3 items, t2 = 4-6, t3 = 7-10, t4 = 11+
+  const [tierDelivery, setTierDelivery] = useState<Record<Currency, { t1: number; t2: number; t3: number; t4: number }>>(emptyTiers());
+
   // Form State
   const [formData, setFormData] = useState({
     name: "",
@@ -198,6 +212,15 @@ export default function AdminDashboard() {
         CHF: chf?.value ? Number(chf.value) : 0,
         AED: aed?.value ? Number(aed.value) : 0,
       });
+      // Load tier delivery settings
+      const tiers: any = emptyTiers();
+      for (const cur of CURRENCIES) {
+        for (const tier of ['t1','t2','t3','t4'] as const) {
+          const entry = data.find((s: any) => s.key === `deliveryTier_${cur}_${tier}`);
+          if (entry) tiers[cur][tier] = Number(entry.value);
+        }
+      }
+      setTierDelivery(tiers);
     } catch {
       toast.error("Failed to load settings");
     }
@@ -206,28 +229,15 @@ export default function AdminDashboard() {
   const saveSettings = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await Promise.all([
-        axios.put("/api/settings", {
-          key: "deliveryCost_USD",
-          value: deliverySettings.USD.toString(),
-        }),
-        axios.put("/api/settings", {
-          key: "deliveryCost_EUR",
-          value: deliverySettings.EUR.toString(),
-        }),
-        axios.put("/api/settings", {
-          key: "deliveryCost_LKR",
-          value: deliverySettings.LKR.toString(),
-        }),
-        axios.put("/api/settings", {
-          key: "deliveryCost_CHF",
-          value: deliverySettings.CHF.toString(),
-        }),
-        axios.put("/api/settings", {
-          key: "deliveryCost_AED",
-          value: deliverySettings.AED.toString(),
-        }),
-      ]);
+      const baseSaves = CURRENCIES.map((cur) =>
+        axios.put("/api/settings", { key: `deliveryCost_${cur}`, value: (deliverySettings as any)[cur].toString() })
+      );
+      const tierSaves = CURRENCIES.flatMap((cur) =>
+        (["t1", "t2", "t3", "t4"] as const).map((tier) =>
+          axios.put("/api/settings", { key: `deliveryTier_${cur}_${tier}`, value: tierDelivery[cur][tier].toString() })
+        )
+      );
+      await Promise.all([...baseSaves, ...tierSaves]);
       toast.success("Settings updated");
     } catch {
       toast.error("Failed to update settings");
@@ -845,93 +855,67 @@ export default function AdminDashboard() {
           <h2 className="text-2xl font-black text-stone-900 mb-6">
             Store Settings
           </h2>
-          <form onSubmit={saveSettings} className="space-y-6 max-w-lg">
-            <h3 className="font-bold text-lg text-stone-800">Delivery Costs</h3>
+          <form onSubmit={saveSettings} className="space-y-10 max-w-2xl">
+
+            {/* Base delivery costs */}
             <div>
-              <label className="block text-sm font-bold text-stone-700 mb-1">
-                USD Cost
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                value={deliverySettings.USD}
-                onChange={(e) =>
-                  setDeliverySettings({
-                    ...deliverySettings,
-                    USD: Number(e.target.value),
-                  })
-                }
-                className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
-              />
+              <h3 className="font-black text-lg text-stone-800 mb-4 pb-2 border-b border-stone-100">
+                Base Delivery Cost <span className="text-stone-400 font-normal text-sm">(1–3 items or when no tier matches)</span>
+              </h3>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                {(["USD","EUR","LKR","CHF","AED"] as const).map((cur) => (
+                  <div key={cur}>
+                    <label className="block text-sm font-bold text-stone-700 mb-1">{cur}</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={(deliverySettings as any)[cur]}
+                      onChange={(e) => setDeliverySettings({ ...deliverySettings, [cur]: Number(e.target.value) })}
+                      className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
+
+            {/* Quantity-based delivery tiers */}
             <div>
-              <label className="block text-sm font-bold text-stone-700 mb-1">
-                EUR Cost
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                value={deliverySettings.EUR}
-                onChange={(e) =>
-                  setDeliverySettings({
-                    ...deliverySettings,
-                    EUR: Number(e.target.value),
-                  })
-                }
-                className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
-              />
+              <h3 className="font-black text-lg text-stone-800 mb-1 pb-2 border-b border-stone-100">
+                Quantity-Based Delivery Tiers
+              </h3>
+              <p className="text-stone-400 text-xs mb-5">Set the delivery charge per currency based on total number of items in the cart. Leave 0 to fall back to the base cost above.</p>
+
+              {([
+                { key: "t1", label: "1 – 3 items" },
+                { key: "t2", label: "4 – 6 items" },
+                { key: "t3", label: "7 – 10 items" },
+                { key: "t4", label: "11+ items" },
+              ] as const).map(({ key: tier, label }) => (
+                <div key={tier} className="mb-6">
+                  <p className="text-sm font-black text-stone-600 uppercase tracking-wider mb-3">{label}</p>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                    {(["USD","EUR","LKR","CHF","AED"] as const).map((cur) => (
+                      <div key={cur}>
+                        <label className="block text-xs font-bold text-stone-500 mb-1">{cur}</label>
+                        <input
+                          type="number"
+                          step="0.01"
+                          value={tierDelivery[cur][tier]}
+                          onChange={(e) =>
+                            setTierDelivery((prev) => ({
+                              ...prev,
+                              [cur]: { ...prev[cur], [tier]: Number(e.target.value) },
+                            }))
+                          }
+                          className="w-full px-3 py-2.5 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
-            <div>
-              <label className="block text-sm font-bold text-stone-700 mb-1">
-                LKR Cost
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                value={deliverySettings.LKR}
-                onChange={(e) =>
-                  setDeliverySettings({
-                    ...deliverySettings,
-                    LKR: Number(e.target.value),
-                  })
-                }
-                className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-bold text-stone-700 mb-1">
-                CHF Cost (Switzerland)
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                value={deliverySettings.CHF}
-                onChange={(e) =>
-                  setDeliverySettings({
-                    ...deliverySettings,
-                    CHF: Number(e.target.value),
-                  })
-                }
-                className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-bold text-stone-700 mb-1">
-                AED Cost (UAE)
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                value={deliverySettings.AED}
-                onChange={(e) =>
-                  setDeliverySettings({
-                    ...deliverySettings,
-                    AED: Number(e.target.value),
-                  })
-                }
-                className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
-              />
-            </div>
+
             <button
               type="submit"
               className="w-full py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl transition-all"

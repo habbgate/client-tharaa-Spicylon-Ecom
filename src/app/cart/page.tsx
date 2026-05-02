@@ -33,8 +33,26 @@ export default function CartPage() {
     axios
       .get("/api/settings")
       .then(({ data }) => {
-        const dm = data.find((s: any) => s.key === "deliveryCost_" + currency);
-        if (dm) setDeliveryAmount(Number(dm.value));
+        // Total item count across all cart lines
+        const totalQty = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+        // Determine which tier key applies
+        let tierKey: string;
+        if (totalQty <= 3) tierKey = "t1";
+        else if (totalQty <= 6) tierKey = "t2";
+        else if (totalQty <= 10) tierKey = "t3";
+        else tierKey = "t4";
+
+        // Try tier-specific cost first, fall back to base cost
+        const tierEntry = data.find((s: any) => s.key === `deliveryTier_${currency}_${tierKey}`);
+        const tierValue = tierEntry ? Number(tierEntry.value) : 0;
+
+        if (tierValue > 0) {
+          setDeliveryAmount(tierValue);
+        } else {
+          const base = data.find((s: any) => s.key === "deliveryCost_" + currency);
+          if (base) setDeliveryAmount(Number(base.value));
+        }
       })
       .catch(console.error);
 
@@ -48,7 +66,7 @@ export default function CartPage() {
         phone: user.address?.phone || "",
       });
     }
-  }, [user, currency]);
+  }, [user, currency, cart]);
 
   const total = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
