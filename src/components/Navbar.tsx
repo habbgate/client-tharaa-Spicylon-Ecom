@@ -16,7 +16,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const Navbar = () => {
-  const { cart, user, setUser } = useStore();
+  const { cart, user, setUser, setCurrency } = useStore();
   const tAuth = useTranslations("Auth");
   const tNav = useTranslations("Nav");
   const router = useRouter();
@@ -29,6 +29,23 @@ const Navbar = () => {
     // Read lang from document cookies
     const match = document.cookie.match(/(^| )lang=([^;]+)/);
     if (match) setCurrentLang(match[2]);
+
+    // Always detect currency from IP on every mount so VPN changes are picked
+    // up immediately. Only refresh the page if the detected currency differs
+    // from what is currently stored (avoids unnecessary flicker).
+    fetch('/api/currency')
+      .then((r) => r.json())
+      .then(({ currency: detected }) => {
+        if (!detected) return;
+        const existing = document.cookie.match(/(^| )currency=([^;]+)/)?.[2];
+        // Store with a 1-hour expiry so stale values don't linger
+        document.cookie = `currency=${detected}; path=/; max-age=3600`;
+        setCurrency(detected);
+        if (existing !== detected) {
+          router.refresh();
+        }
+      })
+      .catch(() => {/* silently ignore */});
 
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll, { passive: true });

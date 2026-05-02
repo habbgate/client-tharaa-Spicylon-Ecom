@@ -42,6 +42,8 @@ const ProductSchema = new Schema(
       USD: { type: Number, required: true },
       EUR: { type: Number, required: true },
       LKR: { type: Number, required: true },
+      CHF: { type: Number, required: true },
+      AED: { type: Number, required: true },
     },
     category: { type: String, default: "Spices" },
     stock: { type: Number, default: 0 },
@@ -120,7 +122,12 @@ const ContactMessageSchema = new Schema(
 );
 
 export const User = models.User || model("User", UserSchema);
-export const Product = models.Product || model("Product", ProductSchema);
+// Force re-compile Product model so schema changes (e.g. new price currencies)
+// are always picked up. Safe because Node module cache means this file runs
+// once per process; in Next.js dev with hot-reload it prevents the stale
+// Mongoose model (without CHF/AED) from being reused.
+if (models.Product) delete (models as any).Product;
+export const Product = model("Product", ProductSchema);
 export const Order = models.Order || model("Order", OrderSchema);
 export const Setting = models.Setting || model("Setting", SettingSchema);
 export const NewsletterSubscriber =

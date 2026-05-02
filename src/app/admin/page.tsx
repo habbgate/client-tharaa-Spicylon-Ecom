@@ -68,6 +68,8 @@ export default function AdminDashboard() {
     USD: 0,
     EUR: 0,
     LKR: 0,
+    CHF: 0,
+    AED: 0,
   });
 
   // Form State
@@ -78,6 +80,8 @@ export default function AdminDashboard() {
     priceUSD: 0,
     priceEUR: 0,
     priceLKR: 0,
+    priceCHF: 0,
+    priceAED: 0,
     stock: 0,
     images: "",
   });
@@ -185,10 +189,14 @@ export default function AdminDashboard() {
       const usd = data.find((s: any) => s.key === "deliveryCost_USD");
       const eur = data.find((s: any) => s.key === "deliveryCost_EUR");
       const lkr = data.find((s: any) => s.key === "deliveryCost_LKR");
+      const chf = data.find((s: any) => s.key === "deliveryCost_CHF");
+      const aed = data.find((s: any) => s.key === "deliveryCost_AED");
       setDeliverySettings({
         USD: usd?.value ? Number(usd.value) : 0,
         EUR: eur?.value ? Number(eur.value) : 0,
         LKR: lkr?.value ? Number(lkr.value) : 0,
+        CHF: chf?.value ? Number(chf.value) : 0,
+        AED: aed?.value ? Number(aed.value) : 0,
       });
     } catch {
       toast.error("Failed to load settings");
@@ -198,18 +206,13 @@ export default function AdminDashboard() {
   const saveSettings = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await axios.put("/api/settings", {
-        key: "deliveryCost_USD",
-        value: deliverySettings.USD.toString(),
-      });
-      await axios.put("/api/settings", {
-        key: "deliveryCost_EUR",
-        value: deliverySettings.EUR.toString(),
-      });
-      await axios.put("/api/settings", {
-        key: "deliveryCost_LKR",
-        value: deliverySettings.LKR.toString(),
-      });
+      await Promise.all([
+        axios.put("/api/settings", { key: "deliveryCost_USD", value: deliverySettings.USD.toString() }),
+        axios.put("/api/settings", { key: "deliveryCost_EUR", value: deliverySettings.EUR.toString() }),
+        axios.put("/api/settings", { key: "deliveryCost_LKR", value: deliverySettings.LKR.toString() }),
+        axios.put("/api/settings", { key: "deliveryCost_CHF", value: deliverySettings.CHF.toString() }),
+        axios.put("/api/settings", { key: "deliveryCost_AED", value: deliverySettings.AED.toString() }),
+      ]);
       toast.success("Settings updated");
     } catch {
       toast.error("Failed to update settings");
@@ -290,6 +293,8 @@ export default function AdminDashboard() {
         priceUSD: product.price?.USD || 0,
         priceEUR: product.price?.EUR || 0,
         priceLKR: product.price?.LKR || 0,
+        priceCHF: product.price?.CHF || 0,
+        priceAED: product.price?.AED || 0,
         stock: product.stock,
         images: product.images?.join(", ") || "",
       });
@@ -301,6 +306,8 @@ export default function AdminDashboard() {
         priceUSD: 0,
         priceEUR: 0,
         priceLKR: 0,
+        priceCHF: 0,
+        priceAED: 0,
         stock: 0,
         images: "",
       });
@@ -318,6 +325,8 @@ export default function AdminDashboard() {
         USD: Number(formData.priceUSD),
         EUR: Number(formData.priceEUR),
         LKR: Number(formData.priceLKR),
+        CHF: Number(formData.priceCHF),
+        AED: Number(formData.priceAED),
       },
       stock: Number(formData.stock),
       images: formData.images
@@ -512,7 +521,7 @@ export default function AdminDashboard() {
                   Product
                 </th>
                 <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest">
-                  Prices (USD/EUR/LKR)
+                  Prices
                 </th>
                 <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest">
                   Stock
@@ -546,9 +555,12 @@ export default function AdminDashboard() {
                         </span>
                       </div>
                     </td>
-                    <td className="px-8 py-6 font-medium text-stone-600">
-                      {product.price?.USD} / {product.price?.EUR} /{" "}
-                      {product.price?.LKR}
+                    <td className="px-8 py-6 text-sm text-stone-600 space-y-0.5">
+                      <div><span className="font-black text-stone-400 text-xs">USD</span> {product.price?.USD}</div>
+                      <div><span className="font-black text-stone-400 text-xs">EUR</span> {product.price?.EUR}</div>
+                      <div><span className="font-black text-stone-400 text-xs">LKR</span> {product.price?.LKR}</div>
+                      <div><span className="font-black text-stone-400 text-xs">CHF</span> {product.price?.CHF}</div>
+                      <div><span className="font-black text-stone-400 text-xs">AED</span> {product.price?.AED}</div>
                     </td>
                     <td className="px-8 py-6">
                       <span
@@ -804,10 +816,7 @@ export default function AdminDashboard() {
                 step="0.01"
                 value={deliverySettings.USD}
                 onChange={(e) =>
-                  setDeliverySettings({
-                    ...deliverySettings,
-                    USD: Number(e.target.value),
-                  })
+                  setDeliverySettings({ ...deliverySettings, USD: Number(e.target.value) })
                 }
                 className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
               />
@@ -821,10 +830,7 @@ export default function AdminDashboard() {
                 step="0.01"
                 value={deliverySettings.EUR}
                 onChange={(e) =>
-                  setDeliverySettings({
-                    ...deliverySettings,
-                    EUR: Number(e.target.value),
-                  })
+                  setDeliverySettings({ ...deliverySettings, EUR: Number(e.target.value) })
                 }
                 className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
               />
@@ -838,10 +844,35 @@ export default function AdminDashboard() {
                 step="0.01"
                 value={deliverySettings.LKR}
                 onChange={(e) =>
-                  setDeliverySettings({
-                    ...deliverySettings,
-                    LKR: Number(e.target.value),
-                  })
+                  setDeliverySettings({ ...deliverySettings, LKR: Number(e.target.value) })
+                }
+                className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-bold text-stone-700 mb-1">
+                CHF Cost (Switzerland)
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                value={deliverySettings.CHF}
+                onChange={(e) =>
+                  setDeliverySettings({ ...deliverySettings, CHF: Number(e.target.value) })
+                }
+                className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-bold text-stone-700 mb-1">
+                AED Cost (UAE)
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                value={deliverySettings.AED}
+                onChange={(e) =>
+                  setDeliverySettings({ ...deliverySettings, AED: Number(e.target.value) })
                 }
                 className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
               />
@@ -1412,10 +1443,7 @@ export default function AdminDashboard() {
                     step="0.01"
                     value={formData.priceUSD}
                     onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        priceUSD: Number(e.target.value),
-                      })
+                      setFormData({ ...formData, priceUSD: Number(e.target.value) })
                     }
                     className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
                   />
@@ -1430,10 +1458,7 @@ export default function AdminDashboard() {
                     step="0.01"
                     value={formData.priceEUR}
                     onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        priceEUR: Number(e.target.value),
-                      })
+                      setFormData({ ...formData, priceEUR: Number(e.target.value) })
                     }
                     className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
                   />
@@ -1448,10 +1473,37 @@ export default function AdminDashboard() {
                     step="0.01"
                     value={formData.priceLKR}
                     onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        priceLKR: Number(e.target.value),
-                      })
+                      setFormData({ ...formData, priceLKR: Number(e.target.value) })
+                    }
+                    className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-stone-700 mb-1">
+                    Price (CHF)
+                  </label>
+                  <input
+                    required
+                    type="number"
+                    step="0.01"
+                    value={formData.priceCHF}
+                    onChange={(e) =>
+                      setFormData({ ...formData, priceCHF: Number(e.target.value) })
+                    }
+                    className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-stone-700 mb-1">
+                    Price (AED)
+                  </label>
+                  <input
+                    required
+                    type="number"
+                    step="0.01"
+                    value={formData.priceAED}
+                    onChange={(e) =>
+                      setFormData({ ...formData, priceAED: Number(e.target.value) })
                     }
                     className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
                   />
