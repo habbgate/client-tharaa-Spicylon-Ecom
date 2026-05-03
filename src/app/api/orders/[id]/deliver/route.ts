@@ -17,7 +17,7 @@ export async function PUT(
 
     order.isDelivered = !order.isDelivered;
     if (order.isDelivered) {
-      order.deliveredAt = Date.now();
+      order.deliveredAt = new Date();
     } else {
       order.deliveredAt = undefined;
     }
