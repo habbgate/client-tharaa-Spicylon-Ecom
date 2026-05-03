@@ -34,7 +34,7 @@ export async function PUT(
     if (order.userId && typeof order.userId === "object" && order.userId !== null) {
       const user = order.userId as any;
       if (user.email) {
-        const addr = order.shippingAddress || {};
+        const addr = (order.shippingAddress || {}) as any;
         const customerName = user.name || "Customer";
         const currency = order.currency || "USD";
 
@@ -133,6 +133,7 @@ export async function PUT(
           },
         ],
       );
+    }
     }
 
     return NextResponse.json(order);
