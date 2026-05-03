@@ -25,29 +25,36 @@ export async function PUT(
     await order.save();
 
     // Customer email notification for delivery status change
-    if (order.userId && order.userId.email) {
-      const isDelivered = order.isDelivered;
-      const statusText = isDelivered ? "Delivered" : "En Route / Not Delivered";
-      const emailHtml = `
-        <div style="font-family: sans-serif; max-width: 600px; margin: auto;">
-          <h2 style="color: #ea580c; font-style: italic;">Spicylon Update</h2>
-          <h3>Order #${order._id} Status: ${statusText}</h3>
-          <p>Hi ${order.userId.name || "Customer"},</p>
-          <p>Your order status has been updated by our admin team.</p>
-          ${
-            isDelivered
-              ? "<p><strong>🎉 Great news! Your authentic Ceylon spices have been marked as delivered.</strong></p>"
-              : "<p>Your order delivery status was reversed to pending delivery.</p>"
-          }
-          <p>Thank you for shopping at Spicylon!</p>
-        </div>
-      `;
+    if (
+      order.userId &&
+      typeof order.userId === "object" &&
+      order.userId !== null
+    ) {
+      const user = order.userId as any;
+      if (user.email) {
+        const isDelivered = order.isDelivered;
+        const statusText = isDelivered ? "Delivered" : "En Route / Not Delivered";
+        const emailHtml = `
+          <div style="font-family: sans-serif; max-width: 600px; margin: auto;">
+            <h2 style="color: #ea580c; font-style: italic;">Spicylon Update</h2>
+            <h3>Order #${order._id} Status: ${statusText}</h3>
+            <p>Hi ${user.name || "Customer"},</p>
+            <p>Your order status has been updated by our admin team.</p>
+            ${
+              isDelivered
+                ? "<p><strong>🎉 Great news! Your authentic Ceylon spices have been marked as delivered.</strong></p>"
+                : "<p>Your order delivery status was reversed to pending delivery.</p>"
+            }
+            <p>Thank you for shopping at Spicylon!</p>
+          </div>
+        `;
 
-      await sendEmailBackground(
-        order.userId.email,
-        `Spicylon Order Update #${order._id} - ${statusText}`,
-        emailHtml,
-      );
+        await sendEmailBackground(
+          user.email,
+          `Spicylon Order Update #${order._id} - ${statusText}`,
+          emailHtml,
+        );
+      }
     }
 
     return NextResponse.json(order);
