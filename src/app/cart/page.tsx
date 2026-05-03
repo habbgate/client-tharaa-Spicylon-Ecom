@@ -174,7 +174,9 @@ export default function CartPage() {
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Cart Items */}
         <div className="lg:w-3/5 space-y-4">
-          {cart.map((item) => (
+          {cart.map((item) => {
+            const currentItemPrice = item.prices?.[currency] || item.price;
+            return (
             <div
               key={item.id}
               className="bg-white p-5 rounded-2xl border border-stone-100 hover:border-orange-100 hover:shadow-md transition-all flex flex-col sm:flex-row items-center gap-5"
@@ -193,7 +195,7 @@ export default function CartPage() {
                   {item.name}
                 </h3>
                 <p className="text-orange-600 font-bold text-sm">
-                  {currency} {(item.prices?.[currency] || item.price).toFixed(2)}
+                  {currency} {currentItemPrice.toFixed(2)}
                 </p>
               </div>
 
@@ -218,7 +220,7 @@ export default function CartPage() {
                   </button>
                 </div>
                 <span className="font-black text-stone-900 w-20 text-right text-sm">
-                  {currency} {(item.price * item.quantity).toFixed(2)}
+                  {currency} {(currentItemPrice * item.quantity).toFixed(2)}
                 </span>
                 <button
                   onClick={() => removeFromCart(item.id)}
@@ -228,7 +230,8 @@ export default function CartPage() {
                 </button>
               </div>
             </div>
-          ))}
+            );
+          })}
 
           {/* Delivery Form */}
           <div className="bg-white rounded-2xl border border-stone-100 p-6 mt-6">
