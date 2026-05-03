@@ -73,7 +73,7 @@ export default function CartPage() {
     }
   }, [user, currency, cart]);
 
-  const total = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const total = cart.reduce((acc, item) => acc + (item.prices?.[currency] || item.price) * item.quantity, 0);
 
   const handleCheckout = async () => {
     // Guest checkout: require an email if not logged in
@@ -101,7 +101,7 @@ export default function CartPage() {
           name: i.name,
           quantity: i.quantity,
           image: i.image,
-          price: i.price,
+          price: i.prices?.[currency] || i.price,
           product: i.id,
         })),
         shippingAddress: shipping,
@@ -121,7 +121,7 @@ export default function CartPage() {
 
       // Pass the created orderId to Stripe checkout
       const { data } = await axios.post("/api/checkout", {
-        items: cart,
+        items: cart.map(i => ({ ...i, price: i.prices?.[currency] || i.price })),
         email: emailForCheckout,
         currency: currency,
         orderId: orderRes.data._id,
@@ -193,7 +193,7 @@ export default function CartPage() {
                   {item.name}
                 </h3>
                 <p className="text-orange-600 font-bold text-sm">
-                  {currency} {item.price.toFixed(2)}
+                  {currency} {(item.prices?.[currency] || item.price).toFixed(2)}
                 </p>
               </div>
 

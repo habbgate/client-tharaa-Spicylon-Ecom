@@ -5,6 +5,7 @@ interface CartItem {
   id: string;
   name: string;
   price: number;
+  prices?: Record<string, number>;
   image: string;
   quantity: number;
   stock: number;
@@ -44,7 +45,7 @@ export const useStore = create<StoreState>()(
         }
         if (product.stock > 0) {
           return {
-            cart: [...state.cart, { id: product._id, name: product.name, price, image: product.images[0], quantity: 1, stock: product.stock }],
+            cart: [...state.cart, { id: product._id, name: product.name, price, prices: product.price, image: product.images[0], quantity: 1, stock: product.stock }],
           };
         }
         return state;
