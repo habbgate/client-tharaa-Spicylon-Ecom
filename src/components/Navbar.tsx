@@ -69,8 +69,8 @@ const Navbar = () => {
   return (
     <>
       {/* Announcement bar */}
-      <div className="bg-orange-600 text-white text-center text-xs font-bold py-2 px-4 tracking-widest uppercase">
-        🌿 Pure Ceylon. No Fillers. No Compromise.
+      <div className="bg-orange-600 text-white text-center text-xs sm:text-sm font-black py-2.5 px-4 tracking-widest uppercase">
+        🌟 100% Organic Products • World-Class Premium Quality • Unmatched Purity! 🌿
       </div>
       <nav
         className={`sticky top-0 z-50 border-b transition-all duration-300 ${
