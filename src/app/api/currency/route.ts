@@ -67,6 +67,18 @@ function getClientIp(req: NextRequest): string {
 }
 
 export async function GET(req: NextRequest) {
+  const vercelCountry = req.headers.get("x-vercel-ip-country");
+  if (vercelCountry) {
+    const currency = getCurrencyFromCountry(vercelCountry);
+    return NextResponse.json({ currency, country: vercelCountry });
+  }
+
+  const cloudflareCountry = req.headers.get("cf-ipcountry");
+  if (cloudflareCountry) {
+    const currency = getCurrencyFromCountry(cloudflareCountry);
+    return NextResponse.json({ currency, country: cloudflareCountry });
+  }
+
   const ip = getClientIp(req);
 
   // Localhost / development: default to USD
