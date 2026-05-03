@@ -31,10 +31,12 @@ export async function PUT(
     }
 
     // Send order confirmation email with invoice PDF attached
-    if (order.userId && order.userId.email) {
-      const addr = order.shippingAddress || {};
-      const customerName = order.userId.name || "Customer";
-      const currency = order.currency || "USD";
+    if (order.userId && typeof order.userId === "object" && order.userId !== null) {
+      const user = order.userId as any;
+      if (user.email) {
+        const addr = order.shippingAddress || {};
+        const customerName = user.name || "Customer";
+        const currency = order.currency || "USD";
 
       const emailHtml = `
         <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 600px; margin: auto; color: #1c1917;">
