@@ -5,7 +5,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Image from "next/image";
 import { Toaster } from "react-hot-toast";
-import { FaFacebookF, FaInstagram } from "react-icons/fa";
+import { FaFacebookF, FaInstagram, FaWhatsapp } from "react-icons/fa";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -97,6 +97,21 @@ export default async function RootLayout({
           <Toaster position="bottom-right" />
           <Navbar />
           <main>{children}</main>
+
+          {/* Floating WhatsApp Button */}
+          <a
+            href="https://wa.me/41764065212"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="fixed bottom-6 right-6 lg:bottom-10 lg:right-10 z-50 bg-[#25D366] text-white p-3.5 lg:p-4 rounded-full shadow-lg hover:scale-110 hover:shadow-xl hover:shadow-[#25D366]/30 transition-all duration-300 flex items-center justify-center group"
+            aria-label="Chat with us on WhatsApp"
+          >
+            <FaWhatsapp className="w-7 h-7 lg:w-8 lg:h-8" />
+            <span className="absolute right-full mr-4 bg-white text-stone-800 text-sm font-bold px-3 py-1.5 rounded-lg shadow-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+              Chat with us
+            </span>
+          </a>
+
           <footer className="bg-stone-950 text-white pt-16 pb-8 lg:pt-24 border-t border-stone-800 relative z-10 overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
               <div className="absolute -top-32 -right-32 w-64 h-64 bg-orange-600/5 rounded-full blur-3xl"></div>
