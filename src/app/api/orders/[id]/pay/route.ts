@@ -122,7 +122,7 @@ export async function PUT(
       const pdfBuffer = generateInvoiceBuffer(order);
 
       await sendEmailBackground(
-        order.userId.email,
+        user.email,
         `Order Confirmed — Spicylon #${String(order._id).slice(-8).toUpperCase()}`,
         emailHtml,
         [
