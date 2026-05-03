@@ -68,13 +68,9 @@ export const generateShippingLabel = async (order: any) => {
 
   // ── HEADER — dark bar (h = 24 mm) ───────────────────────────────
   const HEADER_H = 24;
-  doc.setFillColor(15, 15, 15);
+  doc.setFillColor(250, 250, 250);
   doc.roundedRect(2, 2, W - 4, HEADER_H, 3, 3, "F");
   doc.rect(2, 14, W - 4, HEADER_H - 12, "F"); // flatten bottom corners
-
-  // Left stripe
-  doc.setFillColor(60, 60, 60);
-  doc.rect(2, 2, 5, HEADER_H, "F");
 
   // Logo — centred vertically in bar: bar interior y=2..26, logo 18×18
   const LOGO_SIZE = 18;
@@ -85,12 +81,13 @@ export const generateShippingLabel = async (order: any) => {
 
   // Subtitle text — vertically centred alongside logo
   const textX = 9 + LOGO_SIZE + 3; // = 30
-  doc.setFont("helvetica", "normal");
+  doc.setFont("helvetica", "bold");
   doc.setFontSize(6);
-  doc.setTextColor(160, 160, 160);
+  doc.setTextColor(80, 80, 80);
   doc.text("AUTHENTIC CEYLON SPICES", textX, 12);
   doc.setFontSize(5);
-  doc.setTextColor(110, 110, 110);
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(100, 100, 100);
   doc.text("spicylon.com", textX, 17);
 
   // QR code — right side of header, vertically centred
@@ -98,17 +95,6 @@ export const generateShippingLabel = async (order: any) => {
   const headerQrX = W - 2 - HEADER_QR - 3; // 3 mm from right edge
   const headerQrY = 2 + (HEADER_H - HEADER_QR) / 2; // vertically centred
   if (qrData) {
-    // white background so QR is readable on dark bar
-    doc.setFillColor(255, 255, 255);
-    doc.roundedRect(
-      headerQrX - 1.5,
-      headerQrY - 1.5,
-      HEADER_QR + 3,
-      HEADER_QR + 3,
-      1.5,
-      1.5,
-      "F",
-    );
     doc.addImage(qrData, "PNG", headerQrX, headerQrY, HEADER_QR, HEADER_QR);
   }
 
@@ -148,12 +134,10 @@ export const generateShippingLabel = async (order: any) => {
 
   // ── TO ──────────────────────────────────────────────────────────
   const toTop = fromTop + 30;
-  doc.setFillColor(15, 15, 15);
-  doc.roundedRect(4, toTop, 22, 5, 1.2, 1.2, "F");
-  doc.setFontSize(5);
+  doc.setFontSize(6);
   doc.setFont("helvetica", "bold");
-  doc.setTextColor(255, 255, 255);
-  doc.text("DELIVER TO", 15, toTop + 3.4, { align: "center" });
+  doc.setTextColor(120, 120, 120);
+  doc.text("DELIVER TO", 4, toTop + 3.4);
 
   // Recipient name
   doc.setFontSize(12);
@@ -162,7 +146,7 @@ export const generateShippingLabel = async (order: any) => {
   const nameStr = doc.splitTextToSize(recipientName, W - 10)[0];
   doc.text(nameStr, 4, toTop + 13);
   // Underline
-  doc.setDrawColor(40, 40, 40);
+  doc.setDrawColor(220, 220, 220);
   doc.setLineWidth(0.55);
   doc.line(4, toTop + 15, 4 + doc.getTextWidth(nameStr), toTop + 15);
 
@@ -219,11 +203,11 @@ export const generateShippingLabel = async (order: any) => {
 
   // ── PILLS ───────────────────────────────────────────────────────
   const pillTop = metaTop + 17;
-  doc.setFillColor(30, 30, 30);
+  doc.setFillColor(245, 245, 244);
   doc.roundedRect(4, pillTop, 26, 6.5, 2, 2, "F");
   doc.setFontSize(5.5);
   doc.setFont("helvetica", "bold");
-  doc.setTextColor(255, 255, 255);
+  doc.setTextColor(80, 80, 80);
   doc.text(
     itemCount + " ITEM" + (itemCount !== 1 ? "S" : ""),
     17,
@@ -240,15 +224,13 @@ export const generateShippingLabel = async (order: any) => {
 
   // ── FOOTER ──────────────────────────────────────────────────────
   const footerY = H - 13;
-  doc.setFillColor(15, 15, 15);
+  doc.setFillColor(250, 250, 250);
   doc.roundedRect(2, footerY, W - 4, H - footerY - 2, 3, 3, "F");
   doc.rect(2, footerY, W - 4, 5, "F");
-  doc.setFillColor(60, 60, 60);
-  doc.rect(2, footerY, 5, H - footerY - 2, "F");
 
   doc.setFontSize(5.5);
   doc.setFont("helvetica", "normal");
-  doc.setTextColor(160, 160, 160);
+  doc.setTextColor(120, 120, 120);
   doc.text(
     "spicylon.com  ·  Authentic Ceylon Spices  ·  Est. 2026",
     W / 2,
@@ -256,7 +238,7 @@ export const generateShippingLabel = async (order: any) => {
     { align: "center" },
   );
   doc.setFontSize(4.5);
-  doc.setTextColor(100, 100, 100);
+  doc.setTextColor(150, 150, 150);
   doc.text("Keep dry  ·  Fragile contents", W / 2, footerY + 10.5, {
     align: "center",
   });
