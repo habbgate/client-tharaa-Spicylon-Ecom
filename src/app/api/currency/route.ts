@@ -76,18 +76,18 @@ export async function GET(req: NextRequest) {
 
   try {
     const geoRes = await fetch(
-      `https://ip-api.com/json/${ip}?fields=status,countryCode`,
+      `https://ipapi.co/${ip}/json/`,
       { next: { revalidate: 3600 } },
     );
     if (!geoRes.ok) throw new Error("geo fetch failed");
 
     const geo = await geoRes.json();
-    if (geo.status !== "success" || !geo.countryCode) {
+    if (geo.error || !geo.country_code) {
       return NextResponse.json({ currency: "USD", country: null });
     }
 
-    const currency = getCurrencyFromCountry(geo.countryCode);
-    return NextResponse.json({ currency, country: geo.countryCode });
+    const currency = getCurrencyFromCountry(geo.country_code);
+    return NextResponse.json({ currency, country: geo.country_code });
   } catch {
     return NextResponse.json({ currency: "USD", country: null });
   }
