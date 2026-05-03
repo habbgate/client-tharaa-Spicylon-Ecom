@@ -243,9 +243,14 @@ export default async function RootLayout({
                     </li>
                     <li className="flex items-center gap-3 justify-center lg:justify-start">
                       <span className="text-orange-500 font-bold">T.</span>
-                      <span className="hover:text-white transition-colors">
-                        +94 11 234 5678
-                      </span>
+                      <a
+                        href="https://wa.me/41764065212"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:text-white transition-colors"
+                      >
+                        +41 76 406 52 12
+                      </a>
                     </li>
                     <li className="pt-4">
                       <a
