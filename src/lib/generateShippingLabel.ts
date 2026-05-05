@@ -123,17 +123,19 @@ export const generateShippingLabel = async (order: any) => {
   doc.setFontSize(7.5);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(20, 20, 20);
-  doc.text("Spicylon — Ceylon Spice Trading Co.", 4, fromTop + 11);
+  doc.text("Spicylon", 4, fromTop + 11);
   doc.setFontSize(6.5);
   doc.setFont("helvetica", "normal");
   doc.setTextColor(110, 110, 110);
-  doc.text("Highland Farms District, Sri Lanka", 4, fromTop + 17);
-  doc.text("support@spicylon.com", 4, fromTop + 22);
+  doc.text("T&T Ketheeswaran", 4, fromTop + 15);
+  doc.text("Bad Ragaz", 4, fromTop + 19);
+  doc.text("Switzerland", 4, fromTop + 23);
+  doc.text("support@spicylon.com", 4, fromTop + 27);
 
-  dashed(fromTop + 26);
+  dashed(fromTop + 30);
 
   // ── TO ──────────────────────────────────────────────────────────
-  const toTop = fromTop + 30;
+  const toTop = fromTop + 34;
   doc.setFontSize(6);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(120, 120, 120);

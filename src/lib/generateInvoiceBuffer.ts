@@ -55,7 +55,7 @@ export function generateInvoiceBuffer(order: any): Buffer {
   doc.setDrawColor(200);
   doc.line(14, 55, 196, 55);
 
-  // ── Ship-to address ───────────────────────────────────
+  // ── Ship-to & From address ─────────────────────────────
   doc.setFontSize(12);
   doc.setTextColor(40);
   doc.text("Billed To / Shipped To:", 14, 65);
@@ -71,6 +71,18 @@ export function generateInvoiceBuffer(order: any): Buffer {
     doc.text(`${addr.city || ""}, ${addr.postalCode || ""}`, 14, 87);
   if (addr.country) doc.text(addr.country, 14, 93);
   if (addr.phone) doc.text(`Phone: ${addr.phone}`, 14, 99);
+
+  doc.setFontSize(12);
+  doc.setTextColor(40);
+  doc.text("From:", 100, 65);
+
+  doc.setFontSize(10);
+  doc.setTextColor(80);
+  doc.text("Spicylon", 100, 75);
+  doc.text("T&T Ketheeswaran", 100, 81);
+  doc.text("Bad Ragaz", 100, 87);
+  doc.text("Switzerland", 100, 93);
+  doc.text("support@spicylon.com", 100, 99);
 
   // ── Items table ───────────────────────────────────────
   autoTable(doc, {

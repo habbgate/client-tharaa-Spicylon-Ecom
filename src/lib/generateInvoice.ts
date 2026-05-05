@@ -149,8 +149,35 @@ export const generateInvoice = async (order: any) => {
     addrY += 6;
   }
 
+  // ── FROM SECTION ───────────────────────────────────────────────
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8);
+  doc.setTextColor(130, 130, 130);
+  doc.text("FROM", 85, sectionY);
+  
+  doc.setDrawColor(234, 88, 12);
+  doc.setLineWidth(0.4);
+  doc.line(85, sectionY + 2, 146, sectionY + 2);
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(12);
+  doc.setTextColor(15, 15, 15);
+  doc.text("Spicylon", 85, sectionY + 10);
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(9);
+  doc.setTextColor(80, 80, 80);
+  let fromY = sectionY + 17;
+  doc.text("T&T Ketheeswaran", 85, fromY);
+  fromY += 6;
+  doc.text("Bad Ragaz", 85, fromY);
+  fromY += 6;
+  doc.text("Switzerland", 85, fromY);
+  fromY += 6;
+  doc.text("support@spicylon.com", 85, fromY);
+
   // Section divider
-  const divY = Math.max(addrY + 4, metaStartY + lineH * 3 + 10);
+  const divY = Math.max(addrY + 4, fromY + 4, metaStartY + lineH * 3 + 10);
   doc.setDrawColor(230, 230, 230);
   doc.setLineWidth(0.4);
   doc.line(14, divY, PW - 14, divY);
