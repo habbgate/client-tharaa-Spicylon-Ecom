@@ -252,6 +252,14 @@ export default async function RootLayout({
                         +41 76 406 52 12
                       </a>
                     </li>
+                    <li className="flex gap-3 justify-center lg:justify-start text-left">
+                      <span className="text-orange-500 font-bold mt-1">A.</span>
+                      <span>
+                        T&T Ketheeswaran<br />
+                        Bad Ragaz<br />
+                        Switzerland
+                      </span>
+                    </li>
                     <li className="pt-4">
                       <a
                         href="/contact"

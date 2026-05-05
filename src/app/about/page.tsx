@@ -270,6 +270,44 @@ export default async function AboutPage() {
         </div>
       </section>
 
+      {/* Company Address */}
+      <section className="max-w-7xl mx-auto px-4 py-16 sm:py-24 text-center border-t border-stone-100">
+        <span className="inline-block text-orange-500 font-bold uppercase tracking-[0.2em] mb-4 text-xs sm:text-sm">
+          Headquarters
+        </span>
+        <h2 className="text-3xl sm:text-4xl font-black text-stone-900 tracking-tight mb-8">
+          Company Information
+        </h2>
+        <div className="bg-white border border-stone-100 rounded-3xl p-8 shadow-sm max-w-md mx-auto flex flex-col items-center">
+          <div className="w-12 h-12 rounded-full bg-orange-50 text-orange-500 flex items-center justify-center mb-4">
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+              />
+            </svg>
+          </div>
+          <h3 className="text-lg font-black text-stone-900 mb-2">T&T Ketheeswaran</h3>
+          <p className="text-stone-500 text-base leading-relaxed">
+            Bad Ragaz<br />
+            Switzerland
+          </p>
+        </div>
+      </section>
+
       {/* Core Values / CTA */}
       <section className="max-w-4xl mx-auto px-4 mt-4 sm:mt-8 text-center">
         <h2 className="text-3xl sm:text-4xl font-bold text-stone-900 mb-6 tracking-tight">
