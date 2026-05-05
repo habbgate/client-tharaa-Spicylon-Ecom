@@ -108,6 +108,13 @@ export default function AdminDashboard() {
 
   const user = useStore((state) => state.user);
 
+  // Search & Filters state
+  const [productSearch, setProductSearch] = useState("");
+  const [orderSearch, setOrderSearch] = useState("");
+  const [orderFilter, setOrderFilter] = useState("All");
+  const [messageSearch, setMessageSearch] = useState("");
+  const [messageFilter, setMessageFilter] = useState("All");
+
   useEffect(() => {
     if (user?.role === "admin") {
       fetchProducts();
@@ -134,6 +141,17 @@ export default function AdminDashboard() {
       setMessages(data);
     } catch {
       // silently ignore
+    }
+  };
+
+  const markOrderRead = async (id: string, currentStatus: boolean) => {
+    try {
+      await axios.patch("/api/orders", { id, isRead: !currentStatus });
+      setOrders((prev: any) =>
+        prev.map((o: any) => (o._id === id ? { ...o, isRead: !currentStatus } : o)),
+      );
+    } catch {
+      toast.error("Failed to update order status");
     }
   };
 
@@ -386,6 +404,45 @@ export default function AdminDashboard() {
     }
   };
 
+  const filteredProducts = products.filter((p: any) =>
+    p.name.toLowerCase().includes(productSearch.toLowerCase())
+  );
+
+  const filteredOrders = orders.filter((o: any) => {
+    let matchSearch = true;
+    if (orderSearch) {
+      const term = orderSearch.toLowerCase();
+      matchSearch =
+        o._id.toLowerCase().includes(term) ||
+        o.userId?.email?.toLowerCase().includes(term) ||
+        o.userId?.name?.toLowerCase().includes(term) ||
+        o.guestEmail?.toLowerCase().includes(term) ||
+        o.shippingAddress?.fullName?.toLowerCase().includes(term);
+    }
+    let matchFilter = true;
+    if (orderFilter === "Delivered") matchFilter = o.isDelivered;
+    if (orderFilter === "Processing") matchFilter = !o.isDelivered;
+    if (orderFilter === "Read") matchFilter = o.isRead;
+    if (orderFilter === "Unread") matchFilter = !o.isRead;
+    return matchSearch && matchFilter;
+  });
+
+  const filteredMessages = messages.filter((m: any) => {
+    let matchSearch = true;
+    if (messageSearch) {
+      const term = messageSearch.toLowerCase();
+      matchSearch =
+        m.name?.toLowerCase().includes(term) ||
+        m.email?.toLowerCase().includes(term) ||
+        m.subject?.toLowerCase().includes(term) ||
+        m.message?.toLowerCase().includes(term);
+    }
+    let matchFilter = true;
+    if (messageFilter === "Read") matchFilter = m.isRead;
+    if (messageFilter === "Unread") matchFilter = !m.isRead;
+    return matchSearch && matchFilter;
+  });
+
   if (user?.role !== "admin") {
     return (
       <div className="text-center py-20 font-bold text-red-500">
@@ -415,9 +472,14 @@ export default function AdminDashboard() {
           </button>
           <button
             onClick={() => setTab("orders")}
-            className={`px-6 py-3 font-bold rounded-xl transition-all ${tab === "orders" ? "bg-orange-500 text-white" : "bg-stone-200 text-stone-600 hover:bg-stone-300"}`}
+            className={`relative px-6 py-3 font-bold rounded-xl transition-all ${tab === "orders" ? "bg-orange-500 text-white" : "bg-stone-200 text-stone-600 hover:bg-stone-300"}`}
           >
             Orders
+            {orders.filter((o: any) => !o.isRead).length > 0 && (
+              <span className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 text-white rounded-full flex items-center justify-center text-[10px] font-black">
+                {orders.filter((o: any) => !o.isRead).length}
+              </span>
+            )}
           </button>
           <button
             onClick={() => setTab("settings")}
@@ -542,13 +604,26 @@ export default function AdminDashboard() {
 
       {tab === "products" && (
         <div className="bg-white rounded-3xl border border-stone-200 overflow-hidden shadow-xl">
-          <div className="p-6 border-b border-stone-200 flex justify-end">
-            <button
-              onClick={() => openForm()}
-              className="flex items-center gap-2 px-6 py-3 bg-stone-900 text-white font-bold rounded-xl hover:bg-stone-800 transition-all"
-            >
-              <HiOutlinePlus className="h-5 w-5" /> Add Product
-            </button>
+          <div className="p-6 border-b border-stone-200 flex justify-between items-center">
+            <h2 className="text-xl font-bold text-stone-800">Products</h2>
+            <div className="flex gap-4 items-center">
+              <input
+                type="text"
+                placeholder="Search products..."
+                value={productSearch}
+                onChange={(e) => {
+                  setProductSearch(e.target.value);
+                  setProductsPage(1);
+                }}
+                className="px-4 py-2 border border-stone-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 w-64"
+              />
+              <button
+                onClick={() => openForm()}
+                className="flex items-center gap-2 px-6 py-3 bg-stone-900 text-white font-bold rounded-xl hover:bg-stone-800 transition-all"
+              >
+                <HiOutlinePlus className="h-5 w-5" /> Add Product
+              </button>
+            </div>
           </div>
           <table className="w-full text-left">
             <thead className="bg-stone-50 border-b border-stone-200">
@@ -568,7 +643,7 @@ export default function AdminDashboard() {
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-100">
-              {products
+              {filteredProducts
                 .slice(
                   (productsPage - 1) * ITEMS_PER_PAGE,
                   productsPage * ITEMS_PER_PAGE,
@@ -661,7 +736,7 @@ export default function AdminDashboard() {
           </table>
           <Pagination
             currentPage={productsPage}
-            totalItems={products.length}
+            totalItems={filteredProducts.length}
             itemsPerPage={ITEMS_PER_PAGE}
             onPageChange={setProductsPage}
           />
@@ -670,12 +745,38 @@ export default function AdminDashboard() {
 
       {tab === "orders" && (
         <div className="bg-white rounded-3xl border border-stone-200 overflow-hidden shadow-xl overflow-x-auto">
+          <div className="p-6 border-b border-stone-200 flex flex-col sm:flex-row gap-4 justify-between items-center bg-stone-50">
+            <h2 className="text-xl font-bold text-stone-800">Orders</h2>
+            <div className="flex gap-4 items-center">
+              <input
+                type="text"
+                placeholder="Search orders..."
+                value={orderSearch}
+                onChange={(e) => {
+                  setOrderSearch(e.target.value);
+                  setOrdersPage(1);
+                }}
+                className="px-4 py-2 border border-stone-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 w-64"
+              />
+              <select
+                value={orderFilter}
+                onChange={(e) => {
+                  setOrderFilter(e.target.value);
+                  setOrdersPage(1);
+                }}
+                className="px-4 py-2 border border-stone-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white"
+              >
+                <option value="All">All Statuses</option>
+                <option value="Delivered">Delivered</option>
+                <option value="Processing">Processing</option>
+                <option value="Read">Read</option>
+                <option value="Unread">Unread</option>
+              </select>
+            </div>
+          </div>
           <table className="w-full text-left min-w-[800px]">
             <thead className="bg-stone-50 border-b border-stone-200">
               <tr>
-                <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest">
-                  Order ID
-                </th>
                 <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest">
                   Customer
                 </th>
@@ -694,7 +795,7 @@ export default function AdminDashboard() {
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-100">
-              {orders
+              {filteredOrders
                 .slice(
                   (ordersPage - 1) * ITEMS_PER_PAGE,
                   ordersPage * ITEMS_PER_PAGE,
@@ -702,15 +803,12 @@ export default function AdminDashboard() {
                 .map((order: any) => (
                   <tr
                     key={order._id}
-                    className="hover:bg-stone-50/50 transition-colors"
+                    className={`hover:bg-stone-50/50 transition-colors ${!order.isRead ? "bg-orange-50/30" : ""}`}
                   >
-                    <td className="px-8 py-6 font-medium text-stone-600 text-sm">
-                      {order._id}
-                      <div className="text-xs text-stone-400 mt-1">
-                        {new Date(order.createdAt).toLocaleDateString()}
-                      </div>
-                    </td>
-                    <td className="px-8 py-6 font-bold text-stone-900">
+                    <td className="px-8 py-6 font-bold text-stone-900 relative">
+                      {!order.isRead && (
+                        <div className="absolute left-3 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-red-500"></div>
+                      )}
                       {order.userId?.name || (
                         <span className="text-orange-600 font-semibold italic">
                           Non Registered User
@@ -720,6 +818,9 @@ export default function AdminDashboard() {
                       <span className="text-xs text-stone-500 font-normal">
                         {order.userId?.email || order.guestEmail || "—"}
                       </span>
+                      <div className="text-xs text-stone-400 mt-1 font-normal">
+                        {new Date(order.createdAt).toLocaleDateString()}
+                      </div>
                     </td>
                     <td className="px-8 py-6 text-sm text-stone-600 max-w-[200px] truncate">
                       {order.shippingAddress ? (
@@ -753,7 +854,15 @@ export default function AdminDashboard() {
                     <td className="px-8 py-6 text-right">
                       <div className="flex justify-end gap-2 flex-wrap">
                         <button
+                          onClick={() => markOrderRead(order._id, order.isRead)}
+                          className={`px-4 py-2 border rounded-lg text-sm font-bold transition-all ${order.isRead ? "border-stone-300 text-stone-600 hover:bg-stone-100" : "border-blue-300 bg-blue-50 text-blue-700 hover:bg-blue-100"}`}
+                          title="Toggle Read Status"
+                        >
+                          {order.isRead ? "Mark Unread" : "Mark Read"}
+                        </button>
+                        <button
                           onClick={() => {
+                            if (!order.isRead) markOrderRead(order._id, order.isRead);
                             setViewingOrder(order);
                             setTab("orderDetails");
                           }}
@@ -793,7 +902,7 @@ export default function AdminDashboard() {
                     </td>
                   </tr>
                 ))}
-              {orders.length === 0 && (
+              {filteredOrders.length === 0 && (
                 <tr>
                   <td
                     colSpan={5}
@@ -807,7 +916,7 @@ export default function AdminDashboard() {
           </table>
           <Pagination
             currentPage={ordersPage}
-            totalItems={orders.length}
+            totalItems={filteredOrders.length}
             itemsPerPage={ITEMS_PER_PAGE}
             onPageChange={setOrdersPage}
           />
@@ -1078,21 +1187,45 @@ export default function AdminDashboard() {
 
       {tab === "messages" && (
         <div className="bg-white rounded-3xl border border-stone-200 overflow-hidden shadow-xl">
-          <div className="p-6 border-b border-stone-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="p-6 border-b border-stone-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-stone-50">
             <div>
               <h2 className="text-2xl font-black text-stone-900">
                 Contact Messages
               </h2>
               <p className="text-stone-500 text-sm mt-1">
-                {messages.length} message{messages.length !== 1 ? "s" : ""}{" "}
+                {filteredMessages.length} message{filteredMessages.length !== 1 ? "s" : ""}{" "}
                 &nbsp;·&nbsp;
                 <span className="text-red-500 font-bold">
-                  {messages.filter((m) => !m.isRead).length} unread
+                  {messages.filter((m) => !m.isRead).length} total unread
                 </span>
               </p>
             </div>
+            <div className="flex gap-4 items-center">
+              <input
+                type="text"
+                placeholder="Search messages..."
+                value={messageSearch}
+                onChange={(e) => {
+                  setMessageSearch(e.target.value);
+                  setMessagesPage(1);
+                }}
+                className="px-4 py-2 border border-stone-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 w-64 bg-white"
+              />
+              <select
+                value={messageFilter}
+                onChange={(e) => {
+                  setMessageFilter(e.target.value);
+                  setMessagesPage(1);
+                }}
+                className="px-4 py-2 border border-stone-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white"
+              >
+                <option value="All">All Statuses</option>
+                <option value="Read">Read</option>
+                <option value="Unread">Unread</option>
+              </select>
+            </div>
           </div>
-          {messages.length === 0 ? (
+          {filteredMessages.length === 0 ? (
             <div className="px-8 py-16 text-center text-stone-400">
               <svg
                 className="w-12 h-12 mx-auto mb-4 opacity-30"
@@ -1138,7 +1271,7 @@ export default function AdminDashboard() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-stone-100">
-                  {messages
+                  {filteredMessages
                     .slice(
                       (messagesPage - 1) * ITEMS_PER_PAGE,
                       messagesPage * ITEMS_PER_PAGE,
@@ -1231,7 +1364,7 @@ export default function AdminDashboard() {
               </table>
               <Pagination
                 currentPage={messagesPage}
-                totalItems={messages.length}
+                totalItems={filteredMessages.length}
                 itemsPerPage={ITEMS_PER_PAGE}
                 onPageChange={setMessagesPage}
               />

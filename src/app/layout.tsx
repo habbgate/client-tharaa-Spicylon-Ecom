@@ -125,9 +125,9 @@ export default async function RootLayout({
                     <Image
                       src="/logo.png"
                       alt="Spicylon"
-                      width={240}
-                      height={80}
-                      className="h-24 w-auto object-contain"
+                      width={380}
+                      height={120}
+                      className="h-36 lg:h-40 w-auto object-contain"
                     />
                   </div>
                   <p className="text-stone-400 mb-8 max-w-md leading-relaxed text-lg">

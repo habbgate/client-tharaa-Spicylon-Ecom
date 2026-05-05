@@ -60,3 +60,23 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ message: error.message }, { status: 500 });
   }
 }
+
+export async function PATCH(req: NextRequest) {
+  try {
+    const admin = await getAdminUser();
+    if (!admin || admin.role !== "admin") {
+      return NextResponse.json({ message: "Unauthorized." }, { status: 401 });
+    }
+    const { id, isRead } = await req.json();
+    await dbConnect();
+    const order = await Order.findById(id);
+    if (!order) {
+      return NextResponse.json({ message: "Order not found." }, { status: 404 });
+    }
+    order.isRead = isRead !== undefined ? isRead : true;
+    await order.save();
+    return NextResponse.json({ message: "Order updated." });
+  } catch (error: any) {
+    return NextResponse.json({ message: error.message }, { status: 500 });
+  }
+}

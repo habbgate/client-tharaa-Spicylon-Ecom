@@ -53,7 +53,7 @@ export const generateShippingLabel = async (order: any) => {
   const recipientName = addr.fullName || order.userId?.name || "Customer";
 
   const [logoData, qrData] = await Promise.all([
-    toDataUrl("/logo.png", 200, 200),
+    toDataUrl("/logolabel.jpeg", 200, 200),
     toDataUrl("/logoqr.svg", 200, 200),
   ]);
 
@@ -160,7 +160,7 @@ export const generateShippingLabel = async (order: any) => {
   if (addr.city || addr.postalCode)
     lines.push([addr.city, addr.postalCode].filter(Boolean).join(", "));
   if (addr.country) lines.push(addr.country);
-  if (addr.phone) lines.push("\u260E  " + addr.phone);
+  if (addr.phone) lines.push("Tel: " + addr.phone);
   lines.forEach((ln) => {
     doc.splitTextToSize(ln, W - 10).forEach((l: string) => {
       doc.text(l, 4, ay);
