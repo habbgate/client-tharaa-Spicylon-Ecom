@@ -70,12 +70,12 @@ export default function ReviewSection({
 
   return (
     <div className="mt-32">
-      <div className="flex items-center justify-between mb-12">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-12">
         <h2 className="text-3xl font-black">{t("customerReviews")}</h2>
         {!showForm && (
           <button
             onClick={() => setShowForm(true)}
-            className="px-6 py-2 bg-stone-900 text-white font-bold rounded-xl hover:bg-stone-800 transition-all text-sm"
+            className="px-6 py-3 bg-stone-900 text-white font-bold rounded-xl hover:bg-stone-800 transition-all text-sm w-full sm:w-auto"
           >
             {t("writeReview")}
           </button>

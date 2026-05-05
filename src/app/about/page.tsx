@@ -245,12 +245,7 @@ export default async function AboutPage() {
           </div>
 
           {/* Partner — DEO Global Lanka */}
-          <a
-            href="https://deogloballanka.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group bg-white border border-stone-100 rounded-3xl p-8 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col items-center text-center"
-          >
+          <div className="group bg-white border border-stone-100 rounded-3xl p-8 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col items-center text-center">
             <div className="w-28 h-16 relative mb-5 flex items-center justify-center">
               <Image
                 src="/deo global.jpg"
@@ -270,21 +265,8 @@ export default async function AboutPage() {
             <span className="inline-flex items-center gap-1.5 text-xs font-bold text-stone-700 bg-stone-100 border border-stone-200 rounded-full px-3 py-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-stone-500" />
               Export &amp; Logistics · Colombo
-              <svg
-                className="w-3 h-3 ml-0.5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                />
-              </svg>
             </span>
-          </a>
+          </div>
         </div>
       </section>
 

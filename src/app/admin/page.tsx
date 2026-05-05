@@ -452,27 +452,27 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-16">
-      <div className="flex justify-between items-center mb-12">
-        <h1 className="text-5xl font-black tracking-tighter italic">
+    <div className="max-w-7xl mx-auto px-4 py-8 sm:py-16">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8 sm:mb-12">
+        <h1 className="text-3xl sm:text-5xl font-black tracking-tighter italic">
           Admin <span className="text-orange-600">Dashboard</span>
         </h1>
-        <div className="flex gap-4">
+        <div className="flex flex-wrap gap-2 sm:gap-4 overflow-x-auto pb-2 w-full md:w-auto">
           <button
             onClick={() => setTab("users")}
-            className={`px-6 py-3 font-bold rounded-xl transition-all ${tab === "users" ? "bg-orange-500 text-white" : "bg-stone-200 text-stone-600 hover:bg-stone-300"}`}
+            className={`px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-bold rounded-xl transition-all whitespace-nowrap ${tab === "users" ? "bg-orange-500 text-white" : "bg-stone-200 text-stone-600 hover:bg-stone-300"}`}
           >
             Users
           </button>
           <button
             onClick={() => setTab("products")}
-            className={`px-6 py-3 font-bold rounded-xl transition-all ${tab === "products" ? "bg-orange-500 text-white" : "bg-stone-200 text-stone-600 hover:bg-stone-300"}`}
+            className={`px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-bold rounded-xl transition-all whitespace-nowrap ${tab === "products" ? "bg-orange-500 text-white" : "bg-stone-200 text-stone-600 hover:bg-stone-300"}`}
           >
             Products
           </button>
           <button
             onClick={() => setTab("orders")}
-            className={`relative px-6 py-3 font-bold rounded-xl transition-all ${tab === "orders" ? "bg-orange-500 text-white" : "bg-stone-200 text-stone-600 hover:bg-stone-300"}`}
+            className={`relative px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-bold rounded-xl transition-all whitespace-nowrap ${tab === "orders" ? "bg-orange-500 text-white" : "bg-stone-200 text-stone-600 hover:bg-stone-300"}`}
           >
             Orders
             {orders.filter((o: any) => !o.isRead).length > 0 && (
@@ -483,19 +483,19 @@ export default function AdminDashboard() {
           </button>
           <button
             onClick={() => setTab("settings")}
-            className={`px-6 py-3 font-bold rounded-xl transition-all ${tab === "settings" ? "bg-orange-500 text-white" : "bg-stone-200 text-stone-600 hover:bg-stone-300"}`}
+            className={`px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-bold rounded-xl transition-all whitespace-nowrap ${tab === "settings" ? "bg-orange-500 text-white" : "bg-stone-200 text-stone-600 hover:bg-stone-300"}`}
           >
             Settings
           </button>
           <button
             onClick={() => setTab("newsletter")}
-            className={`px-6 py-3 font-bold rounded-xl transition-all ${tab === "newsletter" ? "bg-orange-500 text-white" : "bg-stone-200 text-stone-600 hover:bg-stone-300"}`}
+            className={`px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-bold rounded-xl transition-all whitespace-nowrap ${tab === "newsletter" ? "bg-orange-500 text-white" : "bg-stone-200 text-stone-600 hover:bg-stone-300"}`}
           >
             Newsletter
           </button>
           <button
             onClick={() => setTab("messages")}
-            className={`relative px-6 py-3 font-bold rounded-xl transition-all ${tab === "messages" ? "bg-orange-500 text-white" : "bg-stone-200 text-stone-600 hover:bg-stone-300"}`}
+            className={`relative px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-bold rounded-xl transition-all whitespace-nowrap ${tab === "messages" ? "bg-orange-500 text-white" : "bg-stone-200 text-stone-600 hover:bg-stone-300"}`}
           >
             Messages
             {messages.filter((m) => !m.isRead).length > 0 && (
@@ -508,8 +508,8 @@ export default function AdminDashboard() {
       </div>
 
       {tab === "users" && (
-        <div className="bg-white rounded-3xl border border-stone-200 overflow-hidden shadow-xl">
-          <table className="w-full text-left">
+        <div className="bg-white rounded-3xl border border-stone-200 overflow-hidden shadow-xl overflow-x-auto">
+          <table className="w-full text-left min-w-[600px]">
             <thead className="bg-stone-50 border-b border-stone-200">
               <tr>
                 <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest">
@@ -604,9 +604,9 @@ export default function AdminDashboard() {
 
       {tab === "products" && (
         <div className="bg-white rounded-3xl border border-stone-200 overflow-hidden shadow-xl">
-          <div className="p-6 border-b border-stone-200 flex justify-between items-center">
+          <div className="p-4 sm:p-6 border-b border-stone-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <h2 className="text-xl font-bold text-stone-800">Products</h2>
-            <div className="flex gap-4 items-center">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 items-stretch sm:items-center w-full sm:w-auto">
               <input
                 type="text"
                 placeholder="Search products..."
@@ -615,17 +615,18 @@ export default function AdminDashboard() {
                   setProductSearch(e.target.value);
                   setProductsPage(1);
                 }}
-                className="px-4 py-2 border border-stone-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 w-64"
+                className="px-4 py-2 border border-stone-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 w-full sm:w-64"
               />
               <button
                 onClick={() => openForm()}
-                className="flex items-center gap-2 px-6 py-3 bg-stone-900 text-white font-bold rounded-xl hover:bg-stone-800 transition-all"
+                className="flex items-center justify-center gap-2 px-6 py-3 bg-stone-900 text-white font-bold rounded-xl hover:bg-stone-800 transition-all w-full sm:w-auto"
               >
                 <HiOutlinePlus className="h-5 w-5" /> Add Product
               </button>
             </div>
           </div>
-          <table className="w-full text-left">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left min-w-[700px]">
             <thead className="bg-stone-50 border-b border-stone-200">
               <tr>
                 <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest">
@@ -734,6 +735,7 @@ export default function AdminDashboard() {
                 ))}
             </tbody>
           </table>
+          </div>
           <Pagination
             currentPage={productsPage}
             totalItems={filteredProducts.length}
@@ -744,10 +746,10 @@ export default function AdminDashboard() {
       )}
 
       {tab === "orders" && (
-        <div className="bg-white rounded-3xl border border-stone-200 overflow-hidden shadow-xl overflow-x-auto">
-          <div className="p-6 border-b border-stone-200 flex flex-col sm:flex-row gap-4 justify-between items-center bg-stone-50">
+        <div className="bg-white rounded-3xl border border-stone-200 overflow-hidden shadow-xl">
+          <div className="p-4 sm:p-6 border-b border-stone-200 flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center bg-stone-50">
             <h2 className="text-xl font-bold text-stone-800">Orders</h2>
-            <div className="flex gap-4 items-center">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 items-stretch sm:items-center w-full sm:w-auto">
               <input
                 type="text"
                 placeholder="Search orders..."
@@ -756,7 +758,7 @@ export default function AdminDashboard() {
                   setOrderSearch(e.target.value);
                   setOrdersPage(1);
                 }}
-                className="px-4 py-2 border border-stone-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 w-64"
+                className="px-4 py-2 border border-stone-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 w-full sm:w-64"
               />
               <select
                 value={orderFilter}
@@ -764,7 +766,7 @@ export default function AdminDashboard() {
                   setOrderFilter(e.target.value);
                   setOrdersPage(1);
                 }}
-                className="px-4 py-2 border border-stone-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white"
+                className="px-4 py-2 border border-stone-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white w-full sm:w-auto"
               >
                 <option value="All">All Statuses</option>
                 <option value="Delivered">Delivered</option>
@@ -774,7 +776,8 @@ export default function AdminDashboard() {
               </select>
             </div>
           </div>
-          <table className="w-full text-left min-w-[800px]">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left min-w-[800px]">
             <thead className="bg-stone-50 border-b border-stone-200">
               <tr>
                 <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest">
@@ -914,6 +917,7 @@ export default function AdminDashboard() {
               )}
             </tbody>
           </table>
+          </div>
           <Pagination
             currentPage={ordersPage}
             totalItems={filteredOrders.length}
