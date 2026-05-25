@@ -100,7 +100,7 @@ export default async function RootLayout({
 
           {/* Floating WhatsApp Button */}
           <a
-            href="https://wa.me/41764065212"
+            href="https://wa.me/41789544455"
             target="_blank"
             rel="noopener noreferrer"
             className="fixed bottom-6 right-6 lg:bottom-10 lg:right-10 z-50 bg-[#25D366] text-white p-3.5 lg:p-4 rounded-full shadow-lg hover:scale-110 hover:shadow-xl hover:shadow-[#25D366]/30 transition-all duration-300 flex items-center justify-center group"
@@ -244,20 +244,19 @@ export default async function RootLayout({
                     <li className="flex items-center gap-3 justify-center lg:justify-start">
                       <span className="text-orange-500 font-bold">T.</span>
                       <a
-                        href="https://wa.me/41764065212"
+                        href="https://wa.me/41789544455"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="hover:text-white transition-colors"
                       >
-                        +41 76 406 52 12
+                        +41 78 954 44 55
                       </a>
                     </li>
                     <li className="flex gap-3 justify-center lg:justify-start text-left">
                       <span className="text-orange-500 font-bold mt-1">A.</span>
                       <span>
-                        T&T Ketheeswaran<br />
-                        Bad Ragaz<br />
-                        Switzerland
+                        Am Platz 6<br />
+                        7310 Bad Ragaz
                       </span>
                     </li>
                     <li className="pt-4">
@@ -270,18 +269,33 @@ export default async function RootLayout({
                     </li>
                     <li className="pt-6 mt-6 border-t border-stone-800/80 w-full flex flex-col items-center lg:items-start gap-3">
                       <span className="text-xs uppercase tracking-wider text-stone-500 font-bold">Payment Methods</span>
-                      <div className="flex flex-wrap gap-2 items-center justify-center lg:justify-start">
-                        {/* TWINT Logo SVG */}
-                        <div className="bg-white rounded px-2 py-1 flex items-center justify-center h-8">
-                          <svg viewBox="0 0 100 30" width="40" height="12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12.92 23.3h-4.3l-1.33-4.74h-.13l-1.3 4.74H1.54L5.6 9.87h4.08l4.03 13.43zm1.6-13.43h3.5v13.43h-3.5V9.87zm12.33 13.43h-4.08l-4.14-9.61h-.1v9.61h-3.5V9.87h4.15L23.2 19.3h.1V9.87h3.5v13.43zm11.23 0h-3.5V13.12h-3.03V9.87h9.54v3.25h-3.01V23.3z" fill="#000" />
-                            <path d="M43.62 14.16c-1.22-.84-2.58-1.46-4-1.78v-1.7c.94.13 1.83.47 2.62.98l1.45-3.05c-1.3-.87-2.8-1.42-4.38-1.63V4.93h-3.32v2.1c-1.52.3-2.9.96-4.06 1.94-1.12.96-1.92 2.25-2.28 3.66.42 1.9 1.45 3.55 2.92 4.67 1.25.95 2.66 1.63 4.14 1.97v1.89a9.55 9.55 0 0 1-3.23-1.2l-1.45 3.01c1.37.95 2.95 1.54 4.61 1.74v2.09h3.32v-2.09c1.64-.28 3.16-1.02 4.41-2.14 1.15-1.05 1.94-2.45 2.26-3.98-.38-2.02-1.46-3.76-3.01-4.93zm-8.32.18c-.85-.6-1.44-1.46-1.66-2.44.17-.74.6-1.39 1.21-1.81.76-.52 1.68-.84 2.64-.93v5.27c-.77-.07-1.48-.42-2.19-.09zm5.35 4.85c-.96.65-2.12 1.04-3.3 1.12v-5.59c.77.1 1.49.33 2.15.69.87.65 1.46 1.58 1.66 2.62-.16.51-.43.98-.82 1.34L40.65 19.2z" fill="#000" />
-                          </svg>
-                        </div>
-                        <FaCcVisa className="text-white text-3xl opacity-80 hover:opacity-100 transition-opacity" />
-                        <FaCcMastercard className="text-white text-3xl opacity-80 hover:opacity-100 transition-opacity" />
-                        <FaCcAmex className="text-white text-3xl opacity-80 hover:opacity-100 transition-opacity" />
-                        <FaCcApplePay className="text-white text-3xl opacity-80 hover:opacity-100 transition-opacity" />
+                      <div className="flex flex-wrap gap-1.5 items-center justify-center lg:justify-start">
+                        {/* Dynamically show all payment type images from public/paymenttypes */}
+                        {[
+                          { img: "6e15aec17f1a1974593c294359295cd7.png", alt: "Visa", url: "https://www.visa.com/" },
+                          { img: "pngwing.com (23).png", alt: "Mastercard", url: "https://www.mastercard.com/" },
+                          { img: "pngwing.com (24).png", alt: "Apple Pay", url: "https://www.apple.com/apple-pay/" },
+                          { img: "pngwing.com (25).png", alt: "American Express", url: "https://www.americanexpress.com/" },
+                          { img: "pngwing.com (27).png", alt: "PayPal", url: "https://www.paypal.com/" },
+                          { img: "twint-logo.svg", alt: "TWINT", url: "https://www.twint.ch/" }
+                        ].map(({ img, alt, url }) => (
+                          <a
+                            key={img}
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label={alt}
+                            className="inline-flex hover:opacity-80 transition-opacity"
+                          >
+                            <Image
+                              src={`/paymenttypes/${img}`}
+                              alt={alt}
+                              width={36}
+                              height={20}
+                              className="h-6 w-auto object-contain bg-white/90 rounded-[3px] px-1 py-0.5"
+                            />
+                          </a>
+                        ))}
                       </div>
                     </li>
                   </ul>
@@ -290,30 +304,36 @@ export default async function RootLayout({
 
               {/* Bottom Copyright Bar */}
               <div className="border-t border-stone-800/80 pt-8 flex flex-col md:flex-row justify-between items-center gap-6 text-stone-500 text-sm font-medium">
-                <p className="order-3 md:order-1">
-                  &copy; {new Date().getFullYear()} Spicylon. All rights
-                  reserved.
-                </p>
-
-                <div className="flex flex-wrap justify-center gap-6 order-1 md:order-3">
-                  <a
-                    href="/privacy-policy"
-                    className="hover:text-white transition-colors"
-                  >
-                    Privacy Policy
-                  </a>
-                  <a
-                    href="/refund-policy"
-                    className="hover:text-white transition-colors"
-                  >
-                    Refund Policy
-                  </a>
-                  <a
-                    href="/terms-of-service"
-                    className="hover:text-white transition-colors"
-                  >
-                    Terms of Service
-                  </a>
+                <div className="flex flex-col md:flex-row w-full justify-between items-center gap-4">
+                  <div className="flex flex-col md:flex-row items-center gap-2 md:gap-6 order-3 md:order-1">
+                    <span className="text-stone-400">&copy; {new Date().getFullYear()} Spicylon. All rights reserved.</span>
+                    <span className="hidden md:inline-block text-stone-600">|</span>
+                    <span className="flex items-center gap-1.5 text-stone-300 text-xs text-opacity-80">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="12" fill="currentColor"/><text x="12" y="17" textAnchor="middle" fontSize="13" fill="#1c1917" fontFamily="Arial, Helvetica, sans-serif" fontWeight="bold">H</text></svg>
+                      Developed by <span className="text-white font-medium">HABB PVT LTD</span>
+                      <a href="https://www.habb.lk" target="_blank" rel="noopener noreferrer" className="ml-1 text-stone-400 hover:text-white transition-colors">www.habb.lk</a>
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap justify-center gap-6 order-1 md:order-3">
+                    <a
+                      href="/privacy-policy"
+                      className="hover:text-white transition-colors"
+                    >
+                      Privacy Policy
+                    </a>
+                    <a
+                      href="/refund-policy"
+                      className="hover:text-white transition-colors"
+                    >
+                      Refund Policy
+                    </a>
+                    <a
+                      href="/terms-of-service"
+                      className="hover:text-white transition-colors"
+                    >
+                      Terms of Service
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>

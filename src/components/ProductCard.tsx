@@ -58,7 +58,7 @@ const ProductCard = ({
       </Link>
 
       {/* Content */}
-      <div className="p-5 flex flex-col flex-grow">
+      <div className="p-3.5 flex flex-col flex-grow">
         {/* Rating */}
         {numReviews > 0 && (
           <div className="flex items-center gap-1.5 mb-2">
@@ -94,7 +94,7 @@ const ProductCard = ({
           <button
             disabled={product.stock <= 0}
             onClick={() => addToCart(product, price)}
-            className={`flex items-center gap-1.5 px-4 py-2 font-bold rounded-xl transition-all text-sm ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 font-bold rounded-xl transition-all text-sm ${
               product.stock <= 0
                 ? "bg-stone-100 text-stone-400 cursor-not-allowed"
                 : "bg-orange-600 hover:bg-orange-500 text-white shadow-md shadow-orange-200 hover:shadow-orange-300 active:scale-95"

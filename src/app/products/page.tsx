@@ -92,7 +92,7 @@ export default async function ProductsPage({
       {/* Products Grid */}
       <section className="max-w-7xl mx-auto px-4">
         {paginatedProducts.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
             {paginatedProducts.map((product: any, i: number) => (
               <div
                 key={product._id}
