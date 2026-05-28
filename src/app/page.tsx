@@ -340,23 +340,7 @@ export default async function Home() {
               {t("historyText2")}
             </p>
 
-            <div className="bg-stone-900/80 border border-stone-800 p-6 sm:p-8 rounded-3xl text-left">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-2 h-2 rounded-full bg-orange-500 animate-pulse-slow" />
-                <span className="text-orange-500 font-semibold text-sm">
-                  {t("supplierPre")}
-                </span>
-              </div>
-              <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">
-                {t("supplierName")}
-              </h3>
-              <p className="text-stone-400 mb-5 text-sm leading-relaxed">
-                {t("supplierText")}
-              </p>
-              <span className="inline-flex items-center gap-2 text-orange-400 font-bold text-sm">
-                {t("visitSupplier")}
-              </span>
-            </div>
+
           </div>
           <div className="relative h-72 sm:h-[500px] lg:h-[600px] rounded-3xl sm:rounded-[3rem] overflow-hidden shadow-2xl order-1 lg:order-2">
             <img

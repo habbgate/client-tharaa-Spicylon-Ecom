@@ -228,9 +228,10 @@ export default async function AboutPage() {
             </svg>
           </div>
           <h3 className="text-lg font-black text-stone-900 mb-2">T&T Ketheeswaran</h3>
-          <p className="text-stone-500 text-base leading-relaxed">
+          <p className="text-stone-500 text-base leading-relaxed text-center">
             Bad Ragaz<br />
-            Switzerland
+            Switzerland<br />
+            <span className="text-sm mt-1 block">Reg No: CHE-394.479.338</span>
           </p>
         </div>
       </section>
