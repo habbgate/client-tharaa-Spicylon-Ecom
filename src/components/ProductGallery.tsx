@@ -21,6 +21,7 @@ export default function ProductGallery({
           src={images[selected]}
           alt={name}
           fill
+          sizes="(max-width: 1024px) 100vw, 50vw"
           className="object-cover"
           priority
         />
@@ -46,7 +47,7 @@ export default function ProductGallery({
                   : "border-stone-200 hover:border-orange-400"
               }`}
             >
-              <Image src={img} alt="" fill className="object-cover" />
+              <Image src={img} alt="" fill sizes="80px" className="object-cover" />
             </button>
           ))}
         </div>

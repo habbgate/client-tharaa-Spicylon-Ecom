@@ -111,8 +111,7 @@ export default async function AboutPage() {
             {t("partnerTitle")}
           </span>
           <h2 className="text-3xl sm:text-5xl font-black mb-8 leading-tight">
-            {t("partnerHeading")} <br />
-            <span className="text-orange-500 italic">Ceylon Spice Garden</span>
+            {t("partnerHeading")}
           </h2>
 
           <p className="text-stone-300 text-base sm:text-lg max-w-3xl mx-auto mb-14 leading-relaxed px-2 sm:px-0">
@@ -194,78 +193,6 @@ export default async function AboutPage() {
                 </p>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Our Partners */}
-      <section className="max-w-7xl mx-auto px-4 py-16 sm:py-24">
-        <div className="text-center mb-12">
-          <span className="inline-block text-orange-500 font-bold uppercase tracking-[0.2em] mb-4 text-xs sm:text-sm">
-            Our Network
-          </span>
-          <h2 className="text-3xl sm:text-4xl font-black text-stone-900 tracking-tight">
-            Trusted Partners
-          </h2>
-          <p className="text-stone-400 mt-4 max-w-xl mx-auto text-sm sm:text-base leading-relaxed">
-            We work with industry-leading companies to bring you the finest
-            Ceylon spices — from highland farms to your doorstep.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
-          {/* Partner — Ceylon Spice Garden */}
-          <div className="group bg-white border border-stone-100 rounded-3xl p-8 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col items-center text-center">
-            <div className="w-16 h-16 rounded-2xl bg-orange-50 border border-orange-100 flex items-center justify-center mb-5 group-hover:bg-orange-100 transition-colors">
-              <svg
-                className="w-8 h-8 text-orange-500"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="1.5"
-                  d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
-            <h3 className="text-lg font-black text-stone-900 mb-2">
-              Ceylon Spice Garden
-            </h3>
-            <p className="text-stone-400 text-sm leading-relaxed mb-5">
-              Our primary highland farm partner — supplying single-origin,
-              hand-harvested spices from the hills of Sri Lanka.
-            </p>
-            <span className="inline-flex items-center gap-1.5 text-xs font-bold text-orange-600 bg-orange-50 border border-orange-100 rounded-full px-3 py-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />
-              Farm Partner · Sri Lanka
-            </span>
-          </div>
-
-          {/* Partner — DEO Global Lanka */}
-          <div className="group bg-white border border-stone-100 rounded-3xl p-8 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col items-center text-center">
-            <div className="w-28 h-16 relative mb-5 flex items-center justify-center">
-              <Image
-                src="/deo global.jpg"
-                alt="DEO Global Lanka"
-                fill
-                className="object-contain"
-              />
-            </div>
-            <h3 className="text-lg font-black text-stone-900 mb-2">
-              DEO Global Lanka
-            </h3>
-            <p className="text-stone-400 text-sm leading-relaxed mb-5">
-              Premium spice sourcing, quality control, export documentation and
-              global logistics — ensuring your order reaches you with
-              excellence.
-            </p>
-            <span className="inline-flex items-center gap-1.5 text-xs font-bold text-stone-700 bg-stone-100 border border-stone-200 rounded-full px-3 py-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-stone-500" />
-              Export &amp; Logistics · Colombo
-            </span>
           </div>
         </div>
       </section>
