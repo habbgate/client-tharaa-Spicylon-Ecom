@@ -282,22 +282,19 @@ export default async function RootLayout({
                   <div className="flex flex-row flex-wrap gap-2 items-center justify-center lg:justify-start max-w-[180px]">
 
                     {[
-                      { img: "6e15aec17f1a1974593c294359295cd7.png", alt: "Visa", url: "https://www.visa.com/" },
-                      { img: "pngwing.com (23).png", alt: "Mastercard", url: "https://www.mastercard.com/" },
-                      { img: "pngwing.com (24).png", alt: "Apple Pay", url: "https://www.apple.com/apple-pay/" },
-                      { img: "pngwing.com (25).png", alt: "American Express", url: "https://www.americanexpress.com/" },
-                      { img: "pngwing.com (27).png", alt: "PayPal", url: "https://www.paypal.com/" },
-                      { img: "twint-logo.svg", alt: "TWINT", url: "https://www.twint.ch/" },
-                      { img: "postfinance-logo.png", alt: "PostFinance", url: "https://www.postfinance.ch/" }
-                    ].map(({ img, alt, url }) => (
+                      { img: "6e15aec17f1a1974593c294359295cd7.png", alt: "Visa" },
+                      { img: "pngwing.com (23).png", alt: "Mastercard" },
+                      { img: "pngwing.com (24).png", alt: "Apple Pay" },
+                      { img: "pngwing.com (25).png", alt: "American Express" },
+                      { img: "pngwing.com (27).png", alt: "PayPal" },
+                      { img: "twint-logo.svg", alt: "TWINT" },
+                      { img: "postfinance-logo.png", alt: "PostFinance" }
+                    ].map(({ img, alt }) => (
 
-                      <a
+                      <div
                         key={img}
-                        href={url}
-                        target="_blank"
-                        rel="noopener noreferrer"
                         aria-label={alt}
-                        className="bg-white rounded overflow-hidden flex items-center justify-center border border-stone-200 hover:opacity-80 transition-opacity"
+                        className="bg-white rounded overflow-hidden flex items-center justify-center border border-stone-200"
                         style={{ width: "40px", height: "26px" }}
                       >
                         <div className="relative w-full h-full p-[2px]">
@@ -309,7 +306,7 @@ export default async function RootLayout({
                             className="object-contain p-[2px]"
                           />
                         </div>
-                      </a>
+                      </div>
 
                     ))}
 
