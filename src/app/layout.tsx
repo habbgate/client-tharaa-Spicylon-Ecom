@@ -259,7 +259,7 @@ export default async function RootLayout({
                       <span className="text-orange-500 font-bold mt-1">A.</span>
 
                       <span>
-                        T & T ketheeswaran Sole Proprietorship (Einzelunternehmen)
+                        T & T ketheeswaran <br />Sole Proprietorship (Einzelunternehmen)
                         <br />
                         Am Platz 6
                         <br />
