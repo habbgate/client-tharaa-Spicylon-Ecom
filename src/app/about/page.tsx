@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
+import CompanyAddress from "@/components/CompanyAddress";
 
 export const metadata = {
   title: "Our Story",
@@ -227,11 +228,8 @@ export default async function AboutPage() {
               />
             </svg>
           </div>
-          <h3 className="text-lg font-black text-stone-900 mb-2">T&T Ketheeswaran</h3>
           <p className="text-stone-500 text-base leading-relaxed text-center">
-            Bad Ragaz<br />
-            Switzerland<br />
-            <span className="text-sm mt-1 block">Reg No: CHE-394.479.338</span>
+            <CompanyAddress />
           </p>
         </div>
       </section>

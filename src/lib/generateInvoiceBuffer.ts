@@ -6,6 +6,7 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import fs from "fs";
 import path from "path";
+import { COMPANY_ADDRESS_LINES, COMPANY_EMAIL, COMPANY_NAME } from "@/lib/company";
 
 function getLogoBase64(): string | null {
   try {
@@ -79,10 +80,10 @@ export function generateInvoiceBuffer(order: any): Buffer {
   doc.setFontSize(10);
   doc.setTextColor(80);
   doc.text("Spicylon", 100, 75);
-  doc.text("T&T Ketheeswaran", 100, 81);
-  doc.text("Bad Ragaz", 100, 87);
-  doc.text("Switzerland", 100, 93);
-  doc.text("support@spicylon.com", 100, 99);
+  doc.text(COMPANY_NAME, 100, 81);
+  doc.text(COMPANY_ADDRESS_LINES[0], 100, 87);
+  doc.text(COMPANY_ADDRESS_LINES[1], 100, 93);
+  doc.text(COMPANY_EMAIL, 100, 99);
 
   // ── Items table ───────────────────────────────────────
   autoTable(doc, {

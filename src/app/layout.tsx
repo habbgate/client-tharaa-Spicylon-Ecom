@@ -1,13 +1,11 @@
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Image from "next/image";
 import { Toaster } from "react-hot-toast";
 import { FaFacebookF, FaInstagram, FaWhatsapp, FaCreditCard, FaCcVisa, FaCcMastercard, FaCcAmex, FaCcApplePay } from "react-icons/fa";
-
-const inter = Inter({ subsets: ["latin"] });
+import CompanyAddress from "@/components/CompanyAddress";
 
 export const metadata = {
   metadataBase: new URL("https://spicylon.com"),
@@ -90,7 +88,7 @@ export default async function RootLayout({
   return (
     <html lang={locale} suppressHydrationWarning>
       <body
-        className={`${inter.className} bg-stone-50 text-stone-900`}
+        className="bg-stone-50 text-stone-900 font-sans"
         suppressHydrationWarning
       >
         <NextIntlClientProvider locale={locale} messages={messages}>
@@ -258,15 +256,7 @@ export default async function RootLayout({
                     <li className="flex gap-3 justify-center lg:justify-start text-left">
                       <span className="text-orange-500 font-bold mt-1">A.</span>
 
-                      <span>
-                        T & T ketheeswaran <br />Sole Proprietorship (Einzelunternehmen)
-                        <br />
-                        Am Platz 6
-                        <br />
-                        7310 Bad Ragaz
-                        <br />
-                        <span className="text-sm text-stone-500">Reg: CHE-394.479.338</span>
-                      </span>
+                      <CompanyAddress />
                     </li>
 
                   </ul>

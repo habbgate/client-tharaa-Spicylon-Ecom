@@ -16,6 +16,41 @@ function createTransporter() {
   });
 }
 
+async function sendWithRetry(
+  to: string,
+  subject: string,
+  html: string,
+  attachments?: any[],
+  maxAttempts = 3,
+): Promise<boolean> {
+  let lastError: unknown;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    try {
+      const transporter = createTransporter();
+      const info = await transporter.sendMail({
+        from: process.env.EMAIL_FROM || '"Spicylon" <noreply@spicylon.com>',
+        to,
+        subject,
+        html,
+        attachments,
+      });
+      console.log(`[Email] Successfully sent to ${to}: ${info.messageId}`);
+      return true;
+    } catch (err) {
+      lastError = err;
+      console.error(`[Email] Attempt ${attempt} failed for ${to}:`, err);
+    }
+
+    if (attempt < maxAttempts) {
+      await new Promise((resolve) => setTimeout(resolve, 500 * attempt));
+    }
+  }
+
+  console.error(`[Email] Failed after ${maxAttempts} attempts for ${to}:`, lastError);
+  return false;
+}
+
 /**
  * Sends an email and awaits delivery before resolving.
  * Must be awaited — fire-and-forget breaks on Vercel serverless.
@@ -25,19 +60,4 @@ export const sendEmailBackground = async (
   subject: string,
   html: string,
   attachments?: any[],
-): Promise<void> => {
-  try {
-    const transporter = createTransporter();
-    const info = await transporter.sendMail({
-      from: process.env.EMAIL_FROM || '"Spicylon" <noreply@spicylon.com>',
-      to,
-      subject,
-      html,
-      attachments,
-    });
-    console.log(`[Email] Successfully sent to ${to}: ${info.messageId}`);
-  } catch (err) {
-    // Log but do not re-throw — email failure should never crash the API response
-    console.error(`[Email] Failed to send to ${to}:`, err);
-  }
-};
+): Promise<boolean> => sendWithRetry(to, subject, html, attachments);

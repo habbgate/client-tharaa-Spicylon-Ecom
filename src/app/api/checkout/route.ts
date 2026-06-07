@@ -7,8 +7,14 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 export async function POST(req: Request) {
   try {
-    const { items, email, currency, orderId, deliveryAmount } =
-      await req.json();
+    const {
+      items,
+      email,
+      currency,
+      deliveryAmount,
+      shipping,
+      guestEmail,
+    } = await req.json();
 
     const lineItems = items.map((item: any) => ({
       price_data: {
@@ -52,12 +58,16 @@ export async function POST(req: Request) {
         payment_method_types: paymentMethods as any,
         line_items: lineItems,
         mode: "payment",
-        success_url: `${baseUrl}/order-success?session_id={CHECKOUT_SESSION_ID}&orderId=${orderId}`,
+        success_url: `${baseUrl}/order-success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${baseUrl}/cart`,
         // Stripe requires a valid email or no field at all
         ...(email ? { customer_email: email } : {}),
         metadata: {
-          orderId: orderId,
+          items: JSON.stringify(items || []),
+          shipping: JSON.stringify(shipping || {}),
+          guestEmail: guestEmail || "",
+          currency: currency || "USD",
+          deliveryAmount: String(deliveryAmount || 0),
         },
       });
 
@@ -72,10 +82,16 @@ export async function POST(req: Request) {
             payment_method_types: ["card"],
             line_items: lineItems,
             mode: "payment",
-            success_url: `${baseUrl}/order-success?session_id={CHECKOUT_SESSION_ID}&orderId=${orderId}`,
+            success_url: `${baseUrl}/order-success?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${baseUrl}/cart`,
             ...(email ? { customer_email: email } : {}),
-            metadata: { orderId: orderId },
+            metadata: {
+              items: JSON.stringify(items || []),
+              shipping: JSON.stringify(shipping || {}),
+              guestEmail: guestEmail || "",
+              currency: currency || "USD",
+              deliveryAmount: String(deliveryAmount || 0),
+            },
           });
 
           return NextResponse.json({

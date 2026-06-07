@@ -1,5 +1,6 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { COMPANY_ADDRESS_LINES, COMPANY_EMAIL, COMPANY_NAME } from "@/lib/company";
 
 function toDataUrl(src: string, w: number, h: number): Promise<string | null> {
   return new Promise((resolve) => {
@@ -168,13 +169,13 @@ export const generateInvoice = async (order: any) => {
   doc.setFontSize(9);
   doc.setTextColor(80, 80, 80);
   let fromY = sectionY + 17;
-  doc.text("T&T Ketheeswaran", 85, fromY);
+  doc.text(COMPANY_NAME, 85, fromY);
   fromY += 6;
-  doc.text("Bad Ragaz", 85, fromY);
+  doc.text(COMPANY_ADDRESS_LINES[0], 85, fromY);
   fromY += 6;
-  doc.text("Switzerland", 85, fromY);
+  doc.text(COMPANY_ADDRESS_LINES[1], 85, fromY);
   fromY += 6;
-  doc.text("support@spicylon.com", 85, fromY);
+  doc.text(COMPANY_EMAIL, 85, fromY);
 
   // Section divider
   const divY = Math.max(addrY + 4, fromY + 4, metaStartY + lineH * 3 + 10);

@@ -1,4 +1,5 @@
 ﻿import jsPDF from "jspdf";
+import { COMPANY_ADDRESS_LINES, COMPANY_EMAIL, COMPANY_NAME } from "@/lib/company";
 
 async function toDataUrl(
   src: string,
@@ -127,10 +128,10 @@ export const generateShippingLabel = async (order: any) => {
   doc.setFontSize(6.5);
   doc.setFont("helvetica", "normal");
   doc.setTextColor(110, 110, 110);
-  doc.text("T&T Ketheeswaran", 4, fromTop + 15);
-  doc.text("Bad Ragaz", 4, fromTop + 19);
-  doc.text("Switzerland", 4, fromTop + 23);
-  doc.text("support@spicylon.com", 4, fromTop + 27);
+  doc.text(COMPANY_NAME, 4, fromTop + 15);
+  doc.text(COMPANY_ADDRESS_LINES[0], 4, fromTop + 19);
+  doc.text(COMPANY_ADDRESS_LINES[1], 4, fromTop + 23);
+  doc.text(COMPANY_EMAIL, 4, fromTop + 27);
 
   dashed(fromTop + 30);
 
