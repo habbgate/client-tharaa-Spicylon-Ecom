@@ -1,14 +1,33 @@
 import nodemailer from "nodemailer";
 
 function createTransporter() {
-  const port = parseInt(process.env.SMTP_PORT || "587");
+  const host = process.env.SMTP_HOST?.trim();
+  const port = Number.parseInt(process.env.SMTP_PORT || "587", 10);
+  const user = process.env.SMTP_USER?.trim();
+  // Trim the password to guard against accidental leading/trailing whitespace in .env
+  const pass = process.env.SMTP_PASS?.trim();
+
+  if (!host || !Number.isFinite(port) || !user || !pass) {
+    console.error("[Email] SMTP config check failed —", {
+      host: host ?? "MISSING",
+      port,
+      user: user ?? "MISSING",
+      passSet: !!pass,
+    });
+    throw new Error(
+      "Missing SMTP configuration: SMTP_HOST, SMTP_PORT, SMTP_USER, and SMTP_PASS are required.",
+    );
+  }
+
+  console.log(`[Email] Creating transporter → ${host}:${port} as ${user}`);
+
   return nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
+    host,
     port,
     secure: port === 465,
     auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
+      user,
+      pass,
     },
     tls: {
       rejectUnauthorized: false,
@@ -16,30 +35,79 @@ function createTransporter() {
   });
 }
 
+export function getFirstValidEmail(
+  ...values: Array<string | undefined | null>
+): string {
+  return (
+    values.find(
+      (value): value is string =>
+        typeof value === "string" && value.trim().length > 0,
+    )?.trim() || ""
+  );
+}
+
+function htmlToText(html: string): string {
+  return html
+    .replace(/<style[\s\S]*?<\/style>/gi, "")
+    .replace(/<script[\s\S]*?<\/script>/gi, "")
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/p>/gi, "\n")
+    .replace(/<\/h[1-6]>/gi, "\n")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 async function sendWithRetry(
   to: string,
   subject: string,
   html: string,
-  attachments?: any[],
+  attachments?: nodemailer.SendMailOptions["attachments"],
   maxAttempts = 3,
 ): Promise<boolean> {
+  const recipient = to.trim();
+
+  if (!recipient || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(recipient)) {
+    console.error(`[Email] Invalid recipient: ${to}`);
+    return false;
+  }
+
   let lastError: unknown;
 
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    const transporter = createTransporter();
+
     try {
-      const transporter = createTransporter();
       const info = await transporter.sendMail({
-        from: process.env.EMAIL_FROM || '"Spicylon" <noreply@spicylon.com>',
-        to,
+        from:
+          process.env.EMAIL_FROM?.trim() || '"Spicylon" <noreply@spicylon.com>',
+        to: recipient,
         subject,
         html,
+        text: htmlToText(html),
         attachments,
       });
-      console.log(`[Email] Successfully sent to ${to}: ${info.messageId}`);
+
+      await transporter.close();
+      console.log(`[Email] Successfully sent to ${recipient}: ${info.messageId}`);
       return true;
     } catch (err) {
       lastError = err;
-      console.error(`[Email] Attempt ${attempt} failed for ${to}:`, err);
+      const message = err instanceof Error ? err.message : String(err);
+      console.error(`[Email] Attempt ${attempt} failed for ${recipient}:`, message);
+
+      try {
+        await transporter.close();
+      } catch (closeError) {
+        console.error(
+          `[Email] Transport close failed for ${recipient}:`,
+          closeError instanceof Error ? closeError.message : String(closeError),
+        );
+      }
     }
 
     if (attempt < maxAttempts) {
@@ -47,17 +115,14 @@ async function sendWithRetry(
     }
   }
 
-  console.error(`[Email] Failed after ${maxAttempts} attempts for ${to}:`, lastError);
+  const message = lastError instanceof Error ? lastError.message : String(lastError);
+  console.error(`[Email] Failed after ${maxAttempts} attempts for ${recipient}:`, message);
   return false;
 }
 
-/**
- * Sends an email and awaits delivery before resolving.
- * Must be awaited — fire-and-forget breaks on Vercel serverless.
- */
 export const sendEmailBackground = async (
   to: string,
   subject: string,
   html: string,
-  attachments?: any[],
+  attachments?: nodemailer.SendMailOptions["attachments"],
 ): Promise<boolean> => sendWithRetry(to, subject, html, attachments);

@@ -86,6 +86,7 @@ const OrderSchema = new Schema(
     totalPrice: { type: Number, required: true },
     isPaid: { type: Boolean, default: false },
     paidAt: { type: Date },
+    invoiceEmailSentAt: { type: Date },
     isDelivered: { type: Boolean, default: false },
     deliveredAt: { type: Date },
     currency: { type: String, required: true },

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
 import { Order, Product } from "@/models";
-import { sendEmailBackground } from "@/lib/sendEmail";
+import { getFirstValidEmail, sendEmailBackground } from "@/lib/sendEmail";
 import { generateInvoiceBuffer } from "@/lib/generateInvoiceBuffer";
 
 export async function PUT(
@@ -11,15 +11,17 @@ export async function PUT(
   try {
     const { id } = await params;
     await dbConnect();
-    const order = await Order.findById(id).populate("userId", "email name");
-    if (!order)
-      return NextResponse.json({ message: "Order not found" }, { status: 404 });
 
+    const order = await Order.findById(id).populate("userId", "email name");
+    if (!order) {
+      return NextResponse.json({ message: "Order not found" }, { status: 404 });
+    }
+
+    const wasPaid = order.isPaid;
     order.isPaid = true;
-    order.paidAt = new Date();
+    order.paidAt = order.paidAt || new Date();
     await order.save();
 
-    // Deduct stock for each product in the order
     for (const item of order.orderItems) {
       if (item.product) {
         const product = await Product.findById(item.product);
@@ -30,13 +32,28 @@ export async function PUT(
       }
     }
 
-    // Send order confirmation email with invoice PDF attached
-    if (order.userId && typeof order.userId === "object" && order.userId !== null) {
-      const user = order.userId as any;
-      if (user.email) {
-        const addr = (order.shippingAddress || {}) as any;
-        const customerName = user.name || "Customer";
-        const currency = order.currency || "USD";
+    const user =
+      typeof order.userId === "object" && order.userId !== null
+        ? (order.userId as { email?: string; name?: string })
+        : null;
+    const recipientEmail = getFirstValidEmail(
+      user?.email,
+      order.guestEmail,
+      order.paymentResult?.email_address,
+    );
+
+    let emailSent = false;
+    if (recipientEmail && !wasPaid) {
+      const customerName = user?.name || "Customer";
+      const currency = order.currency || "USD";
+      const addr = (order.shippingAddress || {}) as {
+        fullName?: string;
+        address?: string;
+        city?: string;
+        postalCode?: string;
+        country?: string;
+        phone?: string;
+      };
 
       const emailHtml = `
         <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 600px; margin: auto; color: #1c1917;">
@@ -47,7 +64,7 @@ export async function PUT(
 
           <div style="background: #fff; padding: 36px 40px; border: 1px solid #e7e5e4; border-top: none;">
             <div style="display: inline-block; background: #dcfce7; color: #15803d; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 6px 14px; border-radius: 100px; margin-bottom: 24px;">
-              ✓ Payment Confirmed
+              Payment Confirmed
             </div>
 
             <h2 style="margin: 0 0 8px; font-size: 22px; font-weight: 900; color: #1c1917;">Thank you, ${customerName}!</h2>
@@ -97,12 +114,12 @@ export async function PUT(
             ${
               addr.fullName || addr.address
                 ? `
-            <div style="margin-top: 28px; padding: 18px 20px; background: #fafaf9; border: 1px solid #e7e5e4; border-radius: 12px;">
-              <p style="margin: 0 0 8px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #a8a29e;">Ships To</p>
-              <p style="margin: 0; font-size: 13px; font-weight: 700; color: #1c1917;">${addr.fullName || customerName}</p>
-              <p style="margin: 2px 0 0; font-size: 13px; color: #78716c;">${[addr.address, addr.city, addr.postalCode, addr.country].filter(Boolean).join(", ")}</p>
-              ${addr.phone ? `<p style="margin: 2px 0 0; font-size: 13px; color: #78716c;">${addr.phone}</p>` : ""}
-            </div>`
+              <div style="margin-top: 28px; padding: 18px 20px; background: #fafaf9; border: 1px solid #e7e5e4; border-radius: 12px;">
+                <p style="margin: 0 0 8px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #a8a29e;">Ships To</p>
+                <p style="margin: 0; font-size: 13px; font-weight: 700; color: #1c1917;">${addr.fullName || customerName}</p>
+                <p style="margin: 2px 0 0; font-size: 13px; color: #78716c;">${[addr.address, addr.city, addr.postalCode, addr.country].filter(Boolean).join(", ")}</p>
+                ${addr.phone ? `<p style="margin: 2px 0 0; font-size: 13px; color: #78716c;">${addr.phone}</p>` : ""}
+              </div>`
                 : ""
             }
 
@@ -118,27 +135,38 @@ export async function PUT(
         </div>
       `;
 
-      // Generate invoice PDF on the server
-      const pdfBuffer = generateInvoiceBuffer(order);
-
-      await sendEmailBackground(
-        user.email,
-        `Order Confirmed — Spicylon #${String(order._id).slice(-8).toUpperCase()}`,
-        emailHtml,
-        [
+      let attachments: import("nodemailer").SendMailOptions["attachments"] = undefined;
+      try {
+        const pdfBuffer = generateInvoiceBuffer(order);
+        attachments = [
           {
             filename: `Invoice_Spicylon_${String(order._id).slice(-8).toUpperCase()}.pdf`,
             content: pdfBuffer,
             contentType: "application/pdf",
           },
-        ],
+        ];
+      } catch (pdfErr) {
+        console.error(`[Pay] PDF generation failed for order ${order._id}:`, pdfErr);
+      }
+
+      emailSent = await sendEmailBackground(
+        recipientEmail,
+        `Order Confirmed — Spicylon #${String(order._id).slice(-8).toUpperCase()}`,
+        emailHtml,
+        attachments,
       );
     }
+
+    if (recipientEmail && wasPaid) {
+      console.log(`[Email] Skipped duplicate invoice email for already paid order ${order._id}`);
     }
 
-    return NextResponse.json(order);
+    const orderJson = order.toJSON();
+    return NextResponse.json({
+      ...orderJson,
+      emailSent,
+    });
   } catch (error: any) {
     return NextResponse.json({ message: error.message }, { status: 500 });
   }
 }
-
