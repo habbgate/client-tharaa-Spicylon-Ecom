@@ -2,8 +2,8 @@
  * Shared rich HTML email templates for Spicylon transactional emails.
  *
  * All templates include:
- *  - Spicylon logo (base64-embedded from public/logo.png, with text fallback)
- *  - Product image thumbnails per order item
+ *  - Spicylon branded text header (no base64 image — keeps email under Gmail's clip limit)
+ *  - Product image thumbnails per order item (external URL references, not embedded)
  *  - Full product details (name, quantity, unit price, line total)
  *  - Price summary (subtotal, shipping, grand total)
  *  - Shipping address
@@ -11,52 +11,17 @@
  *  - Branded footer with website link
  */
 
-import fs from "fs";
-import path from "path";
-
-// ---------------------------------------------------------------------------
-// Logo helper
-// ---------------------------------------------------------------------------
-
-let _logoBase64Cache: string | null | undefined = undefined;
-
-function getLogoBase64(): string | null {
-  if (_logoBase64Cache !== undefined) return _logoBase64Cache;
-  try {
-    const logoPath = path.join(process.cwd(), "public", "logo.png");
-    const buf = fs.readFileSync(logoPath);
-    _logoBase64Cache = `data:image/png;base64,${buf.toString("base64")}`;
-  } catch {
-    _logoBase64Cache = null;
-  }
-  return _logoBase64Cache;
-}
-
 // ---------------------------------------------------------------------------
 // Shared sub-components
 // ---------------------------------------------------------------------------
 
-function logoBlock(): string {
-  const b64 = getLogoBase64();
-  if (b64) {
-    return `<img src="${b64}" alt="Spicylon Logo" width="54" height="54"
-               style="display:block; border-radius:8px; object-fit:contain;" />`;
-  }
-  // Text fallback when logo file is unavailable
-  return `<span style="font-size:26px; font-weight:900; font-style:italic; color:#ea580c;">Spicylon</span>`;
-}
-
 function headerSection(subtitle = "Authentic Ceylon Spices"): string {
   return `
     <div style="background:linear-gradient(135deg,#1c1917 0%,#292524 100%);
-                padding:28px 40px; border-radius:16px 16px 0 0;
-                display:flex; align-items:center; gap:18px;">
-      <div style="flex-shrink:0;">${logoBlock()}</div>
-      <div>
-        <div style="font-size:24px; font-weight:900; font-style:italic;
-                    color:#ea580c; letter-spacing:-1px; line-height:1;">Spicylon</div>
-        <div style="font-size:12px; color:#a8a29e; margin-top:4px;">${subtitle}</div>
-      </div>
+                padding:28px 40px; border-radius:16px 16px 0 0;">
+      <div style="font-size:28px; font-weight:900; font-style:italic;
+                  color:#ea580c; letter-spacing:-1px; line-height:1;">Spicylon</div>
+      <div style="font-size:12px; color:#a8a29e; margin-top:6px;">${subtitle}</div>
     </div>`;
 }
 
