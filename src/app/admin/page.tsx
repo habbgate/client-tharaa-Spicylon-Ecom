@@ -1624,15 +1624,17 @@ export default function AdminDashboard() {
                   <label className="block text-sm font-bold text-stone-700 mb-1">
                     Category
                   </label>
-                  <input
+                  <select
                     required
-                    type="text"
                     value={formData.category}
                     onChange={(e) =>
                       setFormData({ ...formData, category: e.target.value })
                     }
                     className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  />
+                  >
+                    <option value="Spices">🌿 Spices</option>
+                    <option value="Gift Box">🎁 Gift Box</option>
+                  </select>
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-stone-700 mb-1">

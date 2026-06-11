@@ -22,8 +22,20 @@ import { Product } from "@/models";
 async function getProducts() {
   try {
     await dbConnect();
-    const products = await Product.find({}).lean();
+    // Exclude Gift Box products from the featured spices section
+    const products = await Product.find({ category: { $ne: "Gift Box" } }).lean();
     return JSON.parse(JSON.stringify(products));
+  } catch (err) {
+    console.error(err);
+    return [];
+  }
+}
+
+async function getGiftBoxes() {
+  try {
+    await dbConnect();
+    const giftBoxes = await Product.find({ category: "Gift Box" }).limit(4).lean();
+    return JSON.parse(JSON.stringify(giftBoxes));
   } catch (err) {
     console.error(err);
     return [];
@@ -32,6 +44,7 @@ async function getProducts() {
 
 export default async function Home() {
   const products = await getProducts();
+  const giftBoxes = await getGiftBoxes();
   const cookieStore = await cookies();
   const currency = cookieStore.get("currency")?.value || "USD";
 
@@ -318,6 +331,66 @@ export default async function Home() {
           </Link>
         </div>
       </section>
+
+      {/* ── Gift Boxes Section ────────────────────────────────── */}
+      {giftBoxes.length > 0 && (
+        <section className="max-w-7xl mx-auto px-4 mt-16 sm:mt-24">
+          {/* Section header */}
+          <div className="relative rounded-3xl bg-gradient-to-br from-stone-950 via-stone-900 to-stone-950 p-8 sm:p-12 mb-10 overflow-hidden">
+            <div className="absolute -top-16 -right-16 w-64 h-64 bg-orange-600/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-12 -left-12 w-48 h-48 bg-amber-500/8 rounded-full blur-3xl pointer-events-none" />
+            <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+              <div className="flex items-center gap-5">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-500/20 to-amber-500/20 border border-orange-500/30 flex items-center justify-center text-4xl flex-shrink-0">
+                  🎁
+                </div>
+                <div>
+                  <span className="text-orange-400 font-bold uppercase tracking-[0.25em] text-xs mb-1 block">
+                    Curated Collections
+                  </span>
+                  <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
+                    Spice <span className="text-orange-500 italic">Gift Boxes</span>
+                  </h2>
+                  <p className="text-stone-400 text-sm mt-1">
+                    Beautifully packed — perfect for every occasion
+                  </p>
+                </div>
+              </div>
+              <Link
+                href="/gift-boxes"
+                className="flex-shrink-0 flex items-center gap-2 px-6 py-3 bg-orange-600 hover:bg-orange-500 text-white font-bold rounded-full transition-all shadow-lg shadow-orange-900/40 text-sm"
+              >
+                View All Gift Boxes
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </Link>
+            </div>
+          </div>
+
+          {/* Gift Box cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
+            {giftBoxes.map((product: any, i: number) => (
+              <div
+                key={product._id}
+                className="animate-slide-up"
+                style={{ animationDelay: `${i * 60}ms` }}
+              >
+                <ProductCard product={product} currency={currency} />
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-8 text-center">
+            <Link
+              href="/gift-boxes"
+              className="inline-flex items-center gap-2 px-8 py-3 border-2 border-stone-900 text-stone-900 font-bold rounded-full hover:bg-stone-900 hover:text-white transition-all"
+            >
+              Browse All Gift Boxes →
+            </Link>
+          </div>
+        </section>
+      )}
 
       {/* Sri Lankan Spice History & Supplier Info */}
       <section className="bg-stone-950 text-white py-16 sm:py-28 mt-16 sm:mt-24 relative overflow-hidden">

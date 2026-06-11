@@ -22,7 +22,8 @@ import { Product } from "@/models";
 async function getProducts() {
   try {
     await dbConnect();
-    const products = await Product.find({}).lean();
+    // Exclude Gift Box products — those are shown on /gift-boxes
+    const products = await Product.find({ category: { $ne: "Gift Box" } }).lean();
     return JSON.parse(JSON.stringify(products));
   } catch (err) {
     console.error(err);

@@ -98,6 +98,7 @@ const Navbar = () => {
               {[
                 { href: "/", label: tNav("home") },
                 { href: "/products", label: tNav("spices") },
+                { href: "/gift-boxes", label: "Gift Boxes" },
                 { href: "/about", label: tNav("ourStory") },
                 { href: "/contact", label: tNav("contact") },
               ].map((link) => (
@@ -203,6 +204,7 @@ const Navbar = () => {
             {[
               { href: "/", label: tNav("home") },
               { href: "/products", label: tNav("spices") },
+              { href: "/gift-boxes", label: "Gift Boxes" },
               { href: "/about", label: tNav("ourStory") },
               { href: "/contact", label: tNav("contact") },
             ].map((link) => (
