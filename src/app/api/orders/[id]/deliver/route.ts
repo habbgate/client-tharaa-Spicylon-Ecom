@@ -5,6 +5,7 @@ import {
   getFirstValidEmail,
   sendEmailBackground,
 } from "@/lib/sendEmail";
+import { buildDeliveryUpdateEmail } from "@/lib/emailTemplates";
 
 export async function PUT(
   req: Request,
@@ -36,27 +37,34 @@ export async function PUT(
 
     let emailSent = false;
     if (recipientEmail) {
-      const statusText = order.isDelivered ? "Delivered" : "Processing";
-      const emailHtml = `
-        <div style="font-family: sans-serif; max-width: 600px; margin: auto;">
-          <h2 style="color: #ea580c; font-style: italic;">Spicylon Update</h2>
-          <h3>Order #${order._id} Status: ${statusText}</h3>
-          <p>Hi ${user?.name || "Customer"},</p>
-          <p>Your order delivery status has been updated by our admin team.</p>
-          ${
-            order.isDelivered
-              ? "<p><strong>Your authentic Ceylon spices have been marked as delivered.</strong></p>"
-              : "<p>Your order is back in processing and will continue toward shipment.</p>"
-          }
-          <p>Thank you for shopping at Spicylon!</p>
-        </div>
-      `;
+      const customerName = user?.name || "Customer";
 
+      const emailHtml = buildDeliveryUpdateEmail(
+        {
+          _id: String(order._id),
+          orderItems: order.orderItems,
+          shippingAddress: order.shippingAddress,
+          itemsPrice: order.itemsPrice,
+          shippingPrice: order.shippingPrice || 0,
+          totalPrice: order.totalPrice,
+          currency: order.currency || "USD",
+          paidAt: order.paidAt,
+          paymentMethod: order.paymentMethod,
+        },
+        customerName,
+        order.isDelivered,
+      );
+
+      const statusText = order.isDelivered ? "Delivered" : "Processing";
       emailSent = await sendEmailBackground(
         recipientEmail,
-        `Spicylon Order Update #${order._id} - ${statusText}`,
+        `Spicylon Order Update #${String(order._id).slice(-8).toUpperCase()} — ${statusText}`,
         emailHtml,
       );
+
+      if (!emailSent) {
+        console.error(`[Deliver] Email failed for order ${order._id}`);
+      }
     }
 
     const orderJson = order.toJSON();

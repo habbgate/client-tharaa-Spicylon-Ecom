@@ -72,7 +72,7 @@ async function sendWithRetry(
   const recipient = to.trim();
 
   if (!recipient || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(recipient)) {
-    console.error(`[Email] Invalid recipient: ${to}`);
+    console.error(`[Email] Invalid recipient address: "${to}"`);
     return false;
   }
 
@@ -82,6 +82,23 @@ async function sendWithRetry(
     const transporter = createTransporter();
 
     try {
+      // On the first attempt, verify the SMTP connection to catch credential
+      // or connectivity issues immediately with a clear diagnostic message.
+      if (attempt === 1) {
+        try {
+          await transporter.verify();
+          console.log("[Email] SMTP connection verified successfully.");
+        } catch (verifyErr) {
+          const verifyMsg = verifyErr instanceof Error ? verifyErr.message : String(verifyErr);
+          console.error(
+            "[Email] SMTP verification failed — check SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS in .env:",
+            verifyMsg,
+          );
+          // Let the actual sendMail attempt continue; verify failure may still
+          // allow sending in some SMTP server configurations.
+        }
+      }
+
       const info = await transporter.sendMail({
         from:
           process.env.EMAIL_FROM?.trim() || '"Spicylon" <noreply@spicylon.com>',
@@ -93,30 +110,38 @@ async function sendWithRetry(
       });
 
       await transporter.close();
-      console.log(`[Email] Successfully sent to ${recipient}: ${info.messageId}`);
+      console.log(
+        `[Email] ✅ Successfully sent to ${recipient} (attempt ${attempt}): ${info.messageId}`,
+      );
       return true;
     } catch (err) {
       lastError = err;
       const message = err instanceof Error ? err.message : String(err);
-      console.error(`[Email] Attempt ${attempt} failed for ${recipient}:`, message);
+      console.error(
+        `[Email] ❌ Attempt ${attempt}/${maxAttempts} failed for ${recipient}: ${message}`,
+      );
 
       try {
         await transporter.close();
       } catch (closeError) {
         console.error(
-          `[Email] Transport close failed for ${recipient}:`,
+          "[Email] Transport close failed:",
           closeError instanceof Error ? closeError.message : String(closeError),
         );
       }
     }
 
     if (attempt < maxAttempts) {
-      await new Promise((resolve) => setTimeout(resolve, 500 * attempt));
+      const delay = 500 * attempt;
+      console.log(`[Email] Retrying in ${delay}ms…`);
+      await new Promise((resolve) => setTimeout(resolve, delay));
     }
   }
 
   const message = lastError instanceof Error ? lastError.message : String(lastError);
-  console.error(`[Email] Failed after ${maxAttempts} attempts for ${recipient}:`, message);
+  console.error(
+    `[Email] ❌ All ${maxAttempts} attempts exhausted for ${recipient}: ${message}`,
+  );
   return false;
 }
 
