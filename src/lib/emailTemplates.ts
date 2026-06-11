@@ -1,34 +1,44 @@
 /**
  * Shared rich HTML email templates for Spicylon transactional emails.
  *
- * All templates include:
- *  - Spicylon branded text header (no base64 image — keeps email under Gmail's clip limit)
- *  - Product image thumbnails per order item (external URL references, not embedded)
- *  - Full product details (name, quantity, unit price, line total)
- *  - Price summary (subtotal, shipping, grand total)
- *  - Shipping address
- *  - Spicylon website CTA button
- *  - Branded footer with website link
+ * Fixes applied:
+ *  - Logo: hosted image via https://spicylon.com/logo.png (no base64, no Gmail clipping)
+ *  - Product images: larger 72×72px thumbnails with proper table-cell layout
+ *  - Price summary: table-based layout (flex/grid not supported in most email clients)
  */
 
 // ---------------------------------------------------------------------------
 // Shared sub-components
 // ---------------------------------------------------------------------------
 
+/** Logo hosted on the live site — no base64 needed, no size impact on email */
+const LOGO_URL = "https://spicylon.com/logo.png";
+
 function headerSection(subtitle = "Authentic Ceylon Spices"): string {
   return `
     <div style="background:linear-gradient(135deg,#1c1917 0%,#292524 100%);
-                padding:28px 40px; border-radius:16px 16px 0 0;">
-      <div style="font-size:28px; font-weight:900; font-style:italic;
-                  color:#ea580c; letter-spacing:-1px; line-height:1;">Spicylon</div>
-      <div style="font-size:12px; color:#a8a29e; margin-top:6px;">${subtitle}</div>
+                padding:24px 36px; border-radius:16px 16px 0 0;">
+      <table border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+        <tr>
+          <td style="padding-right:16px; vertical-align:middle;">
+            <img src="${LOGO_URL}" alt="Spicylon" width="64" height="64"
+                 style="display:block; border-radius:10px; object-fit:contain;"
+                 onerror="this.style.display='none'" />
+          </td>
+          <td style="vertical-align:middle;">
+            <div style="font-size:26px; font-weight:900; font-style:italic;
+                        color:#ea580c; letter-spacing:-1px; line-height:1;">Spicylon</div>
+            <div style="font-size:12px; color:#a8a29e; margin-top:5px;">${subtitle}</div>
+          </td>
+        </tr>
+      </table>
     </div>`;
 }
 
 function footerSection(): string {
   return `
     <div style="background:#fafaf9; border:1px solid #e7e5e4; border-top:none;
-                padding:20px 40px; border-radius:0 0 16px 16px; text-align:center;">
+                padding:20px 36px; border-radius:0 0 16px 16px; text-align:center;">
       <p style="margin:0 0 8px; font-size:13px; color:#78716c;">
         Questions? Contact us at
         <a href="https://spicylon.com/contact"
@@ -53,23 +63,6 @@ function ctaButton(label: string, url: string): string {
     </div>`;
 }
 
-function productImageTag(imageUrl: string | undefined | null, name: string): string {
-  if (!imageUrl || imageUrl.trim() === "") {
-    // Spice-themed placeholder with initials
-    const initial = (name || "S").charAt(0).toUpperCase();
-    return `<div style="width:56px; height:56px; border-radius:8px;
-                        background:linear-gradient(135deg,#ea580c,#c2410c);
-                        display:flex; align-items:center; justify-content:center;
-                        font-size:22px; font-weight:900; color:#fff; flex-shrink:0;">
-              ${initial}
-            </div>`;
-  }
-  return `<img src="${imageUrl}" alt="${name}"
-               width="56" height="56"
-               style="border-radius:8px; object-fit:cover; display:block; flex-shrink:0;"
-               onerror="this.style.display='none'" />`;
-}
-
 function orderItemsTable(
   orderItems: Array<{ name: string; image?: string; quantity: number; price: number }>,
   currency: string,
@@ -78,49 +71,65 @@ function orderItemsTable(
     .map(
       (item, i) => `
       <tr style="background:${i % 2 === 0 ? "#fff" : "#fafaf9"};">
-        <td style="padding:12px 14px; border-bottom:1px solid #f5f5f4;">
-          <div style="display:flex; align-items:center; gap:14px;">
-            ${productImageTag(item.image, item.name)}
-            <div>
-              <div style="font-size:13px; font-weight:700; color:#1c1917; line-height:1.3;">
-                ${item.name}
-              </div>
-              <div style="font-size:12px; color:#a8a29e; margin-top:3px;">
-                Unit price: ${currency} ${Number(item.price).toFixed(2)}
-              </div>
-            </div>
-          </div>
+        <td style="padding:14px 12px; border-bottom:1px solid #f5f5f4; vertical-align:middle;">
+          <table border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+            <tr>
+              <td style="padding-right:12px; vertical-align:middle;">
+                ${
+                  item.image && item.image.trim() !== ""
+                    ? `<img src="${item.image}" alt="${item.name}" width="72" height="72"
+                           style="border-radius:8px; object-fit:cover; display:block;"
+                           onerror="this.style.display='none'" />`
+                    : `<div style="width:72px; height:72px; border-radius:8px;
+                                   background:linear-gradient(135deg,#ea580c,#c2410c);
+                                   text-align:center; line-height:72px;
+                                   font-size:28px; font-weight:900; color:#fff;">
+                         ${(item.name || "S").charAt(0).toUpperCase()}
+                       </div>`
+                }
+              </td>
+              <td style="vertical-align:middle;">
+                <div style="font-size:13px; font-weight:700; color:#1c1917; line-height:1.4;">
+                  ${item.name}
+                </div>
+                <div style="font-size:12px; color:#a8a29e; margin-top:4px;">
+                  Unit price: ${currency}&nbsp;${Number(item.price).toFixed(2)}
+                </div>
+              </td>
+            </tr>
+          </table>
         </td>
-        <td style="padding:12px 14px; font-size:13px; color:#78716c;
-                   text-align:center; border-bottom:1px solid #f5f5f4; white-space:nowrap;">
-          × ${item.quantity}
+        <td style="padding:14px 12px; font-size:13px; color:#78716c;
+                   text-align:center; border-bottom:1px solid #f5f5f4;
+                   white-space:nowrap; vertical-align:middle;">
+          &times;&nbsp;${item.quantity}
         </td>
-        <td style="padding:12px 14px; font-size:13px; font-weight:700; color:#1c1917;
-                   text-align:right; border-bottom:1px solid #f5f5f4; white-space:nowrap;">
-          ${currency} ${(item.quantity * item.price).toFixed(2)}
+        <td style="padding:14px 12px; font-size:13px; font-weight:700; color:#1c1917;
+                   text-align:right; border-bottom:1px solid #f5f5f4;
+                   white-space:nowrap; vertical-align:middle;">
+          ${currency}&nbsp;${(item.quantity * item.price).toFixed(2)}
         </td>
       </tr>`,
     )
     .join("");
 
   return `
-    <table style="width:100%; border-collapse:collapse; margin-bottom:4px;">
+    <table width="100%" border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse; margin-bottom:4px;">
       <thead>
         <tr style="background:#1c1917;">
-          <th style="text-align:left; padding:10px 14px; font-size:11px; font-weight:700;
-                     text-transform:uppercase; letter-spacing:1px; color:#d6d3d1;
-                     border-radius:8px 0 0 8px;">Product</th>
-          <th style="text-align:center; padding:10px 14px; font-size:11px; font-weight:700;
+          <th style="text-align:left; padding:10px 12px; font-size:11px; font-weight:700;
+                     text-transform:uppercase; letter-spacing:1px; color:#d6d3d1;">Product</th>
+          <th style="text-align:center; padding:10px 12px; font-size:11px; font-weight:700;
                      text-transform:uppercase; letter-spacing:1px; color:#d6d3d1;">Qty</th>
-          <th style="text-align:right; padding:10px 14px; font-size:11px; font-weight:700;
-                     text-transform:uppercase; letter-spacing:1px; color:#d6d3d1;
-                     border-radius:0 8px 8px 0;">Total</th>
+          <th style="text-align:right; padding:10px 12px; font-size:11px; font-weight:700;
+                     text-transform:uppercase; letter-spacing:1px; color:#d6d3d1;">Total</th>
         </tr>
       </thead>
       <tbody>${rows}</tbody>
     </table>`;
 }
 
+/** Table-based price summary — flex/grid not supported in email clients */
 function priceSummary(
   currency: string,
   itemsPrice: number,
@@ -128,27 +137,32 @@ function priceSummary(
   totalPrice: number,
 ): string {
   return `
-    <div style="border-top:2px solid #e7e5e4; padding-top:16px; margin-top:8px;">
-      <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
-        <span style="font-size:13px; color:#78716c;">Subtotal</span>
-        <span style="font-size:13px; color:#1c1917; font-weight:600;">
-          ${currency} ${itemsPrice.toFixed(2)}
-        </span>
-      </div>
-      <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
-        <span style="font-size:13px; color:#78716c;">Shipping</span>
-        <span style="font-size:13px; color:#1c1917; font-weight:600;">
-          ${shippingPrice > 0 ? `${currency} ${shippingPrice.toFixed(2)}` : "Free"}
-        </span>
-      </div>
-      <div style="display:flex; justify-content:space-between; margin-top:10px;
-                  padding-top:10px; border-top:1px solid #e7e5e4;">
-        <span style="font-size:15px; font-weight:900; color:#1c1917;">Total Paid</span>
-        <span style="font-size:15px; font-weight:900; color:#ea580c;">
-          ${currency} ${totalPrice.toFixed(2)}
-        </span>
-      </div>
-    </div>`;
+    <table width="100%" border="0" cellpadding="0" cellspacing="0"
+           style="border-collapse:collapse; border-top:2px solid #e7e5e4;
+                  padding-top:0; margin-top:8px;">
+      <tr>
+        <td style="padding:10px 0 4px; font-size:13px; color:#78716c;">Subtotal</td>
+        <td style="padding:10px 0 4px; font-size:13px; color:#1c1917;
+                   font-weight:600; text-align:right;">
+          ${currency}&nbsp;${itemsPrice.toFixed(2)}
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:4px 0 10px; font-size:13px; color:#78716c;">Shipping</td>
+        <td style="padding:4px 0 10px; font-size:13px; color:#1c1917;
+                   font-weight:600; text-align:right;">
+          ${shippingPrice > 0 ? `${currency}&nbsp;${shippingPrice.toFixed(2)}` : "Free"}
+        </td>
+      </tr>
+      <tr style="border-top:1px solid #e7e5e4;">
+        <td style="padding:12px 0 4px; font-size:15px; font-weight:900; color:#1c1917;
+                   border-top:1px solid #e7e5e4;">Total Paid</td>
+        <td style="padding:12px 0 4px; font-size:15px; font-weight:900; color:#ea580c;
+                   text-align:right; border-top:1px solid #e7e5e4;">
+          ${currency}&nbsp;${totalPrice.toFixed(2)}
+        </td>
+      </tr>
+    </table>`;
 }
 
 function shippingAddressBlock(
@@ -237,7 +251,7 @@ export function buildPaymentConfirmationEmail(
 
     ${headerSection()}
 
-    <div style="background:#fff; padding:36px 40px; border:1px solid #e7e5e4; border-top:none;">
+    <div style="background:#fff; padding:36px 36px; border:1px solid #e7e5e4; border-top:none;">
 
       <!-- Status badge -->
       <div style="display:inline-block; background:#dcfce7; color:#15803d; font-size:11px;
@@ -339,7 +353,7 @@ export function buildDeliveryUpdateEmail(
 
     ${headerSection()}
 
-    <div style="background:#fff; padding:36px 40px; border:1px solid #e7e5e4; border-top:none;">
+    <div style="background:#fff; padding:36px 36px; border:1px solid #e7e5e4; border-top:none;">
 
       <!-- Status badge -->
       ${statusBadge}
