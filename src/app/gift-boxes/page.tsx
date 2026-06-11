@@ -73,17 +73,6 @@ export default async function GiftBoxesPage({
           />
         </div>
 
-        {/* Breadcrumb */}
-        <div className="max-w-7xl mx-auto relative z-10 mb-8">
-          <nav className="flex items-center gap-2 text-sm text-stone-500">
-            <Link href="/" className="hover:text-orange-400 transition-colors">
-              Home
-            </Link>
-            <span>/</span>
-            <span className="text-stone-300 font-medium">Gift Boxes</span>
-          </nav>
-        </div>
-
         <div className="max-w-7xl mx-auto text-center relative z-10">
           {/* Icon */}
           <div className="flex justify-center mb-6">
@@ -108,20 +97,6 @@ export default async function GiftBoxesPage({
               ? `${totalItems} curated gift set${totalItems === 1 ? "" : "s"} — beautifully hand-packed with authentic Ceylon spices`
               : "Beautifully hand-packed collections of authentic Ceylon spices — the perfect gift for any occasion"}
           </p>
-
-          {/* Feature pills */}
-          <div className="flex flex-wrap justify-center gap-3 mt-8">
-            {["🌿 100% Organic", "🎀 Gift Ready", "🌍 Ships Worldwide", "✈️ Premium Packaging"].map(
-              (pill) => (
-                <span
-                  key={pill}
-                  className="px-4 py-2 bg-stone-800/60 border border-stone-700/60 rounded-full text-stone-300 text-xs font-bold tracking-wide backdrop-blur-sm"
-                >
-                  {pill}
-                </span>
-              ),
-            )}
-          </div>
         </div>
       </section>
 
