@@ -34,7 +34,18 @@ export async function POST(req: Request) {
     await dbConnect();
 
     const metadata = session.metadata || {};
-    const items = JSON.parse(metadata.items || '[]');
+
+    let itemsStr = metadata.items || '';
+    if (!itemsStr) {
+      for (let i = 0; i < 50; i++) {
+        if (metadata[`items_${i}`]) {
+          itemsStr += metadata[`items_${i}`];
+        } else {
+          break;
+        }
+      }
+    }
+    const items = JSON.parse(itemsStr || '[]');
     const shipping = JSON.parse(metadata.shipping || '{}');
     const guestEmail = metadata.guestEmail || '';
     const currency = (metadata.currency || session.currency || 'USD').toUpperCase();

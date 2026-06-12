@@ -53,6 +53,19 @@ export async function POST(req: Request) {
 
     if (allowTwint) paymentMethods.push("twint");
 
+    const simplifiedItems = items.map((item: any) => ({
+      id: item.id,
+      name: item.name,
+      price: item.price,
+      quantity: item.quantity,
+      image: item.image,
+    }));
+    const itemsStr = JSON.stringify(simplifiedItems);
+    const itemChunks: Record<string, string> = {};
+    for (let i = 0; i < itemsStr.length; i += 500) {
+      itemChunks[`items_${Math.floor(i / 500)}`] = itemsStr.substring(i, i + 500);
+    }
+
     try {
       const session = await stripe.checkout.sessions.create({
         payment_method_types: paymentMethods as any,
@@ -63,7 +76,7 @@ export async function POST(req: Request) {
         // Stripe requires a valid email or no field at all
         ...(email ? { customer_email: email } : {}),
         metadata: {
-          items: JSON.stringify(items || []),
+          ...itemChunks,
           shipping: JSON.stringify(shipping || {}),
           guestEmail: guestEmail || "",
           currency: currency || "USD",
@@ -86,7 +99,7 @@ export async function POST(req: Request) {
             cancel_url: `${baseUrl}/cart`,
             ...(email ? { customer_email: email } : {}),
             metadata: {
-              items: JSON.stringify(items || []),
+              ...itemChunks,
               shipping: JSON.stringify(shipping || {}),
               guestEmail: guestEmail || "",
               currency: currency || "USD",
