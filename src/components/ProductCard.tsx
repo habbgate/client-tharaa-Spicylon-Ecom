@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useStore } from "@/store/useStore";
 import { useTranslations } from "next-intl";
 import { HiStar, HiOutlineShoppingCart, HiOutlineEye } from "react-icons/hi";
+import { toast } from "react-hot-toast";
 
 const ProductCard = ({
   product,
@@ -94,7 +95,17 @@ const ProductCard = ({
           </div>
           <button
             disabled={product.stock <= 0}
-            onClick={() => addToCart(product, price)}
+            onClick={() => {
+              addToCart(product, price);
+              toast.success("Product added to cart", {
+                icon: '🛒',
+                style: {
+                  borderRadius: '10px',
+                  background: '#333',
+                  color: '#fff',
+                },
+              });
+            }}
             className={`flex items-center gap-1.5 px-3 py-1.5 font-bold rounded-xl transition-all text-sm ${
               product.stock <= 0
                 ? "bg-stone-100 text-stone-400 cursor-not-allowed"

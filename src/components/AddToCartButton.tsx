@@ -2,6 +2,7 @@
 
 import { useStore } from '@/store/useStore';
 import { useTranslations } from 'next-intl';
+import { toast } from 'react-hot-toast';
 
 const AddToCartButton = ({ product, price }: { product: any, price: number }) => {
     const addToCart = useStore((state) => state.addToCart);
@@ -10,7 +11,17 @@ const AddToCartButton = ({ product, price }: { product: any, price: number }) =>
 
     return (
         <button
-            onClick={() => addToCart(product, price)}
+            onClick={() => {
+                addToCart(product, price);
+                toast.success("Product added to cart", {
+                    icon: '🛒',
+                    style: {
+                      borderRadius: '10px',
+                      background: '#333',
+                      color: '#fff',
+                    },
+                });
+            }}
             disabled={outOfStock}
             className={`w-full sm:w-auto px-12 py-5 font-black rounded-2xl transition-all shadow-xl active:scale-95 text-lg ${
                 outOfStock 
