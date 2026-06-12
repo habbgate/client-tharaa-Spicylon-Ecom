@@ -9,13 +9,10 @@ import path from "path";
 import { COMPANY_ADDRESS_LINES, COMPANY_EMAIL, COMPANY_NAME } from "@/lib/company";
 
 function getLogoBase64(): string | null {
-  try {
-    const logoPath = path.join(process.cwd(), "public", "logo.png");
-    const buf = fs.readFileSync(logoPath);
-    return `data:image/png;base64,${buf.toString("base64")}`;
-  } catch {
-    return null;
-  }
+  // Disabling the logo in the server-side PDF generation.
+  // Including a large PNG with transparency causes jsPDF to embed it
+  // uncompressed, resulting in a ~6MB PDF which causes SMTP timeouts.
+  return null;
 }
 
 export function generateInvoiceBuffer(order: any): Buffer {
