@@ -25,14 +25,14 @@ const ProductCard = ({
       {/* Image */}
       <Link
         href={`/products/${product._id}`}
-        className="block relative h-60 overflow-hidden bg-stone-50 flex-shrink-0"
+        className="block relative aspect-[4/5] overflow-hidden bg-stone-50 flex-shrink-0"
       >
         <Image
           src={product.images[0]}
           alt={product.name}
           fill
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          className="object-cover group-hover:scale-105 transition-transform duration-500"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
+          className="object-contain p-5 sm:p-6 group-hover:scale-[1.03] transition-transform duration-500"
         />
         {/* Category badge */}
         <div className="absolute top-3 left-3">
@@ -87,7 +87,7 @@ const ProductCard = ({
         </p>
 
         {/* Price & Add to Cart */}
-        <div className="flex items-center justify-between mt-auto pt-3 border-t border-stone-100">
+        <div className="flex flex-wrap items-center justify-between gap-3 mt-auto pt-3 border-t border-stone-100">
           <div>
             <span className="text-xl font-black text-stone-900">
               {currency} {price.toFixed(2)}

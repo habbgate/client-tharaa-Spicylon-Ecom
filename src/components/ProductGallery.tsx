@@ -15,14 +15,14 @@ export default function ProductGallery({
   const [selected, setSelected] = useState(0);
 
   return (
-    <div className="lg:w-1/2">
-      <div className="relative aspect-square rounded-3xl overflow-hidden shadow-2xl border border-stone-100 bg-stone-50">
+    <div className="w-full min-w-0 lg:w-1/2">
+      <div className="relative aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl border border-stone-100 bg-stone-50">
         <Image
           src={images[selected]}
           alt={name}
           fill
           sizes="(max-width: 1024px) 100vw, 50vw"
-          className="object-cover"
+          className="object-contain p-5 sm:p-8"
           priority
         />
         {outOfStockLabel && (
@@ -35,19 +35,21 @@ export default function ProductGallery({
       </div>
 
       {images.length > 1 && (
-        <div className="flex gap-3 mt-4">
+        <div className="flex gap-3 mt-4 overflow-x-auto pb-1">
           {images.slice(0, 4).map((img, i) => (
             <button
               key={i}
               type="button"
               onClick={() => setSelected(i)}
-              className={`relative w-20 h-20 rounded-xl overflow-hidden border-2 flex-shrink-0 transition-colors ${
+              aria-label={`View ${name} image ${i + 1}`}
+              aria-pressed={selected === i}
+              className={`relative w-20 h-20 rounded-xl overflow-hidden bg-stone-50 border-2 flex-shrink-0 transition-colors ${
                 selected === i
                   ? "border-orange-500"
                   : "border-stone-200 hover:border-orange-400"
               }`}
             >
-              <Image src={img} alt="" fill sizes="80px" className="object-cover" />
+              <Image src={img} alt="" fill sizes="80px" className="object-contain p-1.5" />
             </button>
           ))}
         </div>
