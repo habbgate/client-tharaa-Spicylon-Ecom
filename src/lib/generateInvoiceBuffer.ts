@@ -9,19 +9,21 @@ import path from "path";
 import { COMPANY_ADDRESS_LINES, COMPANY_EMAIL, COMPANY_NAME } from "@/lib/company";
 
 function getLogoBase64(): string | null {
-  // Disabling the logo in the server-side PDF generation.
-  // Including a large PNG with transparency causes jsPDF to embed it
-  // uncompressed, resulting in a ~6MB PDF which causes SMTP timeouts.
-  return null;
+  try {
+    const logo = fs.readFileSync(path.join(process.cwd(), "public", "logo.png"));
+    return `data:image/png;base64,${logo.toString("base64")}`;
+  } catch {
+    return null;
+  }
 }
 
 export function generateInvoiceBuffer(order: any): Buffer {
   const logoBase64 = getLogoBase64();
-  const doc = new jsPDF();
+  const doc = new jsPDF({ compress: true });
 
   // ── Header ──────────────────────────────────────────
   if (logoBase64) {
-    doc.addImage(logoBase64, "PNG", 14, 10, 22, 22);
+    doc.addImage(logoBase64, "PNG", 14, 10, 22, 22, undefined, "FAST");
     doc.setFontSize(10);
     doc.setTextColor(100);
     doc.text("Authentic Ceylon Spices", 38, 19);
