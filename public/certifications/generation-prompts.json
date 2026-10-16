@@ -1,0 +1,17 @@
+{
+  "tool": "Built-in image_gen",
+  "prompts": [
+    {
+      "asset": "iso-22000.png",
+      "prompt": "Use case: logo-brand. Asset type: transparent PNG certification badge for Spicylon spice website. Generate one polished circular certification-style seal centered in a square canvas, full circle visible with 6 percent outer transparent padding. Palette: navy blue and white with subtle silver edging. Classic professional seal with double circular border, restrained metallic rim, clean flat print-like interiors, crisply legible typography. Center large \"ISO\", below \"22000:2018\", top ring \"FOOD SAFETY MANAGEMENT\", bottom ring \"CERTIFIED\". Small laurel branches and tiny stars. Render all text exactly. Reference direction is traditional round ISO/GMP/HACCP badges found on food company promotional brochures. Custom informational graphic; no certification body name, no accreditation logo, no certificate number, no invented authority. No additional text, no background, no mockup, no cast shadow outside seal. True transparent alpha background."
+    },
+    {
+      "asset": "gmp.png",
+      "prompt": "Use case: logo-brand. Asset type: transparent PNG certification badge for Spicylon spice website. Generate one polished circular certification-style seal centered in a square canvas, full circle visible with 6 percent outer transparent padding. Palette: forest green and white with subtle silver edging. Classic professional seal with double circular border, restrained metallic rim, clean flat print-like interiors, crisply legible typography. Center very large \"GMP\", top ring \"GOOD MANUFACTURING PRACTICE\", bottom ring \"CERTIFIED\". Small leaf motif above GMP, laurel branches and tiny stars. Render all text exactly. Reference direction is traditional round ISO/GMP/HACCP badges found on food company promotional brochures. Custom informational graphic; no certification body name, no accreditation logo, no certificate number, no invented authority. No additional text, no background, no mockup, no cast shadow outside seal. True transparent alpha background."
+    },
+    {
+      "asset": "haccp.png",
+      "prompt": "Use case: logo-brand. Asset type: transparent PNG certification badge for Spicylon spice website. Generate one polished circular certification-style seal centered in a square canvas, full circle visible with 6 percent outer transparent padding. Palette: warm metallic gold, black and ivory. Classic professional seal with double circular border, restrained metallic rim, clean flat print-like interiors, crisply legible typography. Center very large \"HACCP\", top ring \"FOOD SAFETY\", bottom ring \"CERTIFIED\". Small shield check above HACCP, laurel branches and tiny stars. Render all text exactly. Reference direction is traditional round ISO/GMP/HACCP badges found on food company promotional brochures. Custom informational graphic; no certification body name, no accreditation logo, no certificate number, no invented authority. No additional text, no background, no mockup, no cast shadow outside seal. True transparent alpha background."
+    }
+  ]
+}

@@ -587,3 +587,28 @@ main .bg-stone-50 { background-color:var(--paper); }
  .refined-product.product-tile .product-tile-add { font-size:10px; padding:10px; min-height:44px; }
  .catalog-no-matches { padding:40px 20px; }
 }
+
+/* Food safety credentials on the company story and footer. */
+.certifications-section { max-width:1280px; margin:0 auto; padding:56px 32px; }
+.certifications-intro { max-width:680px; margin:0 auto 30px; text-align:center; }
+.certifications-intro h2 { font-size:clamp(25px,3vw,38px); line-height:1.2; letter-spacing:-.03em; margin:12px 0; color:#28251f; }
+.certifications-intro p { color:#6b655c; font-size:14px; line-height:1.8; }
+.certifications-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; }
+.certification-card { display:flex; flex-direction:column; align-items:center; justify-content:flex-start; gap:0; padding:28px 20px; text-align:center; border:1px solid #e6e1d7; border-radius:16px; background:#fffdf8; }
+.certification-card .certification-artwork { display:block; flex-shrink:0; width:180px; height:180px; object-fit:contain; margin:0 0 20px; }
+.certification-card h3 { font-size:16px; font-weight:700; color:#28251f; margin-bottom:6px; }
+.certification-card p { color:#6b655c; font-size:12px; line-height:1.7; max-width:230px; margin:0 auto; }
+.certifications-compact { max-width:1136px; margin:24px auto 0; padding:24px 0; border-top:1px solid #ffffff20; display:flex; align-items:center; justify-content:space-between; gap:20px; }
+.pro-footer .certifications-compact h3 { color:inherit; font-size:12px; margin:0; }
+.certifications-footer-link { display:flex; align-items:center; flex-wrap:wrap; gap:12px; width:fit-content; }
+.certifications-footer-link img { width:72px; height:72px; object-fit:contain; transition:transform .2s; }
+.certifications-footer-link:hover img { transform:translateY(-3px); }
+@media(max-width:640px) {
+ .certifications-section { padding:40px 20px; }
+ .certifications-grid { grid-template-columns:1fr; gap:12px; }
+ .certification-card { padding:24px 20px; text-align:center; }
+ .certification-card .certification-artwork { width:120px; height:120px; margin:0 0 16px; }
+ .certification-card p { max-width:260px; }
+ .certifications-compact { flex-direction:column; align-items:center; gap:16px; text-align:center; }
+ .certifications-footer-link { justify-content:center; }
+}

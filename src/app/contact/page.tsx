@@ -133,6 +133,16 @@ export default function ContactPage() {
             </div>
           ))}
 
+          <div className="bg-white border border-stone-100 rounded-2xl p-5 shadow-sm">
+            <p className="text-xs font-bold text-stone-400 uppercase tracking-wider mb-2">Sri Lanka · Phone & WhatsApp</p>
+            <a href="tel:+94757820611" className="block text-stone-800 font-semibold">+94 75 782 0611</a>
+            <a href="https://wa.me/94757820611" target="_blank" rel="noopener noreferrer" className="inline-flex mt-3 text-sm font-bold text-orange-600">Chat on WhatsApp ↗</a>
+          </div>
+          <div className="bg-white border border-stone-100 rounded-2xl p-5 shadow-sm">
+            <p className="text-xs font-bold text-stone-400 uppercase tracking-wider mb-2">Switzerland · WhatsApp</p>
+            <a href="https://wa.me/41789544455" className="text-stone-800 font-semibold">+41 78 954 44 55</a>
+          </div>
+
           {/* FAQ nudge */}
           <div className="bg-orange-50 border border-orange-100 rounded-2xl p-5 mt-6">
             <p className="text-sm font-bold text-stone-700 mb-1">

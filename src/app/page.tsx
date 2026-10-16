@@ -58,6 +58,7 @@ export default async function Home() {
         "@type": "Organization",
         "@id": "https://spicylon.com/#organization",
         name: "Spicylon",
+        telephone: "+94757820611",
         url: "https://spicylon.com",
         logo: {
           "@type": "ImageObject",

@@ -1,3 +1,4 @@
+import Certifications from "@/components/Certifications";
 import PageHero from "@/components/PageHero";
 import Image from "@/components/ProgressiveImage";
 import { getTranslations } from "next-intl/server";
@@ -70,6 +71,8 @@ export default async function AboutPage() {
           </div>
         </div>
       </section>
+
+      <div id="certifications" className="scroll-mt-28"><Certifications /></div>
 
       {/* Partnership Section */}
       <section className="bg-stone-950 text-white py-16 sm:py-28 border-y border-stone-800 relative overflow-hidden">
