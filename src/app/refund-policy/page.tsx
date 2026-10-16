@@ -72,7 +72,7 @@ export default function RefundPolicyPage() {
           <p className="text-orange-600 font-bold tracking-widest text-xs uppercase mb-2">
             Spicylon Customer Care
           </p>
-          <h1 className="text-3xl font-black text-stone-900 mb-4 tracking-tight">
+          <h1 className="text-3xl font-bold text-stone-900 mb-4 tracking-tight">
             Refund Policy
           </h1>
           <p className="text-stone-500 text-sm max-w-xl leading-relaxed">
@@ -87,7 +87,7 @@ export default function RefundPolicyPage() {
               className="border border-stone-200 rounded-lg overflow-hidden"
             >
               <div className="px-6 py-4 border-b border-stone-50 bg-stone-50/50">
-                <h2 className="text-base font-black text-stone-900">
+                <h2 className="text-base font-bold text-stone-900">
                   {section.title}
                 </h2>
               </div>

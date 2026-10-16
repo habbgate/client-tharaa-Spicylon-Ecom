@@ -454,7 +454,7 @@ export default function AdminDashboard() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 sm:py-16">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8 sm:mb-12">
-        <h1 className="text-3xl sm:text-5xl font-black tracking-tighter italic">
+        <h1 className="text-3xl sm:text-5xl font-bold tracking-tight">
           Admin <span className="text-orange-600">Dashboard</span>
         </h1>
         <div className="flex flex-wrap gap-2 sm:gap-4 overflow-x-auto pb-2 w-full md:w-auto">
@@ -476,7 +476,7 @@ export default function AdminDashboard() {
           >
             Orders
             {orders.filter((o: any) => !o.isRead).length > 0 && (
-              <span className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 text-white rounded-full flex items-center justify-center text-[10px] font-black">
+              <span className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 text-white rounded-full flex items-center justify-center text-[10px] font-bold">
                 {orders.filter((o: any) => !o.isRead).length}
               </span>
             )}
@@ -499,7 +499,7 @@ export default function AdminDashboard() {
           >
             Messages
             {messages.filter((m) => !m.isRead).length > 0 && (
-              <span className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 text-white rounded-full flex items-center justify-center text-[10px] font-black">
+              <span className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 text-white rounded-full flex items-center justify-center text-[10px] font-bold">
                 {messages.filter((m) => !m.isRead).length}
               </span>
             )}
@@ -512,16 +512,16 @@ export default function AdminDashboard() {
           <table className="w-full text-left min-w-[600px]">
             <thead className="bg-stone-50 border-b border-stone-200">
               <tr>
-                <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest">
+                <th className="px-8 py-5 font-bold text-stone-400 uppercase text-xs tracking-widest">
                   User ID
                 </th>
-                <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest">
+                <th className="px-8 py-5 font-bold text-stone-400 uppercase text-xs tracking-widest">
                   Name/Email
                 </th>
-                <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest">
+                <th className="px-8 py-5 font-bold text-stone-400 uppercase text-xs tracking-widest">
                   Role
                 </th>
-                <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest text-right">
+                <th className="px-8 py-5 font-bold text-stone-400 uppercase text-xs tracking-widest text-right">
                   Actions
                 </th>
               </tr>
@@ -629,16 +629,16 @@ export default function AdminDashboard() {
             <table className="w-full text-left min-w-[700px]">
             <thead className="bg-stone-50 border-b border-stone-200">
               <tr>
-                <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest">
+                <th className="px-8 py-5 font-bold text-stone-400 uppercase text-xs tracking-widest">
                   Product
                 </th>
-                <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest">
+                <th className="px-8 py-5 font-bold text-stone-400 uppercase text-xs tracking-widest">
                   Prices
                 </th>
-                <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest">
+                <th className="px-8 py-5 font-bold text-stone-400 uppercase text-xs tracking-widest">
                   Stock
                 </th>
-                <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest text-right">
+                <th className="px-8 py-5 font-bold text-stone-400 uppercase text-xs tracking-widest text-right">
                   Actions
                 </th>
               </tr>
@@ -669,31 +669,31 @@ export default function AdminDashboard() {
                     </td>
                     <td className="px-8 py-6 text-sm text-stone-600 space-y-0.5">
                       <div>
-                        <span className="font-black text-stone-400 text-xs">
+                        <span className="font-bold text-stone-400 text-xs">
                           USD
                         </span>{" "}
                         {product.price?.USD}
                       </div>
                       <div>
-                        <span className="font-black text-stone-400 text-xs">
+                        <span className="font-bold text-stone-400 text-xs">
                           EUR
                         </span>{" "}
                         {product.price?.EUR}
                       </div>
                       <div>
-                        <span className="font-black text-stone-400 text-xs">
+                        <span className="font-bold text-stone-400 text-xs">
                           LKR
                         </span>{" "}
                         {product.price?.LKR}
                       </div>
                       <div>
-                        <span className="font-black text-stone-400 text-xs">
+                        <span className="font-bold text-stone-400 text-xs">
                           CHF
                         </span>{" "}
                         {product.price?.CHF}
                       </div>
                       <div>
-                        <span className="font-black text-stone-400 text-xs">
+                        <span className="font-bold text-stone-400 text-xs">
                           AED
                         </span>{" "}
                         {product.price?.AED}
@@ -780,19 +780,19 @@ export default function AdminDashboard() {
             <table className="w-full text-left min-w-[800px]">
             <thead className="bg-stone-50 border-b border-stone-200">
               <tr>
-                <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest">
+                <th className="px-8 py-5 font-bold text-stone-400 uppercase text-xs tracking-widest">
                   Customer
                 </th>
-                <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest">
+                <th className="px-8 py-5 font-bold text-stone-400 uppercase text-xs tracking-widest">
                   Shipping
                 </th>
-                <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest">
+                <th className="px-8 py-5 font-bold text-stone-400 uppercase text-xs tracking-widest">
                   Total
                 </th>
-                <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest">
+                <th className="px-8 py-5 font-bold text-stone-400 uppercase text-xs tracking-widest">
                   Status
                 </th>
-                <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest text-right">
+                <th className="px-8 py-5 font-bold text-stone-400 uppercase text-xs tracking-widest text-right">
                   Actions
                 </th>
               </tr>
@@ -813,7 +813,7 @@ export default function AdminDashboard() {
                         <div className="absolute left-3 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-red-500"></div>
                       )}
                       {order.userId?.name || (
-                        <span className="text-orange-600 font-semibold italic">
+                        <span className="text-orange-600 font-semibold">
                           Non Registered User
                         </span>
                       )}{" "}
@@ -930,7 +930,7 @@ export default function AdminDashboard() {
       {tab === "reviews" && (
         <div className="bg-white rounded-3xl border border-stone-200 overflow-hidden shadow-xl p-8">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-black text-stone-900">
+            <h2 className="text-2xl font-bold text-stone-900">
               Reviews for {reviewsProduct?.name}
             </h2>
             <button
@@ -959,7 +959,7 @@ export default function AdminDashboard() {
                       <span className="font-bold text-stone-800">
                         {review.userName}
                       </span>
-                      <span className="text-orange-500 font-black">
+                      <span className="text-orange-500 font-bold">
                         ★ {review.rating}/5
                       </span>
                     </div>
@@ -981,13 +981,13 @@ export default function AdminDashboard() {
 
       {tab === "settings" && (
         <div className="bg-white rounded-3xl border border-stone-200 overflow-hidden shadow-xl p-8">
-          <h2 className="text-2xl font-black text-stone-900 mb-6">
+          <h2 className="text-2xl font-bold text-stone-900 mb-6">
             Store Settings
           </h2>
           <form onSubmit={saveSettings} className="space-y-10 max-w-2xl">
             {/* Base delivery costs */}
             <div>
-              <h3 className="font-black text-lg text-stone-800 mb-4 pb-2 border-b border-stone-100">
+              <h3 className="font-bold text-lg text-stone-800 mb-4 pb-2 border-b border-stone-100">
                 Base Delivery Cost{" "}
                 <span className="text-stone-400 font-normal text-sm">
                   (1–3 items or when no tier matches)
@@ -1018,7 +1018,7 @@ export default function AdminDashboard() {
 
             {/* Quantity-based delivery tiers */}
             <div>
-              <h3 className="font-black text-lg text-stone-800 mb-1 pb-2 border-b border-stone-100">
+              <h3 className="font-bold text-lg text-stone-800 mb-1 pb-2 border-b border-stone-100">
                 Quantity-Based Delivery Tiers
               </h3>
               <p className="text-stone-400 text-xs mb-5">
@@ -1035,7 +1035,7 @@ export default function AdminDashboard() {
                 ] as const
               ).map(({ key: tier, label }) => (
                 <div key={tier} className="mb-6">
-                  <p className="text-sm font-black text-stone-600 uppercase tracking-wider mb-3">
+                  <p className="text-sm font-bold text-stone-600 uppercase tracking-wider mb-3">
                     {label}
                   </p>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
@@ -1082,7 +1082,7 @@ export default function AdminDashboard() {
         <div className="bg-white rounded-3xl border border-stone-200 overflow-hidden shadow-xl">
           <div className="p-6 border-b border-stone-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h2 className="text-2xl font-black text-stone-900">
+              <h2 className="text-2xl font-bold text-stone-900">
                 Newsletter Subscribers
               </h2>
               <p className="text-stone-500 text-sm mt-1">
@@ -1133,16 +1133,16 @@ export default function AdminDashboard() {
               <table className="w-full text-left">
                 <thead className="bg-stone-50 border-b border-stone-200">
                   <tr>
-                    <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest">
+                    <th className="px-8 py-5 font-bold text-stone-400 uppercase text-xs tracking-widest">
                       #
                     </th>
-                    <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest">
+                    <th className="px-8 py-5 font-bold text-stone-400 uppercase text-xs tracking-widest">
                       Email
                     </th>
-                    <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest">
+                    <th className="px-8 py-5 font-bold text-stone-400 uppercase text-xs tracking-widest">
                       Subscribed At
                     </th>
-                    <th className="px-8 py-5 font-black text-stone-400 uppercase text-xs tracking-widest"></th>
+                    <th className="px-8 py-5 font-bold text-stone-400 uppercase text-xs tracking-widest"></th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-stone-100">
@@ -1193,7 +1193,7 @@ export default function AdminDashboard() {
         <div className="bg-white rounded-3xl border border-stone-200 overflow-hidden shadow-xl">
           <div className="p-6 border-b border-stone-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-stone-50">
             <div>
-              <h2 className="text-2xl font-black text-stone-900">
+              <h2 className="text-2xl font-bold text-stone-900">
                 Contact Messages
               </h2>
               <p className="text-stone-500 text-sm mt-1">
@@ -1251,25 +1251,25 @@ export default function AdminDashboard() {
               <table className="w-full text-left">
                 <thead className="bg-stone-50 border-b border-stone-200">
                   <tr>
-                    <th className="px-6 py-4 font-black text-stone-400 uppercase text-xs tracking-widest">
+                    <th className="px-6 py-4 font-bold text-stone-400 uppercase text-xs tracking-widest">
                       #
                     </th>
-                    <th className="px-6 py-4 font-black text-stone-400 uppercase text-xs tracking-widest">
+                    <th className="px-6 py-4 font-bold text-stone-400 uppercase text-xs tracking-widest">
                       Name
                     </th>
-                    <th className="px-6 py-4 font-black text-stone-400 uppercase text-xs tracking-widest">
+                    <th className="px-6 py-4 font-bold text-stone-400 uppercase text-xs tracking-widest">
                       Email
                     </th>
-                    <th className="px-6 py-4 font-black text-stone-400 uppercase text-xs tracking-widest">
+                    <th className="px-6 py-4 font-bold text-stone-400 uppercase text-xs tracking-widest">
                       Subject
                     </th>
-                    <th className="px-6 py-4 font-black text-stone-400 uppercase text-xs tracking-widest">
+                    <th className="px-6 py-4 font-bold text-stone-400 uppercase text-xs tracking-widest">
                       Date
                     </th>
-                    <th className="px-6 py-4 font-black text-stone-400 uppercase text-xs tracking-widest">
+                    <th className="px-6 py-4 font-bold text-stone-400 uppercase text-xs tracking-widest">
                       Status
                     </th>
-                    <th className="px-6 py-4 font-black text-stone-400 uppercase text-xs tracking-widest">
+                    <th className="px-6 py-4 font-bold text-stone-400 uppercase text-xs tracking-widest">
                       Action
                     </th>
                   </tr>
@@ -1381,7 +1381,7 @@ export default function AdminDashboard() {
         <div className="bg-white rounded-3xl border border-stone-200 overflow-hidden shadow-xl p-8">
           <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 border-b border-stone-100 pb-6 gap-4">
             <div>
-              <h2 className="text-3xl font-black text-stone-900 tracking-tighter italic">
+              <h2 className="text-3xl font-bold text-stone-900 tracking-tight">
                 Order #{viewingOrder._id}
               </h2>
               <p className="text-stone-500 mt-2 font-bold uppercase tracking-widest text-xs">
@@ -1449,7 +1449,7 @@ export default function AdminDashboard() {
             <div className="space-y-6">
               <div className="bg-stone-50 rounded-2xl p-8 border border-stone-200 overflow-hidden relative">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-stone-200 rounded-full -mr-16 -mt-16 blur-2xl opacity-50"></div>
-                <h3 className="text-xl font-black mb-6 uppercase tracking-wider text-stone-800 relative z-10 flex items-center gap-2">
+                <h3 className="text-xl font-bold mb-6 uppercase tracking-wider text-stone-800 relative z-10 flex items-center gap-2">
                   <div className="w-2 h-6 bg-orange-500 rounded-full"></div>
                   Customer Details
                 </h3>
@@ -1460,7 +1460,7 @@ export default function AdminDashboard() {
                     </span>
                     <span className="font-bold text-stone-900 text-lg">
                       {viewingOrder.userId?.name || (
-                        <span className="text-orange-600 italic">
+                        <span className="text-orange-600">
                           Non Registered User
                         </span>
                       )}
@@ -1489,7 +1489,7 @@ export default function AdminDashboard() {
 
               <div className="bg-stone-50 rounded-2xl p-8 border border-stone-200 overflow-hidden relative">
                 <div className="absolute bottom-0 right-0 w-32 h-32 bg-orange-100 rounded-full -mr-16 -mb-16 blur-2xl opacity-50"></div>
-                <h3 className="text-xl font-black mb-6 uppercase tracking-wider text-stone-800 relative z-10 flex items-center gap-2">
+                <h3 className="text-xl font-bold mb-6 uppercase tracking-wider text-stone-800 relative z-10 flex items-center gap-2">
                   <div className="w-2 h-6 bg-stone-900 rounded-full"></div>
                   Shipping Address
                 </h3>
@@ -1509,7 +1509,7 @@ export default function AdminDashboard() {
 
             {/* Order Summary */}
             <div className="bg-white rounded-2xl border border-stone-200 shadow-sm p-8 flex flex-col">
-              <h3 className="text-xl font-black mb-6 uppercase tracking-wider text-stone-800 border-b border-stone-100 pb-6 flex items-center gap-2">
+              <h3 className="text-xl font-bold mb-6 uppercase tracking-wider text-stone-800 border-b border-stone-100 pb-6 flex items-center gap-2">
                 <HiOutlineEye className="w-6 h-6 text-orange-500" />
                 Order Items
               </h3>
@@ -1533,7 +1533,7 @@ export default function AdminDashboard() {
                         </p>
                       </div>
                     </div>
-                    <span className="font-black text-stone-900 text-lg">
+                    <span className="font-bold text-stone-900 text-lg">
                       {viewingOrder.currency}{" "}
                       {(item.price * item.quantity).toFixed(2)}
                     </span>
@@ -1556,7 +1556,7 @@ export default function AdminDashboard() {
                     {viewingOrder.shippingPrice?.toFixed(2)}
                   </span>
                 </div>
-                <div className="flex justify-between text-3xl font-black text-stone-900 mt-6 pt-6 border-t border-stone-200">
+                <div className="flex justify-between text-3xl font-bold text-stone-900 mt-6 pt-6 border-t border-stone-200">
                   <span>Total</span>
                   <span>
                     {viewingOrder.currency}{" "}
@@ -1570,7 +1570,7 @@ export default function AdminDashboard() {
                   Payment Status
                 </span>
                 <span
-                  className={`px-6 py-2 rounded-xl text-sm font-black uppercase tracking-widest shadow-inner ${viewingOrder.isPaid ? "bg-green-500 text-stone-900" : "bg-red-500 text-white"}`}
+                  className={`px-6 py-2 rounded-xl text-sm font-bold uppercase tracking-widest shadow-inner ${viewingOrder.isPaid ? "bg-green-500 text-stone-900" : "bg-red-500 text-white"}`}
                 >
                   {viewingOrder.isPaid ? "PAID" : "PENDING"}
                 </span>
@@ -1584,7 +1584,7 @@ export default function AdminDashboard() {
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
           <div className="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl p-8">
-            <h2 className="text-3xl font-black mb-6">
+            <h2 className="text-3xl font-bold mb-6">
               {editingProduct ? "Edit Product" : "Add New Product"}
             </h2>
 
@@ -1632,8 +1632,8 @@ export default function AdminDashboard() {
                     }
                     className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
                   >
-                    <option value="Spices">🌿 Spices</option>
-                    <option value="Gift Box">🎁 Gift Box</option>
+                    <option value="Spices">Spices</option>
+                    <option value="Gift Box">Gift Box</option>
                   </select>
                 </div>
                 <div>

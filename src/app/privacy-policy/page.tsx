@@ -1,3 +1,4 @@
+import PageHero from "@/components/PageHero";
 import Link from "next/link";
 
 export const metadata = {
@@ -108,31 +109,10 @@ const sections = [
 
 export default function PrivacyPolicyPage() {
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="page-shell min-h-screen bg-stone-50">
       {/* Hero */}
-      <section className="bg-stone-950 text-white py-20 px-4 relative overflow-hidden">
-        <div
-          className="absolute inset-0 opacity-[0.06]"
-          style={{
-            backgroundImage:
-              "radial-gradient(circle at 1px 1px, #f97316 1px, transparent 0)",
-            backgroundSize: "28px 28px",
-          }}
-        />
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[500px] h-40 bg-orange-600/10 rounded-full blur-3xl" />
-        <div className="max-w-3xl mx-auto text-center relative z-10">
-          <span className="inline-block text-orange-400 text-xs font-bold uppercase tracking-[0.25em] border border-orange-500/30 rounded-full px-3 py-1 bg-orange-500/5 mb-5">
-            Legal
-          </span>
-          <h1 className="text-4xl sm:text-6xl font-black tracking-tight mb-5">
-            Privacy <span className="text-orange-400">Policy</span>
-          </h1>
-          <p className="text-stone-400 text-base leading-relaxed max-w-xl mx-auto">
-            Last updated: April 2026. We are committed to protecting your
-            personal data and being transparent about how we use it.
-          </p>
-        </div>
-      </section>
+      <PageHero title={<>Privacy <span className="text-orange-400">Policy</span></>} subtitle={<>Last updated: April 2026. We are committed to protecting your
+            personal data and being transparent about how we use it.</>} eyebrow="YOUR PRIVACY MATTERS" image="/images/ceylon-spices.webp" />
 
       {/* Content */}
       <section className="max-w-3xl mx-auto px-4 py-16">
@@ -173,7 +153,7 @@ export default function PrivacyPolicyPage() {
               className="bg-white border border-stone-100 rounded-2xl shadow-sm overflow-hidden"
             >
               <div className="px-6 py-4 border-b border-stone-50 bg-stone-50/50">
-                <h2 className="text-base font-black text-stone-900">
+                <h2 className="text-base font-bold text-stone-900">
                   {section.title}
                 </h2>
               </div>

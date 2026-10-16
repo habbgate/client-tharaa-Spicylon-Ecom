@@ -1,126 +1,27 @@
 "use client";
 
-import Image from "next/image";
+import Image from "@/components/ProgressiveImage";
 import Link from "next/link";
 import { useStore } from "@/store/useStore";
 import { useTranslations } from "next-intl";
-import { HiStar, HiOutlineShoppingCart, HiOutlineEye } from "react-icons/hi";
+import { HiStar, HiOutlinePlus } from "react-icons/hi";
 import { toast } from "react-hot-toast";
 
-const ProductCard = ({
-  product,
-  currency,
-}: {
-  product: any;
-  currency: string;
-}) => {
-  const addToCart = useStore((state) => state.addToCart);
+export default function ProductCard({ product, currency }: { product: any; currency: string }) {
+  const addToCart = useStore(state => state.addToCart);
   const t = useTranslations("Product");
-  const price = product.price[currency];
-  const rating = product.rating || 0;
-  const numReviews = product.numReviews || 0;
-
-  return (
-    <div className="bg-white rounded-2xl overflow-hidden border border-stone-100 hover:border-orange-200 hover:shadow-xl hover:shadow-orange-100/50 transition-all duration-300 group flex flex-col">
-      {/* Image */}
-      <Link
-        href={`/products/${product._id}`}
-        className="block relative aspect-[4/5] overflow-hidden bg-stone-50 flex-shrink-0"
-      >
-        <Image
-          src={product.images[0]}
-          alt={product.name}
-          fill
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
-          className="object-contain p-5 sm:p-6 group-hover:scale-[1.03] transition-transform duration-500"
-        />
-        {/* Category badge */}
-        <div className="absolute top-3 left-3">
-          <span className="px-2.5 py-1 bg-stone-900/80 backdrop-blur-sm text-orange-300 text-[10px] font-black uppercase tracking-widest rounded-full">
-            {product.category}
-          </span>
-        </div>
-        {/* Stock badge */}
-        {product.stock <= 0 && (
-          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-            <span className="px-4 py-2 bg-stone-900 text-white text-xs font-black uppercase tracking-widest rounded-full">
-              {t("outOfStock")}
-            </span>
-          </div>
-        )}
-        {/* Quick View overlay */}
-        <div className="absolute inset-0 bg-stone-900/0 group-hover:bg-stone-900/20 transition-all duration-300 flex items-center justify-center">
-          <div className="opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
-            <span className="flex items-center gap-1.5 bg-white text-stone-900 font-bold text-xs px-3 py-1.5 rounded-full shadow-lg">
-              <HiOutlineEye className="w-3.5 h-3.5" />
-              Quick View
-            </span>
-          </div>
-        </div>
-      </Link>
-
-      {/* Content */}
-      <div className="p-3.5 flex flex-col flex-grow">
-        {/* Rating */}
-        {numReviews > 0 && (
-          <div className="flex items-center gap-1.5 mb-2">
-            <div className="flex">
-              {[...Array(5)].map((_, i) => (
-                <HiStar
-                  key={i}
-                  className={`w-3.5 h-3.5 ${i < Math.round(rating) ? "text-orange-400" : "text-stone-200"}`}
-                />
-              ))}
-            </div>
-            <span className="text-stone-400 text-xs font-medium">
-              ({numReviews})
-            </span>
-          </div>
-        )}
-
-        <h3 className="text-base font-bold text-stone-900 group-hover:text-orange-600 transition-colors mb-1 line-clamp-1">
-          {product.name}
-        </h3>
-
-        <p className="text-stone-400 text-xs line-clamp-2 mb-4 leading-relaxed flex-grow">
-          {product.description}
-        </p>
-
-        {/* Price & Add to Cart */}
-        <div className="flex flex-wrap items-center justify-between gap-3 mt-auto pt-3 border-t border-stone-100">
-          <div>
-            <span className="text-xl font-black text-stone-900">
-              {currency} {price.toFixed(2)}
-            </span>
-          </div>
-          <button
-            disabled={product.stock <= 0}
-            onClick={() => {
-              addToCart(product, price);
-              toast.success("Product added to cart", {
-                icon: '🛒',
-                style: {
-                  borderRadius: '10px',
-                  background: '#333',
-                  color: '#fff',
-                },
-              });
-            }}
-            className={`flex items-center gap-1.5 px-3 py-1.5 font-bold rounded-xl transition-all text-sm ${
-              product.stock <= 0
-                ? "bg-stone-100 text-stone-400 cursor-not-allowed"
-                : "bg-orange-600 hover:bg-orange-500 text-white shadow-md shadow-orange-200 hover:shadow-orange-300 active:scale-95"
-            }`}
-          >
-            <HiOutlineShoppingCart className="w-4 h-4 flex-shrink-0" />
-            <span className="hidden sm:inline">
-              {product.stock <= 0 ? t("outOfStock") : t("addToCart")}
-            </span>
-          </button>
-        </div>
-      </div>
+  const price = Number(product.price[currency]);
+  const available = product.stock > 0 && Number.isFinite(price);
+  return <article className="refined-product product-tile">
+    <Link href={`/products/${product._id}`} className="product-tile-image">
+      <Image src={product.images[0]} alt={product.name} fill sizes="(max-width: 767px) 50vw, (max-width: 1100px) 40vw, 25vw" className="object-contain" />
+      {!available && <span className="product-tile-unavailable">{t("outOfStock")}</span>}
+    </Link>
+    <div className="product-tile-content">
+      <div className="product-tile-meta"><span>{product.category}</span>{product.numReviews > 0 && <span className="product-tile-rating"><HiStar aria-hidden="true" />{Number(product.rating || 0).toFixed(1)} <small>({product.numReviews})</small></span>}</div>
+      <h3><Link href={`/products/${product._id}`}>{product.name}</Link></h3>
+      <div className="product-tile-price"><span>{currency}</span>{Number.isFinite(price) ? price.toFixed(2) : "—"}</div>
+      <button className="product-tile-add" disabled={!available} aria-label={`${t("addToCart")}: ${product.name}`} onClick={() => { addToCart(product, price); toast.success("Product added to cart"); }}><span>{available ? t("addToCart") : t("outOfStock")}</span>{available && <HiOutlinePlus aria-hidden="true" />}</button>
     </div>
-  );
-};
-
-export default ProductCard;
+  </article>;
+}

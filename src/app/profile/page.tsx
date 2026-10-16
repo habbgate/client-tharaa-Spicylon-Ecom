@@ -14,7 +14,7 @@ import {
   HiDownload,
   HiOutlineLockClosed,
 } from "react-icons/hi";
-import Image from "next/image";
+import Image from "@/components/ProgressiveImage";
 import Link from "next/link";
 import { generateInvoice } from "@/lib/generateInvoice";
 
@@ -174,10 +174,10 @@ export default function ProfilePage() {
                   backgroundSize: "20px 20px",
                 }}
               />
-              <div className="w-16 h-16 mx-auto bg-orange-500 rounded-full flex items-center justify-center text-2xl font-black mb-3 shadow-lg relative z-10">
+              <div className="w-16 h-16 mx-auto bg-orange-500 rounded-full flex items-center justify-center text-2xl font-bold mb-3 shadow-lg relative z-10">
                 {user.name.charAt(0).toUpperCase()}
               </div>
-              <h2 className="text-lg font-black relative z-10">{user.name}</h2>
+              <h2 className="text-lg font-bold relative z-10">{user.name}</h2>
               <p className="text-stone-400 text-xs mt-0.5 relative z-10 truncate">
                 {user.email}
               </p>
@@ -225,14 +225,14 @@ export default function ProfilePage() {
             {/* Account stats */}
             <div className="p-4 pt-0">
               <div className="bg-stone-50 rounded-xl p-4 border border-stone-100 space-y-3">
-                <p className="text-xs font-black text-stone-400 uppercase tracking-widest mb-2">
+                <p className="text-xs font-bold text-stone-400 uppercase tracking-widest mb-2">
                   Account Stats
                 </p>
                 <div className="flex justify-between items-center">
                   <span className="text-xs text-stone-500 font-medium">
                     Total Orders
                   </span>
-                  <span className="text-sm font-black text-stone-900">
+                  <span className="text-sm font-bold text-stone-900">
                     {totalOrders}
                   </span>
                 </div>
@@ -240,7 +240,7 @@ export default function ProfilePage() {
                   <span className="text-xs text-stone-500 font-medium">
                     Delivered
                   </span>
-                  <span className="text-sm font-black text-green-600">
+                  <span className="text-sm font-bold text-green-600">
                     {deliveredOrders}
                   </span>
                 </div>
@@ -248,7 +248,7 @@ export default function ProfilePage() {
                   <span className="text-xs text-stone-500 font-medium">
                     Total Spent
                   </span>
-                  <span className="text-sm font-black text-orange-600">
+                  <span className="text-sm font-bold text-orange-600">
                     {orders[0]?.currency || "USD"} {totalSpent.toFixed(2)}
                   </span>
                 </div>
@@ -263,7 +263,7 @@ export default function ProfilePage() {
           {activeTab === "profile" && (
             <div className="bg-white rounded-2xl shadow-sm border border-stone-100 p-6 sm:p-10">
               <div className="mb-8">
-                <h2 className="text-2xl font-black tracking-tight">
+                <h2 className="text-2xl font-bold tracking-tight">
                   {t("personalInfo")}
                 </h2>
                 <p className="text-stone-400 text-sm mt-1">
@@ -296,7 +296,7 @@ export default function ProfilePage() {
                 </div>
 
                 <div className="pt-4 border-t border-stone-100">
-                  <h3 className="text-sm font-black text-stone-700 uppercase tracking-wider mb-4">
+                  <h3 className="text-sm font-bold text-stone-700 uppercase tracking-wider mb-4">
                     {t("shippingAddress")}
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -379,7 +379,7 @@ export default function ProfilePage() {
             <div className="bg-white rounded-2xl shadow-sm border border-stone-100 p-6 sm:p-10">
               <div className="mb-8 flex items-center justify-between">
                 <div>
-                  <h2 className="text-2xl font-black tracking-tight">
+                  <h2 className="text-2xl font-bold tracking-tight">
                     {t("myOrders")}
                   </h2>
                   <p className="text-stone-400 text-sm mt-1">
@@ -387,7 +387,7 @@ export default function ProfilePage() {
                   </p>
                 </div>
                 {totalOrders > 0 && (
-                  <span className="bg-orange-100 text-orange-700 font-black text-sm px-4 py-1.5 rounded-full">
+                  <span className="bg-orange-100 text-orange-700 font-bold text-sm px-4 py-1.5 rounded-full">
                     {totalOrders} orders
                   </span>
                 )}
@@ -496,7 +496,7 @@ export default function ProfilePage() {
                               >
                                 <div className="flex flex-col items-center flex-shrink-0">
                                   <div
-                                    className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-black border-2 ${
+                                    className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold border-2 ${
                                       step.done
                                         ? "bg-orange-500 border-orange-500 text-white"
                                         : "border-stone-200 text-stone-300"
@@ -600,7 +600,7 @@ export default function ProfilePage() {
                                   {(order.shippingPrice || 0).toFixed(2)}
                                 </span>
                               </div>
-                              <div className="flex justify-between font-black text-stone-900 border-t border-stone-200 pt-2">
+                              <div className="flex justify-between font-bold text-stone-900 border-t border-stone-200 pt-2">
                                 <span>Total</span>
                                 <span>
                                   {order.currency}{" "}
@@ -624,7 +624,7 @@ export default function ProfilePage() {
                             {/* Shipping address */}
                             {order.shippingAddress && (
                               <div className="text-sm text-stone-500 border-t border-stone-100 pt-4">
-                                <p className="text-xs font-black uppercase tracking-wider text-stone-400 mb-1">
+                                <p className="text-xs font-bold uppercase tracking-wider text-stone-400 mb-1">
                                   Shipped to
                                 </p>
                                 <p className="font-semibold text-stone-800">
@@ -661,7 +661,7 @@ export default function ProfilePage() {
                     <HiOutlineLockClosed className="text-xl" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-black text-stone-900">
+                    <h3 className="text-lg font-bold text-stone-900">
                       Change Password
                     </h3>
                     <p className="text-stone-400 text-sm mt-0.5">

@@ -14,7 +14,6 @@ const AddToCartButton = ({ product, price }: { product: any, price: number }) =>
             onClick={() => {
                 addToCart(product, price);
                 toast.success("Product added to cart", {
-                    icon: '🛒',
                     style: {
                       borderRadius: '10px',
                       background: '#333',

@@ -1,4 +1,5 @@
-import Image from "next/image";
+import PageHero from "@/components/PageHero";
+import Image from "@/components/ProgressiveImage";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import CompanyAddress from "@/components/CompanyAddress";
@@ -20,39 +21,16 @@ export default async function AboutPage() {
   const t = await getTranslations("About");
 
   return (
-    <div className="pb-12 sm:pb-20">
+    <div className="page-shell pb-12 sm:pb-20">
       {/* Hero Section */}
-      <section className="relative h-[55vh] min-h-[400px] flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <img
-            src="/headerBanner.webp"
-            alt="Spicylon Origins"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-stone-950/60 via-stone-950/50 to-stone-950/80" />
-        </div>
-
-        <div className="relative z-10 text-center max-w-4xl px-4 mt-8 sm:mt-0">
-          <span className="inline-flex items-center gap-2 text-orange-400 font-bold uppercase tracking-[0.3em] mb-4 text-xs sm:text-sm">
-            <span className="w-6 h-px bg-orange-400/60" />
-            {t("title")}
-            <span className="w-6 h-px bg-orange-400/60" />
-          </span>
-          <h1 className="text-4xl sm:text-6xl md:text-7xl font-black text-white mb-6 drop-shadow-2xl italic tracking-tighter leading-none">
-            {t("historyTitle")}
-          </h1>
-          <p className="text-base sm:text-xl text-stone-200/90 max-w-2xl mx-auto leading-relaxed px-2 sm:px-0">
-            {t("subtitle")}
-          </p>
-        </div>
-      </section>
+      <PageHero title={<>{t("historyTitle")}</>} subtitle={<>{t("subtitle")}</>} eyebrow="ROOTED IN SRI LANKA" image="/images/ceylon-landscape.webp" />
 
       {/* Timeline / Narrative Section */}
       <section className="max-w-7xl mx-auto px-4 py-16 sm:py-28">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-20 items-center">
           <div>
             <span className="section-badge">{t("historyTitle")}</span>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black mt-3 mb-6 text-stone-900 leading-tight">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mt-3 mb-6 text-stone-900 leading-tight">
               {t("title")}
             </h2>
             <p className="text-stone-600 mb-5 text-base sm:text-lg leading-relaxed">
@@ -73,7 +51,7 @@ export default async function AboutPage() {
                   key={stat.label}
                   className="text-center p-4 rounded-2xl bg-orange-50 border border-orange-100"
                 >
-                  <div className="text-2xl font-black text-orange-600">
+                  <div className="text-2xl font-bold text-orange-600">
                     {stat.value}
                   </div>
                   <div className="text-xs text-stone-500 font-bold uppercase tracking-wide mt-1">
@@ -84,8 +62,7 @@ export default async function AboutPage() {
             </div>
           </div>
           <div className="relative h-72 sm:h-[480px] rounded-3xl sm:rounded-[3rem] overflow-hidden shadow-2xl">
-            <img
-              src="/headerBanner.webp"
+            <Image width={1600} height={914} sizes="(max-width: 768px) 100vw, 80vw" src="/images/ceylon-origin.webp"
               alt="Sri Lankan Highlands"
               className="w-full h-full object-cover"
             />
@@ -111,7 +88,7 @@ export default async function AboutPage() {
           <span className="inline-block text-orange-500 font-bold uppercase tracking-[0.2em] mb-4 text-xs sm:text-sm">
             {t("partnerTitle")}
           </span>
-          <h2 className="text-3xl sm:text-5xl font-black mb-8 leading-tight">
+          <h2 className="text-3xl sm:text-5xl font-bold mb-8 leading-tight">
             {t("partnerHeading")}
           </h2>
 
@@ -203,7 +180,7 @@ export default async function AboutPage() {
         <span className="inline-block text-orange-500 font-bold uppercase tracking-[0.2em] mb-4 text-xs sm:text-sm">
           Headquarters
         </span>
-        <h2 className="text-3xl sm:text-4xl font-black text-stone-900 tracking-tight mb-8">
+        <h2 className="text-3xl sm:text-4xl font-bold text-stone-900 tracking-tight mb-8">
           Company Information
         </h2>
         <div className="bg-white border border-stone-100 rounded-3xl p-8 shadow-sm max-w-md mx-auto flex flex-col items-center">
@@ -244,7 +221,7 @@ export default async function AboutPage() {
         </p>
         <Link
           href="/products"
-          className="inline-flex items-center gap-3 px-10 py-4 bg-orange-600 hover:bg-orange-500 text-white font-bold rounded-full transition-all transform hover:scale-105 shadow-xl shadow-orange-200 text-base"
+          className="inline-flex items-center gap-3 px-10 py-4 bg-orange-600 hover:bg-orange-500 text-white font-bold rounded-full transition-all transform hover:opacity-95 shadow-xl shadow-orange-200 text-base"
         >
           {t("exploreBtn")}
           <svg

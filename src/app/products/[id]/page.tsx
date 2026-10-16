@@ -107,10 +107,10 @@ export default async function ProductDetails({
         {/* Info */}
         <div className="lg:w-1/2 flex flex-col">
           <div className="mb-6">
-            <span className="inline-block px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-black uppercase tracking-widest mb-4">
+            <span className="inline-block px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-bold uppercase tracking-widest mb-4">
               {product.category}
             </span>
-            <h1 className="text-4xl sm:text-5xl font-black text-stone-900 mb-4 tracking-tighter leading-tight">
+            <h1 className="text-4xl sm:text-5xl font-bold text-stone-900 mb-4 tracking-tight leading-tight">
               {product.name}
             </h1>
 
@@ -132,7 +132,7 @@ export default async function ProductDetails({
 
             {/* Price */}
             <div className="flex items-baseline gap-3 mb-8">
-              <span className="text-4xl font-black text-stone-900">
+              <span className="text-4xl font-bold text-stone-900">
                 {currency} {price.toFixed(2)}
               </span>
               {product.stock > 0 && (
@@ -143,7 +143,7 @@ export default async function ProductDetails({
             </div>
           </div>
 
-          <blockquote className="text-stone-600 text-lg leading-relaxed mb-10 border-l-4 border-orange-500 pl-5 italic bg-orange-50/50 py-3 pr-4 rounded-r-xl">
+          <blockquote className="text-stone-600 text-lg leading-relaxed mb-10 border-l-4 border-orange-500 pl-5 bg-orange-50/50 py-3 pr-4 rounded-r-xl">
             {product.description}
           </blockquote>
 

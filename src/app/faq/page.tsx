@@ -1,3 +1,4 @@
+import PageHero from "@/components/PageHero";
 import Link from "next/link";
 
 export const metadata = {
@@ -86,37 +87,16 @@ const faqs = [
 
 export default function FAQPage() {
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="page-shell min-h-screen bg-stone-50">
       {/* Hero */}
-      <section className="bg-stone-950 text-white py-20 px-4 relative overflow-hidden">
-        <div
-          className="absolute inset-0 opacity-[0.06]"
-          style={{
-            backgroundImage:
-              "radial-gradient(circle at 1px 1px, #f97316 1px, transparent 0)",
-            backgroundSize: "28px 28px",
-          }}
-        />
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-40 bg-orange-600/10 rounded-full blur-3xl" />
-        <div className="max-w-3xl mx-auto text-center relative z-10">
-          <span className="inline-block text-orange-400 text-xs font-bold uppercase tracking-[0.25em] border border-orange-500/30 rounded-full px-3 py-1 bg-orange-500/5 mb-5">
-            FAQ
-          </span>
-          <h1 className="text-4xl sm:text-6xl font-black tracking-tight mb-5">
-            Frequently Asked <span className="text-orange-400">Questions</span>
-          </h1>
-          <p className="text-stone-400 text-lg leading-relaxed max-w-xl mx-auto">
-            Everything you need to know about our products, orders, and
+      <PageHero title={<>Frequently Asked <span className="text-orange-400">Questions</span></>} subtitle={<>Everything you need to know about our products, orders, and
             delivery. Can't find an answer?{" "}
             <Link
               href="/contact"
               className="text-orange-400 hover:text-orange-300 font-semibold underline underline-offset-2"
             >
               Contact us.
-            </Link>
-          </p>
-        </div>
-      </section>
+            </Link></>} eyebrow="GOOD TO KNOW" image="/images/ceylon-spices.webp" />
 
       {/* FAQ Content */}
       <section className="max-w-4xl mx-auto px-4 py-16 space-y-12">
@@ -124,7 +104,7 @@ export default function FAQPage() {
           <div key={section.category}>
             <div className="flex items-center gap-3 mb-6">
               <div className="w-1 h-6 bg-orange-500 rounded-full" />
-              <h2 className="text-lg font-black text-stone-900 uppercase tracking-wide">
+              <h2 className="text-lg font-bold text-stone-900 uppercase tracking-wide">
                 {section.category}
               </h2>
             </div>
@@ -161,7 +141,7 @@ export default function FAQPage() {
 
         {/* CTA */}
         <div className="bg-stone-900 rounded-2xl p-8 text-center text-white">
-          <h3 className="text-xl font-black mb-2">Still have questions?</h3>
+          <h3 className="text-xl font-bold mb-2">Still have questions?</h3>
           <p className="text-stone-400 text-sm mb-6">
             Our team is happy to help. Reach out and we'll get back to you
             within 24 hours.

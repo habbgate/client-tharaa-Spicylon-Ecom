@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import toast from "react-hot-toast";
 import Link from "next/link";
-import Image from "next/image";
+import Image from "@/components/ProgressiveImage";
 
 type Step = "email" | "reset" | "done";
 
@@ -80,74 +80,11 @@ export default function ForgotPasswordPage() {
     "block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1.5";
 
   return (
-    <div className="min-h-screen flex items-stretch">
+    <div className="auth-shell flex items-stretch">
       {/* Left panel */}
-      <div className="hidden lg:flex lg:w-1/2 relative bg-stone-950 text-white flex-col overflow-hidden self-stretch">
-        <div className="absolute inset-0">
-          <img
-            src="/headerBanner.webp"
-            alt=""
-            className="w-full h-full object-cover scale-[1.04]"
-            style={{ filter: "saturate(1.3) brightness(0.55) sepia(0.15)" }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/60 to-stone-900/30" />
-          <div className="absolute inset-0 bg-gradient-to-r from-stone-950/60 to-transparent" />
-          <div className="absolute bottom-0 left-0 right-0 h-2/3 bg-gradient-to-t from-orange-950/30 to-transparent" />
-        </div>
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-96 h-64 bg-orange-600/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute top-0 right-0 w-px h-full bg-gradient-to-b from-transparent via-orange-500/20 to-transparent" />
-
-        {/* Logo */}
-        <div className="relative z-10 p-10 pt-12">
-          <Link href="/" className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-orange-500 flex items-center justify-center shadow-lg shadow-orange-900/50">
-              <svg
-                className="w-3.5 h-3.5 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2.5"
-                  d="M5 3l14 9-14 9V3z"
-                />
-              </svg>
-            </div>
-            <Image
-              src="/logo.png"
-              alt="Spicylon"
-              width={100}
-              height={34}
-              className="h-8 w-auto object-contain"
-            />
-          </Link>
-        </div>
-
-        {/* Bottom content */}
-        <div className="relative z-10 flex-1 flex flex-col justify-end px-10 pb-14">
-          <div className="mb-5">
-            <span className="inline-flex items-center gap-1.5 text-orange-400 text-xs font-bold uppercase tracking-[0.2em] border border-orange-500/25 rounded-full px-3 py-1.5 bg-orange-500/8 backdrop-blur-sm">
-              <span className="w-1.5 h-1.5 rounded-full bg-orange-400" />
-              Account Security
-            </span>
-          </div>
-          <h2 className="text-5xl xl:text-[3.5rem] font-black leading-[0.95] tracking-tight mb-5">
-            Secure your
-            <br />
-            <span className="text-orange-400">Spice Account.</span>
-          </h2>
-          <p className="text-stone-400 text-sm leading-relaxed max-w-[270px]">
-            We&apos;ll send a one-time code to your email so you can reset your
-            password safely.
-          </p>
-        </div>
-      </div>
-
       {/* Right panel */}
       <div
-        className="w-full lg:w-1/2 flex items-center justify-center relative px-4 py-12 sm:px-8 overflow-hidden self-stretch"
+        className="w-full flex items-center justify-center relative px-4 py-12 sm:px-8 overflow-hidden self-stretch"
         style={{ background: "#fafaf9" }}
       >
         <div className="absolute top-0 right-0 w-72 h-72 bg-orange-100/60 rounded-full blur-3xl pointer-events-none" />
@@ -155,17 +92,7 @@ export default function ForgotPasswordPage() {
 
         <div className="w-full max-w-md relative z-10">
           {/* Mobile logo */}
-          <div className="lg:hidden text-center mb-8">
-            <Link href="/">
-              <Image
-                src="/logo.png"
-                alt="Spicylon"
-                width={130}
-                height={44}
-                className="h-11 w-auto object-contain mx-auto"
-              />
-            </Link>
-          </div>
+          
 
           <div className="bg-white rounded-3xl shadow-lg border border-stone-100/80 overflow-hidden">
             {/* Card header */}
@@ -190,7 +117,7 @@ export default function ForgotPasswordPage() {
                         />
                       </svg>
                     </div>
-                    <h3 className="text-2xl font-black text-stone-900">
+                    <h3 className="text-2xl font-bold text-stone-900">
                       Forgot your password?
                     </h3>
                     <p className="text-stone-400 text-sm mt-1">
@@ -215,7 +142,7 @@ export default function ForgotPasswordPage() {
                         />
                       </svg>
                     </div>
-                    <h3 className="text-2xl font-black text-stone-900">
+                    <h3 className="text-2xl font-bold text-stone-900">
                       Enter your reset code
                     </h3>
                     <p className="text-stone-400 text-sm mt-1">
@@ -241,7 +168,7 @@ export default function ForgotPasswordPage() {
                         />
                       </svg>
                     </div>
-                    <h3 className="text-2xl font-black text-stone-900">
+                    <h3 className="text-2xl font-bold text-stone-900">
                       Password reset!
                     </h3>
                     <p className="text-stone-400 text-sm mt-1">
@@ -286,7 +213,7 @@ export default function ForgotPasswordPage() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full py-3.5 bg-stone-900 hover:bg-stone-800 text-white font-black rounded-xl transition-all text-sm shadow-md disabled:opacity-40 flex items-center justify-center gap-2"
+                    className="w-full py-3.5 bg-stone-900 hover:bg-stone-800 text-white font-bold rounded-xl transition-all text-sm shadow-md disabled:opacity-40 flex items-center justify-center gap-2"
                   >
                     {loading ? (
                       <>
@@ -352,7 +279,7 @@ export default function ForgotPasswordPage() {
                       type="text"
                       required
                       maxLength={6}
-                      className="w-full px-4 py-4 rounded-xl border-2 border-stone-200 focus:border-orange-400 focus:ring-0 transition-all outline-none text-center text-3xl font-black tracking-[0.6em] bg-stone-50 focus:bg-white"
+                      className="w-full px-4 py-4 rounded-xl border-2 border-stone-200 focus:border-orange-400 focus:ring-0 transition-all outline-none text-center text-3xl font-bold tracking-[0.6em] bg-stone-50 focus:bg-white"
                       placeholder="------"
                       value={otp}
                       onChange={(e) =>
@@ -431,7 +358,7 @@ export default function ForgotPasswordPage() {
                   <button
                     type="submit"
                     disabled={loading || otp.length !== 6}
-                    className="w-full py-3.5 bg-stone-900 hover:bg-stone-800 text-white font-black rounded-xl transition-all text-sm shadow-md disabled:opacity-40 flex items-center justify-center gap-2"
+                    className="w-full py-3.5 bg-stone-900 hover:bg-stone-800 text-white font-bold rounded-xl transition-all text-sm shadow-md disabled:opacity-40 flex items-center justify-center gap-2"
                   >
                     {loading ? (
                       <>
@@ -522,7 +449,7 @@ export default function ForgotPasswordPage() {
                   </div>
                   <button
                     onClick={() => router.push("/login")}
-                    className="w-full py-3.5 bg-stone-900 hover:bg-stone-800 text-white font-black rounded-xl transition-all text-sm shadow-md flex items-center justify-center gap-2"
+                    className="w-full py-3.5 bg-stone-900 hover:bg-stone-800 text-white font-bold rounded-xl transition-all text-sm shadow-md flex items-center justify-center gap-2"
                   >
                     Sign In
                     <svg

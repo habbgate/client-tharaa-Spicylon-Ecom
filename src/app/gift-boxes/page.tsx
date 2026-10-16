@@ -1,3 +1,5 @@
+import PageHero from "@/components/PageHero";
+import { HiOutlineGlobeAlt, HiOutlineLocationMarker } from "react-icons/hi";
 import ProductCard from "@/components/ProductCard";
 import { cookies } from "next/headers";
 import { Pagination } from "@/components/Pagination";
@@ -56,54 +58,17 @@ export default async function GiftBoxesPage({
   );
 
   return (
-    <div className="pb-20">
+    <div className="page-shell pb-20">
       {/* Hero Section */}
-      <section className="relative bg-stone-950 text-white py-20 px-4 mb-16 overflow-hidden">
-        {/* Decorative background */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute -top-20 left-1/4 w-96 h-96 bg-orange-600/10 rounded-full blur-3xl" />
-          <div className="absolute -bottom-20 right-1/4 w-64 h-64 bg-amber-500/8 rounded-full blur-3xl" />
-          <div
-            className="absolute inset-0 opacity-5"
-            style={{
-              backgroundImage:
-                "radial-gradient(circle at 1px 1px, #f97316 1px, transparent 0)",
-              backgroundSize: "32px 32px",
-            }}
-          />
-        </div>
-
-        <div className="max-w-7xl mx-auto text-center relative z-10">
-          {/* Icon */}
-          <div className="flex justify-center mb-6">
-            <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-orange-500/20 to-amber-500/20 border border-orange-500/30 flex items-center justify-center text-5xl shadow-2xl shadow-orange-900/30">
-              🎁
-            </div>
-          </div>
-
-          <span className="inline-flex items-center gap-2 text-orange-400 font-bold uppercase tracking-[0.3em] mb-4 text-xs sm:text-sm">
-            <span className="w-6 h-px bg-orange-400/50" />
-            Curated Collections
-            <span className="w-6 h-px bg-orange-400/50" />
-          </span>
-
-          <h1 className="text-5xl md:text-7xl font-black mb-4 italic tracking-tighter leading-none">
-            Spice{" "}
-            <span className="text-orange-500">Gift Boxes</span>
-          </h1>
-
-          <p className="text-stone-400 max-w-xl mx-auto mt-4 text-base leading-relaxed">
-            {totalItems > 0
+      <PageHero title={<>Spice{" "}
+            <span className="text-orange-500">Gift Boxes</span></>} subtitle={<>{totalItems > 0
               ? `${totalItems} curated gift set${totalItems === 1 ? "" : "s"} — beautifully hand-packed with authentic Ceylon spices`
-              : "Beautifully hand-packed collections of authentic Ceylon spices — the perfect gift for any occasion"}
-          </p>
-        </div>
-      </section>
+              : "Beautifully hand-packed collections of authentic Ceylon spices — the perfect gift for any occasion"}</>} eyebrow="THOUGHTFULLY CURATED" image="/images/gift-ritual.webp" />
 
       {/* Gift Boxes Grid */}
       <section className="max-w-7xl mx-auto px-4">
         {paginated.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {paginated.map((product: any, i: number) => (
               <div
                 key={product._id}
@@ -117,10 +82,7 @@ export default async function GiftBoxesPage({
         ) : (
           /* Empty state */
           <div className="text-center py-28 flex flex-col items-center">
-            <div className="w-24 h-24 bg-orange-50 border-2 border-orange-100 rounded-3xl flex items-center justify-center mb-6 text-5xl">
-              🎁
-            </div>
-            <h3 className="text-2xl font-black text-stone-800 mb-2">
+            <h3 className="text-2xl font-bold text-stone-800 mb-2">
               Gift Boxes Coming Soon
             </h3>
             <p className="text-stone-500 mb-8 max-w-sm leading-relaxed">
@@ -159,9 +121,9 @@ export default async function GiftBoxesPage({
                 The Perfect Gift
                 <span className="w-6 h-px bg-orange-400/50" />
               </span>
-              <h2 className="text-3xl sm:text-4xl font-black mb-4 tracking-tight">
+              <h2 className="text-3xl sm:text-4xl font-bold mb-4 tracking-tight">
                 Why Gift{" "}
-                <span className="text-orange-500 italic">Ceylon Spices?</span>
+                <span className="text-orange-500">Ceylon Spices?</span>
               </h2>
               <p className="text-stone-400 max-w-2xl mx-auto mb-12 leading-relaxed">
                 Each gift box is a culinary journey — hand-selected spices from
@@ -171,17 +133,17 @@ export default async function GiftBoxesPage({
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                 {[
                   {
-                    emoji: "🏔️",
+                    icon: HiOutlineLocationMarker,
                     title: "Highland Sourced",
                     desc: "Grown at 1,500–2,500m elevation in Sri Lanka's central highlands",
                   },
                   {
-                    emoji: "🎀",
+                    icon: null,
                     title: "Gift Ready",
                     desc: "Premium packaging designed to impress — ready to give straight from the box",
                   },
                   {
-                    emoji: "✈️",
+                    icon: HiOutlineGlobeAlt,
                     title: "Ships Worldwide",
                     desc: "Delivered to your door or directly to your recipient anywhere in the world",
                   },
@@ -190,7 +152,7 @@ export default async function GiftBoxesPage({
                     key={item.title}
                     className="bg-stone-800/50 border border-stone-700/50 rounded-2xl p-6 text-center hover:border-orange-500/30 transition-colors"
                   >
-                    <div className="text-4xl mb-3">{item.emoji}</div>
+                    {item.icon && <item.icon className="w-8 h-8 mx-auto mb-4 text-orange-400" aria-hidden="true" />}
                     <h3 className="font-bold text-white mb-2">{item.title}</h3>
                     <p className="text-stone-400 text-sm leading-relaxed">
                       {item.desc}

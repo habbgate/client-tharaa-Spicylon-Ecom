@@ -1,4 +1,5 @@
 "use client";
+import PageHero from "@/components/PageHero";
 
 import { useState } from "react";
 import toast from "react-hot-toast";
@@ -37,37 +38,16 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="page-shell min-h-screen bg-stone-50">
       {/* Hero */}
-      <section className="bg-stone-950 text-white py-20 px-4 relative overflow-hidden">
-        <div
-          className="absolute inset-0 opacity-[0.06]"
-          style={{
-            backgroundImage:
-              "radial-gradient(circle at 1px 1px, #f97316 1px, transparent 0)",
-            backgroundSize: "28px 28px",
-          }}
-        />
-        <div className="absolute top-0 right-0 w-96 h-96 bg-orange-600/10 rounded-full blur-3xl" />
-        <div className="max-w-3xl mx-auto text-center relative z-10">
-          <span className="inline-block text-orange-400 text-xs font-bold uppercase tracking-[0.25em] border border-orange-500/30 rounded-full px-3 py-1 bg-orange-500/5 mb-5">
-            Contact Us
-          </span>
-          <h1 className="text-4xl sm:text-6xl font-black tracking-tight mb-5">
-            We'd Love to <span className="text-orange-400">Hear From You</span>
-          </h1>
-          <p className="text-stone-400 text-lg leading-relaxed max-w-xl mx-auto">
-            Have a question about an order, a product, or anything else? Send us
-            a message and we'll respond within 24 hours.
-          </p>
-        </div>
-      </section>
+      <PageHero title={<>We'd Love to <span className="text-orange-400">Hear From You</span></>} subtitle={<>Have a question about an order, a product, or anything else? Send us
+            a message and we'll respond within 24 hours.</>} eyebrow="WE’RE HERE TO HELP" image="/images/kitchen-ritual.webp" />
 
       {/* Content */}
       <section className="max-w-6xl mx-auto px-4 py-16 grid grid-cols-1 lg:grid-cols-3 gap-10">
         {/* Contact Info */}
         <div className="space-y-5">
-          <h2 className="text-xl font-black text-stone-900 mb-6">
+          <h2 className="text-xl font-bold text-stone-900 mb-6">
             Get in Touch
           </h2>
           {[
@@ -187,7 +167,7 @@ export default function ContactPage() {
         {/* Form */}
         <div className="lg:col-span-2">
           <div className="bg-white rounded-2xl border border-stone-100 shadow-sm p-8">
-            <h2 className="text-xl font-black text-stone-900 mb-6">
+            <h2 className="text-xl font-bold text-stone-900 mb-6">
               Send a Message
             </h2>
             <form onSubmit={handleSubmit} className="space-y-5">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
+import Image from "@/components/ProgressiveImage";
 
 export default function ProductGallery({
   images,
@@ -16,7 +16,7 @@ export default function ProductGallery({
 
   return (
     <div className="w-full min-w-0 lg:w-1/2">
-      <div className="relative aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl border border-stone-100 bg-stone-50">
+      <div className="relative aspect-[4/5] rounded-xl overflow-hidden shadow-none border border-stone-100 bg-stone-50">
         <Image
           src={images[selected]}
           alt={name}

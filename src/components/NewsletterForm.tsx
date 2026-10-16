@@ -34,7 +34,7 @@ export default function NewsletterForm({
 
   if (done) {
     return (
-      <div className="flex items-center gap-3 px-5 py-3.5 bg-green-50 border border-green-200 rounded-xl text-green-700 font-bold text-sm max-w-md">
+      <div className="flex items-center gap-3 px-5 py-3.5 bg-green-50 border border-green-200 rounded-md text-green-700 font-bold text-sm max-w-md">
         <svg
           className="w-5 h-5 shrink-0"
           fill="none"
@@ -60,16 +60,17 @@ export default function NewsletterForm({
     >
       <input
         type="email"
+        aria-label="Email address"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder={placeholder}
         required
-        className="px-5 py-3.5 rounded-xl flex-1 focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white shadow-sm border border-orange-100 text-sm"
+        className="px-5 py-3.5 rounded-md flex-1 focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white shadow-sm border border-orange-100 text-sm"
       />
       <button
         type="submit"
         disabled={loading}
-        className="px-7 py-3.5 bg-stone-900 text-white font-bold rounded-xl hover:bg-stone-800 transition-all shadow-lg text-sm whitespace-nowrap disabled:opacity-60"
+        className="px-7 py-3.5 bg-stone-900 text-white font-bold rounded-md hover:bg-stone-800 transition-all shadow-none text-sm whitespace-nowrap disabled:opacity-60"
       >
         {loading ? "Joining…" : buttonLabel}
       </button>

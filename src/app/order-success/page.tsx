@@ -48,7 +48,7 @@ export default function OrderSuccessPage() {
           Order Confirmed
         </span>
 
-        <h1 className="text-4xl sm:text-5xl font-black tracking-tight mb-4 text-stone-900">
+        <h1 className="text-4xl sm:text-5xl font-bold tracking-tight mb-4 text-stone-900">
           {t("title")}
         </h1>
         <p className="text-stone-500 text-base leading-relaxed mb-8 max-w-sm mx-auto">
@@ -66,7 +66,7 @@ export default function OrderSuccessPage() {
             </div>
             <div className="flex justify-between items-center text-sm">
               <span className="text-stone-400 font-medium">Total Paid</span>
-              <span className="font-black text-stone-900 text-base">
+              <span className="font-bold text-stone-900 text-base">
                 {order.currency} {order.totalPrice?.toFixed(2)}
               </span>
             </div>

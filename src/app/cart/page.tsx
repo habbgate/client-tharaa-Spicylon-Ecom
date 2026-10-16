@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useStore } from "@/store/useStore";
-import Image from "next/image";
+import Image from "@/components/ProgressiveImage";
 import Link from "next/link";
 import {
   HiOutlineTrash,
@@ -145,7 +145,7 @@ export default function CartPage() {
         <div className="w-28 h-28 bg-stone-100 rounded-full flex items-center justify-center mb-8">
           <HiOutlineShoppingBag className="w-14 h-14 text-stone-300" />
         </div>
-        <h2 className="text-4xl font-black mb-3 tracking-tighter">
+        <h2 className="text-4xl font-bold mb-3 tracking-tight">
           {t("emptyHeading")}
         </h2>
         <p className="text-stone-400 mb-8 max-w-sm">{t("emptySub")}</p>
@@ -163,7 +163,7 @@ export default function CartPage() {
     <div className="max-w-7xl mx-auto px-4 py-12 sm:py-16">
       {/* Header */}
       <div className="mb-10">
-        <h1 className="text-4xl sm:text-5xl font-black tracking-tighter italic">
+        <h1 className="text-4xl sm:text-5xl font-bold tracking-tight">
           {t("title")} <span className="text-orange-600">{t("titleSpan")}</span>
         </h1>
         <p className="text-stone-400 mt-2">
@@ -219,7 +219,7 @@ export default function CartPage() {
                     <HiOutlinePlus className="h-3.5 w-3.5" />
                   </button>
                 </div>
-                <span className="font-black text-stone-900 w-20 text-right text-sm">
+                <span className="font-bold text-stone-900 w-20 text-right text-sm">
                   {currency} {(currentItemPrice * item.quantity).toFixed(2)}
                 </span>
                 <button
@@ -235,8 +235,8 @@ export default function CartPage() {
 
           {/* Delivery Form */}
           <div className="bg-white rounded-2xl border border-stone-100 p-6 mt-6">
-            <h2 className="text-xl font-black mb-5 flex items-center gap-2">
-              <span className="w-7 h-7 rounded-full bg-orange-600 text-white text-xs font-black flex items-center justify-center">
+            <h2 className="text-xl font-bold mb-5 flex items-center gap-2">
+              <span className="w-7 h-7 rounded-full bg-orange-600 text-white text-xs font-bold flex items-center justify-center">
                 1
               </span>
               Delivery Details
@@ -354,8 +354,8 @@ export default function CartPage() {
           <div className="bg-stone-950 rounded-3xl p-8 text-white sticky top-24 shadow-2xl overflow-hidden relative">
             <div className="absolute top-0 right-0 w-48 h-48 bg-orange-600/10 rounded-full -mr-24 -mt-24 blur-3xl pointer-events-none" />
 
-            <h2 className="text-2xl font-black mb-2 flex items-center gap-2">
-              <span className="w-7 h-7 rounded-full bg-orange-600 text-white text-xs font-black flex items-center justify-center">
+            <h2 className="text-2xl font-bold mb-2 flex items-center gap-2">
+              <span className="w-7 h-7 rounded-full bg-orange-600 text-white text-xs font-bold flex items-center justify-center">
                 2
               </span>
               {t("summary")}
@@ -396,7 +396,7 @@ export default function CartPage() {
                   {currency} {deliveryAmount.toFixed(2)}
                 </span>
               </div>
-              <div className="flex justify-between text-lg font-black pt-3 border-t border-stone-800 text-white">
+              <div className="flex justify-between text-lg font-bold pt-3 border-t border-stone-800 text-white">
                 <span>{t("total")}</span>
                 <span className="text-orange-400">
                   {currency} {(total + deliveryAmount).toFixed(2)}
@@ -406,7 +406,7 @@ export default function CartPage() {
 
             <button
               onClick={handleCheckout}
-              className="w-full py-4 bg-orange-600 hover:bg-orange-500 text-white font-black rounded-2xl transition-all shadow-xl flex items-center justify-center gap-3 active:scale-95 text-base"
+              className="w-full py-4 bg-orange-600 hover:bg-orange-500 text-white font-bold rounded-2xl transition-all shadow-xl flex items-center justify-center gap-3 active:scale-95 text-base"
             >
               {t("checkoutBtn")}
               <HiOutlineArrowRight className="h-5 w-5" />
