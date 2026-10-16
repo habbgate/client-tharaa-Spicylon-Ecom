@@ -71,7 +71,7 @@ export default async function Home() {
         },
         sameAs: [
           "https://www.facebook.com/spicylon",
-          "https://www.instagram.com/spicylon",
+          "https://www.instagram.com/spicyloncom",
         ],
       },
       {
