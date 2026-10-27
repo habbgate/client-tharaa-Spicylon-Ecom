@@ -68,6 +68,9 @@ export default async function Home() {
           "Authentic single-origin Ceylon spices sourced directly from highland farms in Sri Lanka.",
         address: {
           "@type": "PostalAddress",
+          streetAddress: "86, Nallur Cross Road",
+          addressLocality: "Nallur, Jaffna",
+          postalCode: "40000",
           addressCountry: "LK",
         },
         sameAs: [
